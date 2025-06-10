@@ -1,0 +1,5 @@
+# Ignore the OSMD_do_not_touch folder
+OSMD_do_not_touch/
+
+# macOS system files
+.DS_Store
