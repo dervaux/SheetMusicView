@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OpenSheetMusicDisplay</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: white;
+            overflow: hidden;
+        }
+        
+        #osmdContainer {
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        #loadingMessage {
+            color: #666;
+            font-size: 16px;
+            text-align: center;
+        }
+        
+        .osmd-content {
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+        }
+        
+        /* Ensure OSMD content is properly sized */
+        .osmd-content svg {
+            max-width: 100%;
+            height: auto;
+        }
+    </style>
+</head>
+<body>
+    <div id="osmdContainer">
+        <div id="loadingMessage">Initializing OpenSheetMusicDisplay...</div>
+    </div>
+
+    <!-- Debug info -->
+    <div id="debugInfo" style="position: fixed; top: 10px; right: 10px; background: rgba(0,0,0,0.8); color: white; padding: 10px; font-size: 12px; border-radius: 5px; max-width: 300px;">
+        <div>Status: <span id="status">Loading...</span></div>
+        <div>OSMD: <span id="osmdStatus">Not loaded</span></div>
+        <div>Messages: <span id="messageCount">0</span></div>
+    </div>
+
+    <!-- Load OSMD from CDN as fallback, or use local build if available -->
+    <script>
+        // Update debug info
+        function updateDebug(status, osmdStatus) {
+            document.getElementById('status').textContent = status;
+            if (osmdStatus) document.getElementById('osmdStatus').textContent = osmdStatus;
+        }
+
+        // Load OSMD from CDN (more reliable for app bundle)
+        function loadOSMD() {
+            console.log('Loading OSMD from CDN...');
+            updateDebug('Loading OSMD from CDN...', 'Loading...');
+
+            const cdnScript = document.createElement('script');
+            cdnScript.src = 'https://cdn.jsdelivr.net/npm/opensheetmusicdisplay@1.9.0/build/opensheetmusicdisplay.min.js';
+            cdnScript.onload = function() {
+                console.log('Loaded OSMD from CDN successfully');
+                updateDebug('OSMD script loaded', 'Script loaded');
+                waitForOSMD();
+            };
+            cdnScript.onerror = function() {
+                console.error('Failed to load OSMD from CDN');
+                updateDebug('Failed to load OSMD', 'Load failed');
+                document.getElementById('osmdContainer').innerHTML =
+                    '<div id="loadingMessage" style="color: red;">Failed to load OpenSheetMusicDisplay library. Please check your internet connection.</div>';
+            };
+            document.head.appendChild(cdnScript);
+        }
+
+        // Load OSMD when DOM is ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', loadOSMD);
+        } else {
+            loadOSMD();
+        }
+    </script>
+    
+    <script>
+        // Global OSMD instance
+        let osmd = null;
+        let isInitialized = false;
+        
+        // Initialize OSMD when the page loads and script is available
+        function waitForOSMD() {
+            console.log('Waiting for OSMD...', typeof opensheetmusicdisplay);
+            updateDebug('Waiting for OSMD...', typeof opensheetmusicdisplay);
+
+            if (typeof opensheetmusicdisplay !== 'undefined') {
+                console.log('OSMD is available, initializing...');
+                updateDebug('OSMD available, initializing...', 'Available');
+                initializeOSMD();
+            } else {
+                // Wait a bit and try again
+                setTimeout(waitForOSMD, 100);
+            }
+        }
+
+        // Test Swift bridge immediately
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM loaded, testing Swift bridge...');
+            updateDebug('DOM loaded', 'Testing bridge...');
+
+            // Test if Swift bridge is available
+            if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.osmdBridge) {
+                console.log('Swift bridge is available');
+                updateDebug('Swift bridge available', 'Bridge OK');
+
+                // Send test message
+                window.webkit.messageHandlers.osmdBridge.postMessage({
+                    type: 'test',
+                    message: 'WebView is working'
+                });
+
+                // Start loading OSMD
+                loadOSMD();
+            } else {
+                console.error('Swift bridge not available');
+                updateDebug('Swift bridge NOT available', 'Bridge FAILED');
+            }
+        });
+        
+        function initializeOSMD() {
+            try {
+                console.log('Starting OSMD initialization...');
+
+                // Clear loading message
+                const container = document.getElementById('osmdContainer');
+                container.innerHTML = '';
+
+                console.log('Creating OSMD instance...');
+
+                // Create OSMD instance
+                osmd = new opensheetmusicdisplay.OpenSheetMusicDisplay(container, {
+                    autoResize: true,
+                    backend: 'svg',
+                    drawTitle: true,
+                    drawSubtitle: true,
+                    drawComposer: true,
+                    drawLyricist: true,
+                    drawCredits: true,
+                    drawPartNames: true,
+                    drawPartAbbreviations: true,
+                    drawMeasureNumbers: true,
+                    measureNumberInterval: 5,
+                    drawTimeSignatures: true,
+                    drawKeySignatures: true,
+                    coloringMode: 0, // No coloring
+                    defaultColorNotehead: '#000000',
+                    defaultColorRest: '#000000',
+                    defaultColorStem: '#000000',
+                    followCursor: false,
+                    cursorsOptions: []
+                });
+                
+                isInitialized = true;
+                
+                // Notify Swift that OSMD is ready
+                if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.osmdBridge) {
+                    window.webkit.messageHandlers.osmdBridge.postMessage({
+                        type: 'ready'
+                    });
+                }
+                
+                console.log('OSMD initialized successfully');
+                
+            } catch (error) {
+                console.error('Failed to initialize OSMD:', error);
+                
+                // Show error message
+                const container = document.getElementById('osmdContainer');
+                container.innerHTML = '<div id="loadingMessage" style="color: red;">Failed to initialize OpenSheetMusicDisplay</div>';
+                
+                // Notify Swift of the error
+                if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.osmdBridge) {
+                    window.webkit.messageHandlers.osmdBridge.postMessage({
+                        type: 'error',
+                        error: error.message || error.toString()
+                    });
+                }
+            }
+        }
+        
+        // Load MusicXML content
+        function osmdLoadXML(xmlString) {
+            if (!isInitialized || !osmd) {
+                throw new Error('OSMD is not initialized');
+            }
+            
+            try {
+                osmd.load(xmlString);
+                console.log('MusicXML loaded successfully');
+                return true;
+            } catch (error) {
+                console.error('Failed to load MusicXML:', error);
+                throw error;
+            }
+        }
+        
+        // Render the loaded music
+        function osmdRender() {
+            if (!isInitialized || !osmd) {
+                throw new Error('OSMD is not initialized');
+            }
+            
+            try {
+                osmd.render();
+                console.log('Music rendered successfully');
+                return true;
+            } catch (error) {
+                console.error('Failed to render music:', error);
+                throw error;
+            }
+        }
+        
+        // Set absolute transposition value
+        function osmdSetTranspose(steps) {
+            if (!isInitialized || !osmd) {
+                throw new Error('OSMD is not initialized');
+            }
+
+            try {
+                // Get the current sheet
+                const sheet = osmd.sheet;
+                if (!sheet) {
+                    throw new Error('No music sheet loaded');
+                }
+
+                // Create TransposeCalculator if not exists
+                if (!osmd.TransposeCalculator) {
+                    osmd.TransposeCalculator = new opensheetmusicdisplay.TransposeCalculator();
+                }
+
+                // Set the transpose value on the sheet
+                console.log(`Setting transpose to ${steps}, current value: ${osmd.Sheet.Transpose}`);
+                osmd.Sheet.Transpose = steps;
+                console.log(`Transpose set to: ${osmd.Sheet.Transpose}`);
+
+                // Update the graphic representation
+                osmd.updateGraphic();
+
+                // Re-render after transposition
+                osmd.render();
+
+                console.log(`Music transposed to ${steps} semitones`);
+                updateDebug(`Transposed to ${steps}`, `${steps} semitones`);
+                return true;
+            } catch (error) {
+                console.error('Failed to transpose music:', error);
+                throw error;
+            }
+        }
+
+        // Legacy function for compatibility
+        function osmdTranspose(steps) {
+            return osmdSetTranspose(steps);
+        }
+        
+        // Clear the display
+        function osmdClear() {
+            if (!isInitialized || !osmd) {
+                throw new Error('OSMD is not initialized');
+            }
+            
+            try {
+                osmd.clear();
+                console.log('Display cleared');
+                return true;
+            } catch (error) {
+                console.error('Failed to clear display:', error);
+                throw error;
+            }
+        }
+        
+        // Handle window resize
+        window.addEventListener('resize', function() {
+            if (isInitialized && osmd) {
+                try {
+                    osmd.render();
+                } catch (error) {
+                    console.error('Failed to re-render on resize:', error);
+                }
+            }
+        });
+        
+        // Error handling for uncaught JavaScript errors
+        window.addEventListener('error', function(event) {
+            console.error('JavaScript error:', event.error);
+            
+            if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.osmdBridge) {
+                window.webkit.messageHandlers.osmdBridge.postMessage({
+                    type: 'error',
+                    error: event.error ? event.error.message : 'Unknown JavaScript error'
+                });
+            }
+        });
+        
+        // Handle unhandled promise rejections
+        window.addEventListener('unhandledrejection', function(event) {
+            console.error('Unhandled promise rejection:', event.reason);
+            
+            if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.osmdBridge) {
+                window.webkit.messageHandlers.osmdBridge.postMessage({
+                    type: 'error',
+                    error: event.reason ? event.reason.message || event.reason.toString() : 'Unknown promise rejection'
+                });
+            }
+        });
+    </script>
+</body>
+</html>
