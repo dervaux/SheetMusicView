@@ -25,6 +25,8 @@ public struct OSMDView: View {
     // MARK: - Private State
     @State private var lastXML: String = ""
     @State private var lastTransposeSteps: Int = 0
+    @State private var containerSize: CGSize = .zero
+    @State private var lastContainerSize: CGSize = .zero
     
     // MARK: - Initialization
     
@@ -58,19 +60,25 @@ public struct OSMDView: View {
     
     // MARK: - Body
     public var body: some View {
-        OSMDWebViewRepresentable(coordinator: coordinator)
-            .onAppear {
-                setupCoordinator()
-            }
-            .onChange(of: xml) { newXML in
-                handleXMLChange(newXML)
-            }
-            .onChange(of: transposeSteps) { newSteps in
-                handleTransposeChange(newSteps)
-            }
-            .onChange(of: coordinator.isLoading) { loading in
-                isLoading = loading
-            }
+        GeometryReader { geometry in
+            OSMDWebViewRepresentable(coordinator: coordinator)
+                .onAppear {
+                    setupCoordinator()
+                    containerSize = geometry.size
+                }
+                .onChange(of: xml) { newXML in
+                    handleXMLChange(newXML)
+                }
+                .onChange(of: transposeSteps) { newSteps in
+                    handleTransposeChange(newSteps)
+                }
+                .onChange(of: coordinator.isLoading) { loading in
+                    isLoading = loading
+                }
+                .onChange(of: geometry.size) { newSize in
+                    handleContainerSizeChange(newSize)
+                }
+        }
     }
     
     // MARK: - Private Methods
@@ -124,6 +132,51 @@ public struct OSMDView: View {
             } catch {
                 // Error handling is done in coordinator
             }
+        }
+    }
+
+    private func handleContainerSizeChange(_ newSize: CGSize) {
+        // Debounce rapid size changes
+        guard abs(newSize.width - lastContainerSize.width) > 1 ||
+              abs(newSize.height - lastContainerSize.height) > 1 else { return }
+
+        containerSize = newSize
+        lastContainerSize = newSize
+
+        // Only update if OSMD is ready and we have a meaningful size
+        guard coordinator.isReady, newSize.width > 0, newSize.height > 0 else { return }
+
+        Task {
+            do {
+                // Determine optimal page format based on container dimensions
+                let pageFormat = determineOptimalPageFormat(for: newSize)
+
+                // Update OSMD with new container size and page format
+                try await coordinator.updateContainerSize(width: newSize.width, height: newSize.height)
+                try await coordinator.setPageFormat(pageFormat)
+
+                // Re-render to apply the new layout
+                try await coordinator.render()
+            } catch {
+                // Error handling is done in coordinator
+            }
+        }
+    }
+
+    private func determineOptimalPageFormat(for size: CGSize) -> String {
+        let aspectRatio = size.width / size.height
+
+        // For very wide containers (landscape), use endless format for optimal line wrapping
+        if aspectRatio > 1.5 {
+            return "Endless"
+        }
+        // For portrait or square containers, use a format that encourages line breaks
+        else if aspectRatio < 0.8 {
+            return "Endless"
+        }
+        // For moderate aspect ratios, use endless format as well for best responsiveness
+        else {
+            return "Endless"
         }
     }
 }

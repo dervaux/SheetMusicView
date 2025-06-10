@@ -10,6 +10,8 @@ This project provides a native SwiftUI wrapper around the powerful OpenSheetMusi
 
 - **Native SwiftUI Integration**: Clean, declarative API that follows SwiftUI patterns and conventions
 - **Full OSMD Functionality**: Access to all OpenSheetMusicDisplay features including rendering, transposition, playback control, and more
+- **Responsive Line Wrapping**: Automatic line breaks that adapt to container size changes, device rotation, and window resizing
+- **Dynamic Layout**: Real-time responsive behavior for optimal music display across different screen sizes and orientations
 - **Hybrid Architecture**: Combines the power of OSMD's mature JavaScript engine with native iOS performance
 - **Reactive Data Binding**: Uses SwiftUI's `@Binding` and `@State` for seamless data flow
 - **Cross-Platform**: Supports both iOS and macOS applications
@@ -104,11 +106,18 @@ The bridge is designed to provide complete coverage of OSMD's functionality. The
 - MusicXML loading and parsing
 - Sheet music rendering and display
 - Responsive layout and scaling
+- Automatic line wrapping and page breaks
 
 ✅ **Music Manipulation**
 - Transposition (chromatic and diatonic)
 - Key signature changes
 - Tempo modifications
+
+✅ **Responsive Features**
+- Container size monitoring with GeometryReader
+- Dynamic page format adjustment
+- Device rotation and window resize handling
+- Debounced performance optimization
 
 🚧 **Planned Features** (Full OSMD API Coverage)
 - Playback control and cursor tracking
@@ -128,6 +137,41 @@ The bridge architecture is designed for easy extension. New OSMD features can be
 3. Updating the SwiftUI binding system as needed
 
 All OSMD functions will be exposed through type-safe Swift interfaces with proper error handling and documentation.
+
+## Responsive Line Wrapping
+
+The SwiftUI-OSMD bridge includes comprehensive responsive line wrapping functionality that automatically adapts music notation layout to different screen sizes and orientations.
+
+### Key Features
+
+- **Automatic Line Breaks**: Music notation automatically wraps to the next line when it extends beyond the available container width
+- **Device Rotation Support**: Line wrapping adjusts seamlessly when rotating between portrait and landscape orientations
+- **Window Resize Handling**: On macOS and iPad, line wrapping responds dynamically to window size changes
+- **Performance Optimized**: Debounced resize events ensure smooth performance during rapid size changes
+- **Container Size Monitoring**: Uses SwiftUI's `GeometryReader` to detect and respond to container size changes
+
+### How It Works
+
+1. **Container Monitoring**: The `OSMDView` uses `GeometryReader` to monitor container size changes
+2. **Intelligent Updates**: Only meaningful size changes (>1px) trigger layout updates to optimize performance
+3. **Dynamic Page Format**: Automatically selects optimal page format based on container dimensions and aspect ratio
+4. **OSMD Integration**: Leverages OSMD's built-in `autoResize` and "Endless" page format for optimal line wrapping
+5. **Debounced Rendering**: Resize events are debounced with a 150ms delay for smooth performance
+
+### Testing Responsive Behavior
+
+A comprehensive demo is available in the `ResponsiveDemo/` directory that showcases:
+- Real-time container size information
+- Interactive window resizing (macOS)
+- Device rotation testing (iOS)
+- Transposition with responsive layout
+- Performance monitoring
+
+To run the responsive demo:
+```bash
+cd ResponsiveDemo
+swift run ResponsiveDemo
+```
 
 ## Usage Examples
 
@@ -286,7 +330,3 @@ The included OpenSheetMusicDisplay library is also licensed under BSD-3-Clause -
 - [OpenSheetMusicDisplay](https://opensheetmusicdisplay.org) team for the excellent music notation engine
 - [VexFlow](https://vexflow.com) for the underlying music rendering technology
 - The Swift and SwiftUI communities for inspiration and best practices
-
----
-
-For questions, issues, or contributions, please visit our [GitHub repository](https://github.com/yourusername/SwiftUI-OSMD-Bridge).

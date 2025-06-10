@@ -109,9 +109,43 @@ public class OSMDCoordinator: NSObject, ObservableObject {
         guard isReady else {
             throw OSMDError.notReady
         }
-        
+
         do {
             let script = "osmdClear()"
+            _ = try await evaluateJavaScript(script)
+        } catch {
+            let osmdError = error as? OSMDError ?? OSMDError.operationFailed(error.localizedDescription)
+            lastError = osmdError
+            onError?(osmdError)
+            throw osmdError
+        }
+    }
+
+    /// Update the container size for responsive layout
+    public func updateContainerSize(width: CGFloat, height: CGFloat) async throws {
+        guard isReady else {
+            throw OSMDError.notReady
+        }
+
+        do {
+            let script = "osmdUpdateContainerSize(\(width), \(height))"
+            _ = try await evaluateJavaScript(script)
+        } catch {
+            let osmdError = error as? OSMDError ?? OSMDError.operationFailed(error.localizedDescription)
+            lastError = osmdError
+            onError?(osmdError)
+            throw osmdError
+        }
+    }
+
+    /// Set page format for responsive layout
+    public func setPageFormat(_ format: String) async throws {
+        guard isReady else {
+            throw OSMDError.notReady
+        }
+
+        do {
+            let script = "osmdSetPageFormat('\(format)')"
             _ = try await evaluateJavaScript(script)
         } catch {
             let osmdError = error as? OSMDError ?? OSMDError.operationFailed(error.localizedDescription)

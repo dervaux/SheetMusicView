@@ -19,24 +19,46 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            position: relative;
+            box-sizing: border-box;
         }
-        
+
         #loadingMessage {
             color: #666;
             font-size: 16px;
             text-align: center;
         }
-        
+
         .osmd-content {
             width: 100%;
             height: 100%;
             overflow: auto;
+            box-sizing: border-box;
         }
-        
-        /* Ensure OSMD content is properly sized */
+
+        /* Enhanced responsive styling for OSMD content */
         .osmd-content svg {
             max-width: 100%;
             height: auto;
+            display: block;
+        }
+
+        /* Ensure proper responsive behavior */
+        * {
+            box-sizing: border-box;
+        }
+
+        /* Responsive container adjustments */
+        @media (max-width: 768px) {
+            #osmdContainer {
+                padding: 10px;
+            }
+        }
+
+        @media (orientation: landscape) and (max-height: 500px) {
+            #osmdContainer {
+                padding: 5px;
+            }
         }
     </style>
 </head>
@@ -143,10 +165,11 @@
 
                 console.log('Creating OSMD instance...');
 
-                // Create OSMD instance
+                // Create OSMD instance with enhanced responsive settings
                 osmd = new opensheetmusicdisplay.OpenSheetMusicDisplay(container, {
                     autoResize: true,
                     backend: 'svg',
+                    pageFormat: 'Endless', // Enable automatic line wrapping
                     drawTitle: true,
                     drawSubtitle: true,
                     drawComposer: true,
@@ -163,7 +186,11 @@
                     defaultColorRest: '#000000',
                     defaultColorStem: '#000000',
                     followCursor: false,
-                    cursorsOptions: []
+                    cursorsOptions: [],
+                    // Enhanced responsive settings
+                    renderSingleHorizontalStaffline: false, // Allow line wrapping
+                    newSystemFromXML: false, // Let OSMD handle line breaks
+                    newPageFromXML: false // Let OSMD handle page breaks
                 });
                 
                 isInitialized = true;
@@ -274,7 +301,7 @@
             if (!isInitialized || !osmd) {
                 throw new Error('OSMD is not initialized');
             }
-            
+
             try {
                 osmd.clear();
                 console.log('Display cleared');
@@ -284,15 +311,86 @@
                 throw error;
             }
         }
+
+        // Update container size for responsive layout
+        function osmdUpdateContainerSize(width, height) {
+            if (!isInitialized || !osmd) {
+                throw new Error('OSMD is not initialized');
+            }
+
+            try {
+                console.log(`Updating container size to ${width}x${height}`);
+
+                // Update container dimensions
+                const container = document.getElementById('osmdContainer');
+                if (container) {
+                    container.style.width = width + 'px';
+                    container.style.height = height + 'px';
+                }
+
+                // Trigger OSMD's internal resize handling
+                if (osmd.AutoResizeEnabled) {
+                    // Force a re-render with new dimensions
+                    setTimeout(() => {
+                        if (osmd && osmd.sheet) {
+                            osmd.render();
+                        }
+                    }, 50); // Small delay to ensure container size is updated
+                }
+
+                console.log('Container size updated successfully');
+                return true;
+            } catch (error) {
+                console.error('Failed to update container size:', error);
+                throw error;
+            }
+        }
+
+        // Set page format for responsive layout
+        function osmdSetPageFormat(format) {
+            if (!isInitialized || !osmd) {
+                throw new Error('OSMD is not initialized');
+            }
+
+            try {
+                console.log(`Setting page format to: ${format}`);
+
+                // Set the page format
+                osmd.setPageFormat(format);
+
+                console.log('Page format set successfully');
+                return true;
+            } catch (error) {
+                console.error('Failed to set page format:', error);
+                throw error;
+            }
+        }
         
-        // Handle window resize
+        // Enhanced window resize handling with debouncing
+        let resizeTimeout;
         window.addEventListener('resize', function() {
             if (isInitialized && osmd) {
-                try {
-                    osmd.render();
-                } catch (error) {
-                    console.error('Failed to re-render on resize:', error);
-                }
+                // Clear previous timeout
+                clearTimeout(resizeTimeout);
+
+                // Debounce resize events for better performance
+                resizeTimeout = setTimeout(() => {
+                    try {
+                        console.log('Window resized, re-rendering OSMD');
+
+                        // Get current container size
+                        const container = document.getElementById('osmdContainer');
+                        if (container && osmd.sheet) {
+                            const rect = container.getBoundingClientRect();
+                            console.log(`Container size: ${rect.width}x${rect.height}`);
+
+                            // Re-render with current content
+                            osmd.render();
+                        }
+                    } catch (error) {
+                        console.error('Failed to re-render on resize:', error);
+                    }
+                }, 150); // 150ms debounce delay
             }
         });
         
