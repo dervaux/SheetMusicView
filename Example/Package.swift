@@ -5,8 +5,8 @@ import PackageDescription
 let package = Package(
     name: "OSMDExample",
     platforms: [
-        .iOS(.v14),
-        .macOS(.v11)
+        .iOS(.v15),
+        .macOS(.v12)
     ],
     products: [
         .executable(
@@ -14,16 +14,13 @@ let package = Package(
             targets: ["OSMDExample"]),
     ],
     dependencies: [
-        .package(path: "../")
+        .package(name: "OSMD_Swift", path: "../")
     ],
     targets: [
         .executableTarget(
             name: "OSMDExample",
             dependencies: [
-                .product(name: "SwiftUIOSMD", package: "SwiftUIOSMD")
-            ],
-            resources: [
-                .process("Resources")
+                .product(name: "SwiftUIOSMD", package: "OSMD_Swift")
             ]
         ),
     ]

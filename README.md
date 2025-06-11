@@ -45,13 +45,13 @@ SwiftUI App ←→ OSMDView ←→ OSMDCoordinator ←→ WKWebView ←→ OSMD 
 
 The bridge uses `WKWebView`'s JavaScript evaluation capabilities for Swift-to-OSMD communication and `WKScriptMessageHandler` for bidirectional messaging, ensuring robust and performant interaction between the native Swift layer and the embedded OSMD engine.
 
-### Reference Implementation
+### Offline Capability
 
-This project includes the complete OpenSheetMusicDisplay library (v1.9.0) in the `OSMD_do_not_touch/` directory as a reference implementation. This ensures:
-- Development environment consistency
-- API compatibility verification
-- Local testing and debugging capabilities
-- Independence from external CDN dependencies
+This project includes the compiled OpenSheetMusicDisplay library (v1.9.0) directly in the package resources. This ensures:
+- Complete offline functionality without internet dependencies
+- Faster loading times by avoiding CDN requests
+- Consistent library version across all installations
+- Reliable operation in environments with restricted network access
 
 ## Swift Package Manager Integration
 
@@ -404,8 +404,8 @@ SwiftUIOSMD/
 │       ├── OSMDView.swift
 │       ├── OSMDCoordinator.swift
 │       └── Resources/
-│           └── osmd.html
-├── OSMD_do_not_touch/          # Reference OSMD implementation
+│           ├── osmd.html
+│           └── opensheetmusicdisplay.min.js
 ├── Tests/
 ├── Package.swift
 └── README.md
@@ -432,11 +432,9 @@ If you're setting up this package for distribution:
    cd SwiftUIOSMD
    ```
 
-2. **Build the OSMD reference** (for development):
+2. **Build the package**:
    ```bash
-   cd OSMD_do_not_touch
-   npm install
-   npm run build
+   swift build
    ```
 
 3. **Open in Xcode**:
@@ -472,10 +470,10 @@ If you're setting up this package for distribution:
 
 This project is licensed under the BSD-3-Clause License - see the [LICENSE](LICENSE) file for details.
 
-The included OpenSheetMusicDisplay library is also licensed under BSD-3-Clause - see [OSMD_do_not_touch/LICENSE](OSMD_do_not_touch/LICENSE) for details.
+The included OpenSheetMusicDisplay library is also licensed under BSD-3-Clause. The compiled library file (`opensheetmusicdisplay.min.js`) included in this package is from the official OpenSheetMusicDisplay project.
 
 ## Acknowledgments
 
 - [OpenSheetMusicDisplay](https://opensheetmusicdisplay.org) team for the excellent music notation engine
 - [VexFlow](https://vexflow.com) for the underlying music rendering technology
-- The Swift and SwiftUI communities for inspiration and best practices
+- The Swift and SwiftUI communities for inspiration and best practicesw

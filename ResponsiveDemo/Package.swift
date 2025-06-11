@@ -14,13 +14,13 @@ let package = Package(
         ),
     ],
     dependencies: [
-        .package(name: "SwiftUIOSMD", path: "..")
+        .package(name: "OSMD_Swift", path: "..")
     ],
     targets: [
         .executableTarget(
             name: "ResponsiveDemo",
             dependencies: [
-                .product(name: "SwiftUIOSMD", package: "SwiftUIOSMD")
+                .product(name: "SwiftUIOSMD", package: "OSMD_Swift")
             ]
         ),
     ]

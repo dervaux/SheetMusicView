@@ -76,7 +76,8 @@
         <div>Messages: <span id="messageCount">0</span></div>
     </div>
 
-    <!-- Load OSMD from CDN as fallback, or use local build if available -->
+    <!-- Load OSMD from local bundle -->
+    <script src="opensheetmusicdisplay.min.js"></script>
     <script>
         // Update debug info
         function updateDebug(status, osmdStatus) {
@@ -84,32 +85,18 @@
             if (osmdStatus) document.getElementById('osmdStatus').textContent = osmdStatus;
         }
 
-        // Load OSMD from CDN (more reliable for app bundle)
-        function loadOSMD() {
-            console.log('Loading OSMD from CDN...');
-            updateDebug('Loading OSMD from CDN...', 'Loading...');
-
-            const cdnScript = document.createElement('script');
-            cdnScript.src = 'https://cdn.jsdelivr.net/npm/opensheetmusicdisplay@1.9.0/build/opensheetmusicdisplay.min.js';
-            cdnScript.onload = function() {
-                console.log('Loaded OSMD from CDN successfully');
-                updateDebug('OSMD script loaded', 'Script loaded');
-                waitForOSMD();
-            };
-            cdnScript.onerror = function() {
-                console.error('Failed to load OSMD from CDN');
-                updateDebug('Failed to load OSMD', 'Load failed');
-                document.getElementById('osmdContainer').innerHTML =
-                    '<div id="loadingMessage" style="color: red;">Failed to load OpenSheetMusicDisplay library. Please check your internet connection.</div>';
-            };
-            document.head.appendChild(cdnScript);
+        // OSMD is loaded directly from local file, so we can proceed immediately
+        function initOSMDWhenReady() {
+            console.log('OSMD loaded from local bundle');
+            updateDebug('OSMD loaded from bundle', 'Local bundle');
+            waitForOSMD();
         }
 
         // Load OSMD when DOM is ready
         if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', loadOSMD);
+            document.addEventListener('DOMContentLoaded', initOSMDWhenReady);
         } else {
-            loadOSMD();
+            initOSMDWhenReady();
         }
     </script>
     
@@ -149,8 +136,8 @@
                     message: 'WebView is working'
                 });
 
-                // Start loading OSMD
-                loadOSMD();
+                // Start initializing OSMD
+                initOSMDWhenReady();
             } else {
                 console.error('Swift bridge not available');
                 updateDebug('Swift bridge NOT available', 'Bridge FAILED');
