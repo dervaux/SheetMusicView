@@ -20,7 +20,7 @@ let package = Package(
         .executableTarget(
             name: "OSMDExample",
             dependencies: [
-                .product(name: "SwiftUIOSMD", package: "OSMD_Swift")
+                .product(name: "SwiftUIOSMD", package: "SwiftUIOSMD")
             ],
             resources: [
                 .process("Resources")

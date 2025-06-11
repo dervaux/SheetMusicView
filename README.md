@@ -55,46 +55,171 @@ This project includes the complete OpenSheetMusicDisplay library (v1.9.0) in the
 
 ## Swift Package Manager Integration
 
-### Adding as a Dependency
+The SwiftUI-OSMD bridge is designed for seamless integration into iOS and macOS projects using Swift Package Manager. Follow these comprehensive steps to add it to your project.
 
-Add the SwiftUI-OSMD bridge to your project using Swift Package Manager:
+### Repository and Package Names
+
+- **GitHub Repository**: `https://github.com/dervaux/SwiftUIOSMD`
+- **Swift Package Name**: `SwiftUIOSMD`
+- **Import Statement**: `import SwiftUIOSMD`
+
+The repository and Swift package now have consistent naming for clarity and ease of use.
+
+### System Requirements
+
+- **iOS**: 15.0+
+- **macOS**: 12.0+
+- **Xcode**: 13.0+
+- **Swift**: 5.7+
+
+### Method 1: Integration via Xcode (Recommended)
+
+This is the easiest method for most developers:
+
+1. **Open your Xcode project**
+
+2. **Add Package Dependency**:
+   - Go to `File` → `Add Package Dependencies...`
+   - Enter the repository URL: `https://github.com/dervaux/SwiftUIOSMD.git`
+   - Click `Add Package`
+
+3. **Configure Package Options**:
+   - **Dependency Rule**: Choose "Up to Next Major Version" and enter `1.0.0`
+   - **Add to Target**: Select your app target
+   - Click `Add Package`
+
+4. **Verify Installation**:
+   - In your project navigator, you should see `SwiftUIOSMD` under "Package Dependencies"
+   - The package will be automatically linked to your target
+
+### Method 2: Package.swift Integration
+
+For Swift Package projects or manual configuration:
 
 ```swift
-// Package.swift
-dependencies: [
-    .package(url: "https://github.com/yourusername/SwiftUI-OSMD-Bridge.git", from: "1.0.0")
-]
-```
+// swift-tools-version: 5.7
 
-### Target Configuration
+import PackageDescription
 
-```swift
-.target(
+let package = Package(
     name: "YourApp",
+    platforms: [
+        .iOS(.v15),
+        .macOS(.v12)
+    ],
     dependencies: [
-        .product(name: "SwiftUIOSMD", package: "SwiftUI-OSMD-Bridge")
+        .package(url: "https://github.com/dervaux/SwiftUIOSMD.git", from: "1.0.0")
+    ],
+    targets: [
+        .target(
+            name: "YourApp",
+            dependencies: [
+                .product(name: "SwiftUIOSMD", package: "SwiftUIOSMD")
+            ]
+        )
     ]
 )
 ```
 
-### Requirements
+### Method 3: Local Development Integration
 
-- **iOS**: 14.0+
-- **macOS**: 11.0+
-- **Xcode**: 12.0+
-- **Swift**: 5.3+
+For local development or when working with the source code directly:
 
-### Required Capabilities
+```swift
+// Package.swift
+dependencies: [
+    .package(path: "../SwiftUIOSMD")  // Adjust path as needed
+]
+```
 
-Ensure your app's `Info.plist` includes:
+### Import and Basic Usage
+
+After successful integration, import the library in your Swift files:
+
+```swift
+import SwiftUI
+import SwiftUIOSMD
+
+struct ContentView: View {
+    @State private var musicXML: String = ""
+    @State private var transposeSteps: Int = 0
+    @State private var isLoading: Bool = false
+
+    var body: some View {
+        OSMDView(
+            xml: $musicXML,
+            transposeSteps: $transposeSteps,
+            isLoading: $isLoading
+        )
+        .frame(height: 400)
+    }
+}
+```
+
+### Verification Steps
+
+To verify the integration was successful:
+
+1. **Build your project** (`Cmd+B`) - it should compile without errors
+2. **Check imports** - `import SwiftUIOSMD` should not show any errors
+3. **Test basic functionality** - Try creating an `OSMDView` in a preview or simulator
+
+### App Configuration
+
+#### Info.plist Requirements
+
+No special Info.plist configuration is required for basic functionality. The package handles all necessary WebKit permissions internally.
+
+#### Optional: Network Security (if loading remote MusicXML)
+
+If your app loads MusicXML files from remote servers, you may need to configure App Transport Security:
 
 ```xml
+<!-- Only add this if you need to load MusicXML from HTTP (not HTTPS) sources -->
 <key>NSAppTransportSecurity</key>
 <dict>
-    <key>NSAllowsLocalNetworking</key>
+    <key>NSAllowsArbitraryLoads</key>
     <true/>
 </dict>
 ```
+
+### Troubleshooting
+
+#### Common Integration Issues
+
+**Problem**: "No such module 'SwiftUIOSMD'"
+- **Solution**: Ensure the package was added correctly and your target includes the dependency
+- **Check**: Project Navigator → Package Dependencies → SwiftUIOSMD should be visible
+
+**Problem**: Build errors related to minimum deployment target
+- **Solution**: Ensure your app's deployment target is iOS 15.0+ or macOS 12.0+
+- **Check**: Project Settings → Deployment Info → Deployment Target
+
+**Problem**: Package resolution fails
+- **Solution**: Check your internet connection and GitHub repository access
+- **Alternative**: Use local development integration method
+
+**Problem**: WebView not displaying content
+- **Solution**: Ensure you're testing on a physical device or simulator (not SwiftUI previews for complex WebKit content)
+- **Check**: Add some sample MusicXML content to verify the view is working
+
+#### Getting Help
+
+If you encounter issues:
+1. Check the [Issues](https://github.com/dervaux/SwiftUIOSMD/issues) page
+2. Review the example projects in `TestApp/` and `ResponsiveDemo/` directories
+3. Ensure you're using compatible versions of Xcode and Swift
+
+### Quick Start Summary
+
+For experienced developers, here's the fastest way to get started:
+
+1. **Add Package**: In Xcode, `File` → `Add Package Dependencies` → `https://github.com/dervaux/SwiftUIOSMD.git`
+2. **Import**: Add `import SwiftUIOSMD` to your Swift file
+3. **Use**: Create an `OSMDView(xml: $musicXML, transposeSteps: $transposeSteps, isLoading: $isLoading)`
+4. **Test**: Load some MusicXML content and verify rendering
+
+That's it! The package handles all the complex WebKit and OSMD integration automatically.
 
 ## API Coverage and Extensibility
 
@@ -273,7 +398,7 @@ class OSMDManager: ObservableObject {
 ### Project Structure
 
 ```
-SwiftUI-OSMD-Bridge/
+SwiftUIOSMD/
 ├── Sources/
 │   └── SwiftUIOSMD/
 │       ├── OSMDView.swift
@@ -286,12 +411,25 @@ SwiftUI-OSMD-Bridge/
 └── README.md
 ```
 
+### Repository Setup (For Package Publishers)
+
+If you're setting up this package for distribution:
+
+1. **Create a GitHub repository** for your fork/distribution
+2. **Update the repository URL** in the README examples above
+3. **Tag releases** using semantic versioning:
+   ```bash
+   git tag 1.0.0
+   git push origin 1.0.0
+   ```
+4. **Verify package resolution** by testing integration in a sample project
+
 ### Building and Testing
 
 1. **Clone the repository**:
    ```bash
-   git clone https://github.com/yourusername/SwiftUI-OSMD-Bridge.git
-   cd SwiftUI-OSMD-Bridge
+   git clone https://github.com/dervaux/SwiftUIOSMD.git
+   cd SwiftUIOSMD
    ```
 
 2. **Build the OSMD reference** (for development):
@@ -309,6 +447,17 @@ SwiftUI-OSMD-Bridge/
 4. **Run tests**:
    ```bash
    swift test
+   ```
+
+5. **Test example applications**:
+   ```bash
+   # Test the basic example
+   cd TestApp
+   swift run OSMDTestApp
+
+   # Test responsive features
+   cd ../ResponsiveDemo
+   swift run ResponsiveDemo
    ```
 
 ### Contributing
