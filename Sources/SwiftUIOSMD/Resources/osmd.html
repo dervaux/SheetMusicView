@@ -10,29 +10,31 @@
             padding: 0;
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background-color: white;
-            overflow: hidden;
+            overflow: auto; /* Enable scrolling for long content */
         }
-        
+
         #osmdContainer {
             width: 100%;
-            height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            min-height: 100vh; /* Use min-height instead of fixed height */
+            display: block; /* Change from flex to block for better scrolling */
             position: relative;
             box-sizing: border-box;
+            padding: 20px; /* Add some padding for better appearance */
         }
 
         #loadingMessage {
             color: #666;
             font-size: 16px;
             text-align: center;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
         }
 
         .osmd-content {
             width: 100%;
-            height: 100%;
-            overflow: auto;
+            overflow: visible; /* Allow content to flow naturally */
             box-sizing: border-box;
         }
 
@@ -165,11 +167,11 @@
 
                 console.log('Creating OSMD instance...');
 
-                // Create OSMD instance with enhanced responsive settings
+                // Create OSMD instance with enhanced scrollable settings
                 osmd = new opensheetmusicdisplay.OpenSheetMusicDisplay(container, {
                     autoResize: true,
                     backend: 'svg',
-                    pageFormat: 'Endless', // Enable automatic line wrapping
+                    pageFormat: 'Endless', // Enable vertical scrolling for long pieces
                     drawTitle: true,
                     drawSubtitle: true,
                     drawComposer: true,
@@ -187,10 +189,16 @@
                     defaultColorStem: '#000000',
                     followCursor: false,
                     cursorsOptions: [],
-                    // Enhanced responsive settings
+                    // Enhanced scrollable settings
                     renderSingleHorizontalStaffline: false, // Allow line wrapping
                     newSystemFromXML: false, // Let OSMD handle line breaks
-                    newPageFromXML: false // Let OSMD handle page breaks
+                    newPageFromXML: false, // Let OSMD handle page breaks
+                    // Optimize for scrolling
+                    pageBackgroundColor: '#FFFFFF',
+                    pageTopMargin: 10,
+                    pageBottomMargin: 10,
+                    pageLeftMargin: 10,
+                    pageRightMargin: 10
                 });
                 
                 isInitialized = true;
@@ -242,10 +250,16 @@
             if (!isInitialized || !osmd) {
                 throw new Error('OSMD is not initialized');
             }
-            
+
             try {
                 osmd.render();
                 console.log('Music rendered successfully');
+
+                // Check scrollability after rendering
+                setTimeout(() => {
+                    checkScrollability();
+                }, 200);
+
                 return true;
             } catch (error) {
                 console.error('Failed to render music:', error);
@@ -312,7 +326,7 @@
             }
         }
 
-        // Update container size for responsive layout
+        // Update container size for responsive layout with scrolling support
         function osmdUpdateContainerSize(width, height) {
             if (!isInitialized || !osmd) {
                 throw new Error('OSMD is not initialized');
@@ -321,11 +335,12 @@
             try {
                 console.log(`Updating container size to ${width}x${height}`);
 
-                // Update container dimensions
+                // Update container dimensions - use width but allow height to grow
                 const container = document.getElementById('osmdContainer');
                 if (container) {
                     container.style.width = width + 'px';
-                    container.style.height = height + 'px';
+                    container.style.minHeight = height + 'px';
+                    // Don't set fixed height to allow scrolling
                 }
 
                 // Trigger OSMD's internal resize handling
@@ -334,6 +349,11 @@
                     setTimeout(() => {
                         if (osmd && osmd.sheet) {
                             osmd.render();
+
+                            // Check if content is scrollable and show indicator
+                            setTimeout(() => {
+                                checkScrollability();
+                            }, 100);
                         }
                     }, 50); // Small delay to ensure container size is updated
                 }
@@ -343,6 +363,57 @@
             } catch (error) {
                 console.error('Failed to update container size:', error);
                 throw error;
+            }
+        }
+
+        // Check if content is scrollable and show visual indicator
+        function checkScrollability() {
+            const body = document.body;
+            const isScrollable = body.scrollHeight > body.clientHeight;
+
+            if (isScrollable) {
+                // Add scroll indicator if not already present
+                if (!document.getElementById('scrollIndicator')) {
+                    const indicator = document.createElement('div');
+                    indicator.id = 'scrollIndicator';
+                    indicator.innerHTML = '↕️ Scroll to see more';
+                    indicator.style.cssText = `
+                        position: fixed;
+                        bottom: 20px;
+                        right: 20px;
+                        background: rgba(0,0,0,0.8);
+                        color: white;
+                        padding: 8px 12px;
+                        border-radius: 20px;
+                        font-size: 12px;
+                        z-index: 1000;
+                        animation: fadeInOut 3s ease-in-out;
+                    `;
+
+                    // Add CSS animation
+                    if (!document.getElementById('scrollIndicatorStyle')) {
+                        const style = document.createElement('style');
+                        style.id = 'scrollIndicatorStyle';
+                        style.textContent = `
+                            @keyframes fadeInOut {
+                                0% { opacity: 0; }
+                                20% { opacity: 1; }
+                                80% { opacity: 1; }
+                                100% { opacity: 0; }
+                            }
+                        `;
+                        document.head.appendChild(style);
+                    }
+
+                    document.body.appendChild(indicator);
+
+                    // Remove indicator after animation
+                    setTimeout(() => {
+                        if (indicator.parentNode) {
+                            indicator.parentNode.removeChild(indicator);
+                        }
+                    }, 3000);
+                }
             }
         }
 
