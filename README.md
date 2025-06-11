@@ -2,6 +2,16 @@
 
 A comprehensive SwiftUI bridge for [OpenSheetMusicDisplay (OSMD)](https://opensheetmusicdisplay.org) that enables native iOS and macOS applications to display and interact with music notation seamlessly.
 
+> **📋 Documentation Policy**: This README contains a complete API reference section that MUST be updated whenever new functionality is added. See the [Complete API Reference](#complete-api-reference) section for all available methods, properties, and features.
+
+## Table of Contents
+
+- [Project Overview](#project-overview)
+- [Swift Package Manager Integration](#swift-package-manager-integration)
+- [**Complete API Reference**](#complete-api-reference) ← **All available functionality**
+- [Usage Examples](#usage-examples)
+- [Development Notes](#development-notes)
+
 ## Project Overview
 
 This project provides a native SwiftUI wrapper around the powerful OpenSheetMusicDisplay JavaScript library, allowing developers to integrate professional music notation rendering into their iOS and macOS applications. The bridge leverages a hybrid architecture using `WKWebView` to embed OSMD's full JavaScript functionality within clean, reactive SwiftUI components.
@@ -221,47 +231,187 @@ For experienced developers, here's the fastest way to get started:
 
 That's it! The package handles all the complex WebKit and OSMD integration automatically.
 
-## API Coverage and Extensibility
+## Complete API Reference
+
+> **⚠️ IMPORTANT**: This section documents ALL available functionality in SwiftUIOSMD. When new features are implemented, they MUST be documented here immediately. This ensures users always have access to the complete, up-to-date API reference.
+
+### Core Components
+
+#### OSMDView (SwiftUI View)
+
+The main SwiftUI component for displaying music notation.
+
+**Initializers:**
+```swift
+// Basic initialization
+OSMDView(
+    xml: Binding<String>,
+    transposeSteps: Binding<Int> = .constant(0),
+    isLoading: Binding<Bool> = .constant(false)
+)
+
+// Full initialization with callbacks
+OSMDView(
+    xml: Binding<String>,
+    transposeSteps: Binding<Int> = .constant(0),
+    isLoading: Binding<Bool> = .constant(false),
+    onError: ((OSMDError) -> Void)? = nil,
+    onReady: (() -> Void)? = nil
+)
+```
+
+**Parameters:**
+- `xml: Binding<String>` - MusicXML content to display
+- `transposeSteps: Binding<Int>` - Number of semitones to transpose (-12 to +12)
+- `isLoading: Binding<Bool>` - Loading state indicator
+- `onError: ((OSMDError) -> Void)?` - Error callback handler
+- `onReady: (() -> Void)?` - Ready state callback
+
+#### OSMDCoordinator (JavaScript Bridge)
+
+Low-level coordinator for direct OSMD control.
+
+**Published Properties:**
+```swift
+@Published public var isLoading: Bool        // Current loading state
+@Published public var lastError: OSMDError?  // Last error encountered
+@Published public var isReady: Bool          // OSMD initialization state
+```
+
+**Callback Properties:**
+```swift
+public var onReady: (() -> Void)?           // Called when OSMD is ready
+public var onError: ((OSMDError) -> Void)?  // Called on errors
+```
+
+**Methods:**
+```swift
+// Load MusicXML content
+func loadMusicXML(_ xml: String) async throws
+
+// Transpose music by semitones
+func transpose(_ steps: Int) async throws
+
+// Render the loaded music
+func render() async throws
+
+// Clear the current display
+func clear() async throws
+
+// Update container size for responsive layout
+func updateContainerSize(width: CGFloat, height: CGFloat) async throws
+
+// Set page format (e.g., "A4", "Letter", "Endless")
+func setPageFormat(_ format: String) async throws
+```
+
+#### OSMDError (Error Handling)
+
+Comprehensive error types for all OSMD operations.
+
+**Error Cases:**
+```swift
+case notReady                              // OSMD not initialized
+case webViewNotAvailable                   // WebView not accessible
+case webViewLoadingFailed(String)          // WebView failed to load
+case javascriptEvaluationFailed(String)    // JS evaluation error
+case javascriptError(String)               // JS runtime error
+case loadingFailed(String)                 // MusicXML loading error
+case renderingFailed(String)               // Rendering error
+case transpositionFailed(String)           // Transposition error
+case operationFailed(String)               // General operation error
+```
+
+**Error Descriptions:**
+All errors conform to `LocalizedError` and provide descriptive error messages.
+
+#### SwiftUIOSMDInfo (Library Information)
+
+Static information about the library.
+
+**Properties:**
+```swift
+public static let version: String              // "1.0.0"
+public static let osmdVersion: String          // "1.9.0"
+public static let supportedPlatforms: [String] // ["iOS 15.0+", "macOS 12.0+"]
+public static let description: String          // Library description
+```
 
 ### Current Implementation Status
 
-The bridge is designed to provide complete coverage of OSMD's functionality. The initial implementation includes:
+✅ **Fully Implemented Features:**
 
-✅ **Core Rendering**
+**Core Rendering:**
 - MusicXML loading and parsing
 - Sheet music rendering and display
 - Responsive layout and scaling
 - Automatic line wrapping and page breaks
+- Offline operation (no CDN dependencies)
 
-✅ **Music Manipulation**
-- Transposition (chromatic and diatonic)
-- Key signature changes
-- Tempo modifications
+**Music Manipulation:**
+- Absolute transposition (chromatic, -12 to +12 semitones)
+- Real-time transposition updates
+- Transposition state management
 
-✅ **Responsive Features**
+**Responsive Features:**
 - Container size monitoring with GeometryReader
 - Dynamic page format adjustment
 - Device rotation and window resize handling
 - Debounced performance optimization
+- Scrollable content for long musical pieces
 
-🚧 **Planned Features** (Full OSMD API Coverage)
+**Error Handling:**
+- Comprehensive error types
+- Async/await error propagation
+- User-friendly error messages
+- Error recovery mechanisms
+
+**Platform Support:**
+- iOS 15.0+ with UIKit integration
+- macOS 12.0+ with AppKit integration
+- SwiftUI reactive bindings
+- WebKit debugging support
+
+### Planned Features (Roadmap)
+
+🚧 **Next Implementation Priority:**
 - Playback control and cursor tracking
 - Interactive note selection and editing
-- Custom styling and theming
+- Custom styling and theming options
 - Export functionality (PNG, SVG, PDF)
-- Advanced layout options
+- Advanced layout configuration
 - Plugin system integration
 - Real-time collaboration features
+- MIDI input/output support
 
-### Extensibility
+### API Extension Guidelines
 
-The bridge architecture is designed for easy extension. New OSMD features can be added by:
+When implementing new features, follow these requirements:
 
-1. Extending the `OSMDCoordinator` with new JavaScript bridge methods
-2. Adding corresponding Swift API methods
-3. Updating the SwiftUI binding system as needed
+1. **Add to OSMDCoordinator**: Implement the JavaScript bridge method
+2. **Update OSMDView**: Add SwiftUI bindings if needed
+3. **Document in README**: Update this API reference section immediately
+4. **Add Error Handling**: Include appropriate OSMDError cases
+5. **Write Tests**: Add unit tests for new functionality
+6. **Update Examples**: Show usage in example applications
 
-All OSMD functions will be exposed through type-safe Swift interfaces with proper error handling and documentation.
+**Example of proper API extension:**
+```swift
+// 1. Add to OSMDCoordinator
+public func setTempo(_ bpm: Int) async throws {
+    // Implementation
+}
+
+// 2. Add to OSMDView if needed
+@Binding private var tempo: Int
+
+// 3. Document here in README (this section)
+// 4. Add OSMDError.tempoChangeFailed if needed
+// 5. Add tests in SwiftUIOSMDTests
+// 6. Update TestApp example
+```
+
+This ensures the API reference remains complete and accurate for all users.
 
 ## Responsive Line Wrapping
 
