@@ -15,6 +15,7 @@ public class SheetMusicCoordinator: NSObject, ObservableObject {
     private var pendingOperations: [String: (Result<Any?, SheetMusicError>) -> Void] = [:]
     private var operationCounter: Int = 0
     private var currentTransposition: Int = 0
+    private var currentZoom: Double = 1.0
 
     // MARK: - Callbacks
     public var onReady: (() -> Void)?
@@ -56,8 +57,9 @@ public class SheetMusicCoordinator: NSObject, ObservableObject {
             let script = "osmdLoadXML(\"\(escapedXML)\")"
             _ = try await evaluateJavaScript(script)
 
-            // Reset transposition when loading new music
+            // Reset transposition and zoom when loading new music
             currentTransposition = 0
+            currentZoom = 1.0
             isLoading = false
         } catch {
             isLoading = false
@@ -103,7 +105,52 @@ public class SheetMusicCoordinator: NSObject, ObservableObject {
             throw sheetMusicError
         }
     }
-    
+
+    /// Set the zoom level for the music display
+    public func setZoom(_ level: Double) async throws {
+        guard isReady else {
+            throw SheetMusicError.notReady
+        }
+
+        // Validate zoom level (typical range is 0.1 to 5.0)
+        guard level >= 0.1 && level <= 5.0 else {
+            throw SheetMusicError.invalidZoomLevel(level)
+        }
+
+        do {
+            currentZoom = level
+            let script = "osmdSetZoom(\(level))"
+            _ = try await evaluateJavaScript(script)
+        } catch {
+            let sheetMusicError = error as? SheetMusicError ?? SheetMusicError.zoomFailed(error.localizedDescription)
+            lastError = sheetMusicError
+            onError?(sheetMusicError)
+            throw sheetMusicError
+        }
+    }
+
+    /// Zoom in by increasing the zoom level by 0.2
+    public func zoomIn() async throws {
+        let newZoom = min(currentZoom + 0.2, 5.0)
+        try await setZoom(newZoom)
+    }
+
+    /// Zoom out by decreasing the zoom level by 0.2
+    public func zoomOut() async throws {
+        let newZoom = max(currentZoom - 0.2, 0.1)
+        try await setZoom(newZoom)
+    }
+
+    /// Reset zoom to default level (1.0)
+    public func resetZoom() async throws {
+        try await setZoom(1.0)
+    }
+
+    /// Get the current zoom level
+    public var zoomLevel: Double {
+        return currentZoom
+    }
+
     /// Clear the current music display
     public func clear() async throws {
         guard isReady else {
@@ -290,6 +337,8 @@ public enum SheetMusicError: Error, LocalizedError {
     case loadingFailed(String)
     case renderingFailed(String)
     case transpositionFailed(String)
+    case zoomFailed(String)
+    case invalidZoomLevel(Double)
     case operationFailed(String)
 
     public var errorDescription: String? {
@@ -310,6 +359,10 @@ public enum SheetMusicError: Error, LocalizedError {
             return "Music rendering failed: \(message)"
         case .transpositionFailed(let message):
             return "Transposition failed: \(message)"
+        case .zoomFailed(let message):
+            return "Zoom operation failed: \(message)"
+        case .invalidZoomLevel(let level):
+            return "Invalid zoom level: \(level). Zoom level must be between 0.1 and 5.0."
         case .operationFailed(let message):
             return "Operation failed: \(message)"
         }

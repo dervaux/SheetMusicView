@@ -39,6 +39,7 @@ public struct SheetMusicView: View {
     @Binding private var xml: String
     @Binding private var transposeSteps: Int
     @Binding private var isLoading: Bool
+    @Binding private var zoomLevel: Double?
 
     // MARK: - State
     @StateObject private var coordinator = SheetMusicCoordinator()
@@ -50,6 +51,7 @@ public struct SheetMusicView: View {
     // MARK: - Private State
     @State private var lastXML: String = ""
     @State private var lastTransposeSteps: Int = 0
+    @State private var lastZoomLevel: Double = 1.0
     @State private var containerSize: CGSize = .zero
     @State private var lastContainerSize: CGSize = .zero
 
@@ -59,11 +61,24 @@ public struct SheetMusicView: View {
     public init(
         xml: Binding<String>,
         transposeSteps: Binding<Int> = .constant(0),
-        isLoading: Binding<Bool> = .constant(false)
+        isLoading: Binding<Bool> = .constant(false),
+        zoomLevel: Binding<Double>? = nil
     ) {
         self._xml = xml
         self._transposeSteps = transposeSteps
         self._isLoading = isLoading
+        if let zoomLevel = zoomLevel {
+            self._zoomLevel = Binding(
+                get: { zoomLevel.wrappedValue },
+                set: { newValue in
+                    if let newValue = newValue {
+                        zoomLevel.wrappedValue = newValue
+                    }
+                }
+            )
+        } else {
+            self._zoomLevel = .constant(nil)
+        }
         self.onError = nil
         self.onReady = nil
     }
@@ -73,12 +88,25 @@ public struct SheetMusicView: View {
         xml: Binding<String>,
         transposeSteps: Binding<Int> = .constant(0),
         isLoading: Binding<Bool> = .constant(false),
+        zoomLevel: Binding<Double>? = nil,
         onError: ((SheetMusicError) -> Void)? = nil,
         onReady: (() -> Void)? = nil
     ) {
         self._xml = xml
         self._transposeSteps = transposeSteps
         self._isLoading = isLoading
+        if let zoomLevel = zoomLevel {
+            self._zoomLevel = Binding(
+                get: { zoomLevel.wrappedValue },
+                set: { newValue in
+                    if let newValue = newValue {
+                        zoomLevel.wrappedValue = newValue
+                    }
+                }
+            )
+        } else {
+            self._zoomLevel = .constant(nil)
+        }
         self.onError = onError
         self.onReady = onReady
     }
@@ -96,6 +124,9 @@ public struct SheetMusicView: View {
                 }
                 .onChange(of: transposeSteps) { newSteps in
                     handleTransposeChange(newSteps)
+                }
+                .onChange(of: zoomLevel) { newZoom in
+                    handleZoomChange(newZoom)
                 }
                 .onChange(of: coordinator.isLoading) { loading in
                     isLoading = loading
@@ -139,6 +170,14 @@ public struct SheetMusicView: View {
                 } else {
                     lastTransposeSteps = 0
                 }
+
+                // Apply current zoom if needed
+                if let currentZoom = zoomLevel, currentZoom != 1.0 {
+                    lastZoomLevel = currentZoom
+                    try await coordinator.setZoom(currentZoom)
+                } else {
+                    lastZoomLevel = 1.0
+                }
             } catch {
                 // Error handling is done in coordinator
             }
@@ -154,6 +193,21 @@ public struct SheetMusicView: View {
             do {
                 // Send absolute transposition value, not relative
                 try await coordinator.transpose(newSteps)
+            } catch {
+                // Error handling is done in coordinator
+            }
+        }
+    }
+
+    private func handleZoomChange(_ newZoom: Double?) {
+        let targetZoom = newZoom ?? 1.0
+        guard coordinator.isReady, targetZoom != lastZoomLevel else { return }
+
+        lastZoomLevel = targetZoom
+
+        Task {
+            do {
+                try await coordinator.setZoom(targetZoom)
             } catch {
                 // Error handling is done in coordinator
             }

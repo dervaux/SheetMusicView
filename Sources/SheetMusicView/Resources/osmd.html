@@ -296,7 +296,58 @@
         function osmdTranspose(steps) {
             return osmdSetTranspose(steps);
         }
-        
+
+        // Set zoom level
+        function osmdSetZoom(zoomLevel) {
+            if (!isInitialized || !osmd) {
+                throw new Error('OSMD is not initialized');
+            }
+
+            try {
+                console.log(`Setting zoom level to: ${zoomLevel}`);
+
+                // Set the zoom level on OSMD
+                osmd.Zoom = zoomLevel;
+
+                // Re-render to apply the zoom
+                osmd.render();
+
+                console.log(`Zoom level set to: ${zoomLevel}`);
+                updateDebug(`Zoom: ${zoomLevel}`, `${Math.round(zoomLevel * 100)}%`);
+                return true;
+            } catch (error) {
+                console.error('Failed to set zoom level:', error);
+                throw error;
+            }
+        }
+
+        // Zoom in by 20%
+        function osmdZoomIn() {
+            if (!isInitialized || !osmd) {
+                throw new Error('OSMD is not initialized');
+            }
+
+            const currentZoom = osmd.Zoom || 1.0;
+            const newZoom = Math.min(currentZoom + 0.2, 5.0);
+            return osmdSetZoom(newZoom);
+        }
+
+        // Zoom out by 20%
+        function osmdZoomOut() {
+            if (!isInitialized || !osmd) {
+                throw new Error('OSMD is not initialized');
+            }
+
+            const currentZoom = osmd.Zoom || 1.0;
+            const newZoom = Math.max(currentZoom - 0.2, 0.1);
+            return osmdSetZoom(newZoom);
+        }
+
+        // Reset zoom to default (100%)
+        function osmdResetZoom() {
+            return osmdSetZoom(1.0);
+        }
+
         // Clear the display
         function osmdClear() {
             if (!isInitialized || !osmd) {

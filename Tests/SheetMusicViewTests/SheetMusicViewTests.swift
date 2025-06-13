@@ -13,6 +13,8 @@ final class SheetMusicViewTests: XCTestCase {
             .loadingFailed("Load error"),
             .renderingFailed("Render error"),
             .transpositionFailed("Transpose error"),
+            .zoomFailed("Zoom error"),
+            .invalidZoomLevel(2.5),
             .operationFailed("Operation error")
         ]
 
@@ -29,6 +31,22 @@ final class SheetMusicViewTests: XCTestCase {
         XCTAssertFalse(coordinator.isLoading)
         XCTAssertFalse(coordinator.isReady)
         XCTAssertNil(coordinator.lastError)
+        XCTAssertEqual(coordinator.zoomLevel, 1.0)
+    }
+
+    @MainActor
+    func testZoomLevelValidation() {
+        let coordinator = SheetMusicCoordinator()
+
+        // Test that zoom level is initially 1.0
+        XCTAssertEqual(coordinator.zoomLevel, 1.0)
+
+        // Test zoom level bounds in error descriptions
+        let invalidZoomError = SheetMusicError.invalidZoomLevel(10.0)
+        XCTAssertTrue(invalidZoomError.errorDescription?.contains("between 0.1 and 5.0") == true)
+
+        let zoomFailedError = SheetMusicError.zoomFailed("Test zoom error")
+        XCTAssertTrue(zoomFailedError.errorDescription?.contains("Zoom operation failed") == true)
     }
     
     func testSheetMusicCoordinatorNotReadyOperations() async {

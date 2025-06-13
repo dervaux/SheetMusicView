@@ -264,6 +264,7 @@ SheetMusicView(
 - `xml: Binding<String>` - MusicXML content to display
 - `transposeSteps: Binding<Int>` - Number of semitones to transpose (-12 to +12)
 - `isLoading: Binding<Bool>` - Loading state indicator
+- `zoomLevel: Binding<Double>?` - Optional zoom level (0.1 to 5.0, default: 1.0)
 - `onError: ((SheetMusicError) -> Void)?` - Error callback handler
 - `onReady: (() -> Void)?` - Ready state callback
 
@@ -303,6 +304,13 @@ func updateContainerSize(width: CGFloat, height: CGFloat) async throws
 
 // Set page format (e.g., "A4", "Letter", "Endless")
 func setPageFormat(_ format: String) async throws
+
+// Zoom functionality
+func setZoom(_ level: Double) async throws        // Set specific zoom level (0.1 to 5.0)
+func zoomIn() async throws                        // Zoom in by 0.2
+func zoomOut() async throws                       // Zoom out by 0.2
+func resetZoom() async throws                     // Reset to 1.0 (100%)
+var zoomLevel: Double { get }                     // Get current zoom level
 ```
 
 #### SheetMusicError (Error Handling)
@@ -488,6 +496,49 @@ struct ContentView: View {
         if let path = Bundle.main.path(forResource: "sample", ofType: "xml"),
            let xml = try? String(contentsOfFile: path) {
             musicXML = xml
+        }
+    }
+}
+```
+
+### Zoom Functionality
+
+```swift
+struct ZoomableSheetMusicView: View {
+    @State private var musicXML: String = ""
+    @State private var transposeSteps: Int = 0
+    @State private var isLoading: Bool = false
+    @State private var zoomLevel: Double = 1.0
+
+    var body: some View {
+        VStack {
+            SheetMusicView(
+                xml: $musicXML,
+                transposeSteps: $transposeSteps,
+                isLoading: $isLoading,
+                zoomLevel: $zoomLevel
+            )
+            .frame(height: 400)
+
+            HStack {
+                Button("Zoom Out") {
+                    zoomLevel = max(zoomLevel - 0.2, 0.1)
+                }
+                .disabled(zoomLevel <= 0.1)
+
+                Text("\(Int(zoomLevel * 100))%")
+                    .frame(width: 60)
+
+                Button("Zoom In") {
+                    zoomLevel = min(zoomLevel + 0.2, 5.0)
+                }
+                .disabled(zoomLevel >= 5.0)
+
+                Button("Reset") {
+                    zoomLevel = 1.0
+                }
+            }
+            .padding()
         }
     }
 }
