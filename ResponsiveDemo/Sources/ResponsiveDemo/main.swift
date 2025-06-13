@@ -1,5 +1,5 @@
 import SwiftUI
-import SwiftUIOSMD
+import SheetMusicView
 
 @main
 struct ResponsiveDemoApp: App {
@@ -14,7 +14,7 @@ struct ResponsiveDemoView: View {
     @State private var musicXML: String = ""
     @State private var transposeSteps: Int = 0
     @State private var isLoading: Bool = false
-    @State private var lastError: OSMDError?
+    @State private var lastError: SheetMusicError?
     @State private var showingError: Bool = false
     @State private var containerInfo: String = "Container: Not measured"
 
@@ -199,9 +199,9 @@ struct ResponsiveDemoView: View {
             }
             .padding(.horizontal)
 
-            // OSMD View with responsive container
+            // Sheet Music View with responsive container
             GeometryReader { geometry in
-                OSMDView(
+                SheetMusicView(
                     xml: $musicXML,
                     transposeSteps: $transposeSteps,
                     isLoading: $isLoading,
@@ -210,7 +210,7 @@ struct ResponsiveDemoView: View {
                         showingError = true
                     },
                     onReady: {
-                        print("OSMD is ready for responsive demo!")
+                        print("Sheet music display is ready for responsive demo!")
                     }
                 )
                 .background(Color.gray.opacity(0.1))

@@ -1,3 +1,9 @@
+// SheetMusicView - A SwiftUI bridge for OpenSheetMusicDisplay
+//
+// This file serves as the main entry point for the SheetMusicView library,
+// exporting all public interfaces and types.
+
+import Foundation
 import SwiftUI
 import WebKit
 
@@ -7,30 +13,49 @@ import UIKit
 import AppKit
 #endif
 
-/// SwiftUI view wrapper that embeds the OSMD web view
-public struct OSMDView: View {
-    
+// MARK: - Library Information
+
+/// Information about the SheetMusicView library
+public struct SheetMusicViewInfo {
+    /// The current version of the SheetMusicView library
+    public static let version = "1.0.0"
+
+    /// The version of OpenSheetMusicDisplay that this library is built against
+    public static let osmdVersion = "1.9.0"
+
+    /// Supported platforms
+    public static let supportedPlatforms = ["iOS 15.0+", "macOS 12.0+"]
+
+    /// Library description
+    public static let description = "A comprehensive SwiftUI bridge for OpenSheetMusicDisplay"
+}
+
+// MARK: - Main SwiftUI View
+
+/// SwiftUI view wrapper that embeds the OSMD web view for displaying sheet music
+public struct SheetMusicView: View {
+
     // MARK: - Bindings
     @Binding private var xml: String
     @Binding private var transposeSteps: Int
     @Binding private var isLoading: Bool
-    
+
     // MARK: - State
-    @StateObject private var coordinator = OSMDCoordinator()
-    
+    @StateObject private var coordinator = SheetMusicCoordinator()
+
     // MARK: - Callbacks
-    private let onError: ((OSMDError) -> Void)?
+    private let onError: ((SheetMusicError) -> Void)?
     private let onReady: (() -> Void)?
-    
+
     // MARK: - Private State
     @State private var lastXML: String = ""
     @State private var lastTransposeSteps: Int = 0
     @State private var containerSize: CGSize = .zero
     @State private var lastContainerSize: CGSize = .zero
-    
+
     // MARK: - Initialization
-    
-    /// Initialize OSMDView with basic bindings
+
+    /// Initialize SheetMusicView with basic bindings
     public init(
         xml: Binding<String>,
         transposeSteps: Binding<Int> = .constant(0),
@@ -42,13 +67,13 @@ public struct OSMDView: View {
         self.onError = nil
         self.onReady = nil
     }
-    
-    /// Initialize OSMDView with callbacks
+
+    /// Initialize SheetMusicView with callbacks
     public init(
         xml: Binding<String>,
         transposeSteps: Binding<Int> = .constant(0),
         isLoading: Binding<Bool> = .constant(false),
-        onError: ((OSMDError) -> Void)? = nil,
+        onError: ((SheetMusicError) -> Void)? = nil,
         onReady: (() -> Void)? = nil
     ) {
         self._xml = xml
@@ -57,11 +82,11 @@ public struct OSMDView: View {
         self.onError = onError
         self.onReady = onReady
     }
-    
+
     // MARK: - Body
     public var body: some View {
         GeometryReader { geometry in
-            OSMDWebViewRepresentable(coordinator: coordinator)
+            SheetMusicWebViewRepresentable(coordinator: coordinator)
                 .onAppear {
                     setupCoordinator()
                     containerSize = geometry.size
@@ -80,9 +105,9 @@ public struct OSMDView: View {
                 }
         }
     }
-    
+
     // MARK: - Private Methods
-    
+
     private func setupCoordinator() {
         coordinator.onReady = {
             onReady?()
@@ -91,12 +116,12 @@ public struct OSMDView: View {
                 handleXMLChange(xml)
             }
         }
-        
+
         coordinator.onError = { error in
             onError?(error)
         }
     }
-    
+
     private func handleXMLChange(_ newXML: String) {
         guard coordinator.isReady, !newXML.isEmpty, newXML != lastXML else { return }
 
@@ -119,7 +144,7 @@ public struct OSMDView: View {
             }
         }
     }
-    
+
     private func handleTransposeChange(_ newSteps: Int) {
         guard coordinator.isReady, newSteps != lastTransposeSteps else { return }
 
@@ -184,9 +209,9 @@ public struct OSMDView: View {
 // MARK: - WebView Representable
 
 #if os(iOS)
-private struct OSMDWebViewRepresentable: UIViewRepresentable {
-    let coordinator: OSMDCoordinator
-    
+private struct SheetMusicWebViewRepresentable: UIViewRepresentable {
+    let coordinator: SheetMusicCoordinator
+
     func makeUIView(context: Context) -> WKWebView {
         let configuration = WKWebViewConfiguration()
         configuration.preferences.javaScriptEnabled = true
@@ -205,11 +230,11 @@ private struct OSMDWebViewRepresentable: UIViewRepresentable {
 
         return webView
     }
-    
+
     func updateUIView(_ webView: WKWebView, context: Context) {
         // Updates are handled through the coordinator
     }
-    
+
     private func loadHTML(in webView: WKWebView) {
         // Try different resource paths
         var htmlURL: URL?
@@ -224,7 +249,7 @@ private struct OSMDWebViewRepresentable: UIViewRepresentable {
 
         // If still not found, try with different name
         if htmlURL == nil {
-            htmlURL = Bundle.module.url(forResource: "osmd", withExtension: "html", subdirectory: "SwiftUIOSMD_SwiftUIOSMD.bundle/Contents/Resources")
+            htmlURL = Bundle.module.url(forResource: "osmd", withExtension: "html", subdirectory: "SheetMusicView_SheetMusicView.bundle/Contents/Resources")
         }
 
         guard let finalURL = htmlURL else {
@@ -240,9 +265,9 @@ private struct OSMDWebViewRepresentable: UIViewRepresentable {
 }
 
 #elseif os(macOS)
-private struct OSMDWebViewRepresentable: NSViewRepresentable {
-    let coordinator: OSMDCoordinator
-    
+private struct SheetMusicWebViewRepresentable: NSViewRepresentable {
+    let coordinator: SheetMusicCoordinator
+
     func makeNSView(context: Context) -> WKWebView {
         let configuration = WKWebViewConfiguration()
         // Note: javaScriptEnabled is deprecated but still needed for compatibility
@@ -263,11 +288,11 @@ private struct OSMDWebViewRepresentable: NSViewRepresentable {
 
         return webView
     }
-    
+
     func updateNSView(_ webView: WKWebView, context: Context) {
         // Updates are handled through the coordinator
     }
-    
+
     private func loadHTML(in webView: WKWebView) {
         // Try different resource paths
         var htmlURL: URL?
@@ -282,7 +307,7 @@ private struct OSMDWebViewRepresentable: NSViewRepresentable {
 
         // If still not found, try with different name
         if htmlURL == nil {
-            htmlURL = Bundle.module.url(forResource: "osmd", withExtension: "html", subdirectory: "SwiftUIOSMD_SwiftUIOSMD.bundle/Contents/Resources")
+            htmlURL = Bundle.module.url(forResource: "osmd", withExtension: "html", subdirectory: "SheetMusicView_SheetMusicView.bundle/Contents/Resources")
         }
 
         guard let finalURL = htmlURL else {
@@ -300,13 +325,13 @@ private struct OSMDWebViewRepresentable: NSViewRepresentable {
 
 // MARK: - Preview
 #if DEBUG
-struct OSMDView_Previews: PreviewProvider {
+struct SheetMusicView_Previews: PreviewProvider {
     @State static var xml = ""
     @State static var transposeSteps = 0
     @State static var isLoading = false
-    
+
     static var previews: some View {
-        OSMDView(
+        SheetMusicView(
             xml: $xml,
             transposeSteps: $transposeSteps,
             isLoading: $isLoading

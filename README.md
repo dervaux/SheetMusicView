@@ -1,4 +1,4 @@
-# SwiftUI-OSMD Bridge
+# SheetMusicView
 
 A comprehensive SwiftUI bridge for [OpenSheetMusicDisplay (OSMD)](https://opensheetmusicdisplay.org) that enables native iOS and macOS applications to display and interact with music notation seamlessly.
 
@@ -33,14 +33,14 @@ This project provides a native SwiftUI wrapper around the powerful OpenSheetMusi
 
 The bridge consists of two primary components that work together to provide seamless OSMD integration:
 
-#### OSMDCoordinator
+#### SheetMusicCoordinator
 A coordinator class that manages the communication bridge between Swift and the OSMD JavaScript engine:
 - Handles JavaScript evaluation and message passing
 - Manages OSMD lifecycle and state
 - Provides error handling and async operation support
 - Implements the full OSMD API surface in Swift
 
-#### OSMDView
+#### SheetMusicView
 A SwiftUI view wrapper that embeds the OSMD web view:
 - Implements `UIViewRepresentable` for iOS and `NSViewRepresentable` for macOS
 - Manages WebKit view lifecycle
@@ -50,7 +50,7 @@ A SwiftUI view wrapper that embeds the OSMD web view:
 ### Communication Flow
 
 ```
-SwiftUI App ←→ OSMDView ←→ OSMDCoordinator ←→ WKWebView ←→ OSMD JavaScript
+SwiftUI App ←→ SheetMusicView ←→ SheetMusicCoordinator ←→ WKWebView ←→ OSMD JavaScript
 ```
 
 The bridge uses `WKWebView`'s JavaScript evaluation capabilities for Swift-to-OSMD communication and `WKScriptMessageHandler` for bidirectional messaging, ensuring robust and performant interaction between the native Swift layer and the embedded OSMD engine.
@@ -65,13 +65,13 @@ This project includes the compiled OpenSheetMusicDisplay library (v1.9.0) direct
 
 ## Swift Package Manager Integration
 
-The SwiftUI-OSMD bridge is designed for seamless integration into iOS and macOS projects using Swift Package Manager. Follow these comprehensive steps to add it to your project.
+The SheetMusicView bridge is designed for seamless integration into iOS and macOS projects using Swift Package Manager. Follow these comprehensive steps to add it to your project.
 
 ### Repository and Package Names
 
-- **GitHub Repository**: `https://github.com/dervaux/SwiftUIOSMD`
-- **Swift Package Name**: `SwiftUIOSMD`
-- **Import Statement**: `import SwiftUIOSMD`
+- **GitHub Repository**: `https://github.com/dervaux/SheetMusicView`
+- **Swift Package Name**: `SheetMusicView`
+- **Import Statement**: `import SheetMusicView`
 
 The repository and Swift package now have consistent naming for clarity and ease of use.
 
@@ -90,7 +90,7 @@ This is the easiest method for most developers:
 
 2. **Add Package Dependency**:
    - Go to `File` → `Add Package Dependencies...`
-   - Enter the repository URL: `https://github.com/dervaux/SwiftUIOSMD.git`
+   - Enter the repository URL: `https://github.com/dervaux/SheetMusicView.git`
    - Click `Add Package`
 
 3. **Configure Package Options**:
@@ -99,7 +99,7 @@ This is the easiest method for most developers:
    - Click `Add Package`
 
 4. **Verify Installation**:
-   - In your project navigator, you should see `SwiftUIOSMD` under "Package Dependencies"
+   - In your project navigator, you should see `SheetMusicView` under "Package Dependencies"
    - The package will be automatically linked to your target
 
 ### Method 2: Package.swift Integration
@@ -118,13 +118,13 @@ let package = Package(
         .macOS(.v12)
     ],
     dependencies: [
-        .package(url: "https://github.com/dervaux/SwiftUIOSMD.git", from: "1.0.0")
+        .package(url: "https://github.com/dervaux/SheetMusicView.git", from: "1.0.0")
     ],
     targets: [
         .target(
             name: "YourApp",
             dependencies: [
-                .product(name: "SwiftUIOSMD", package: "SwiftUIOSMD")
+                .product(name: "SheetMusicView", package: "SheetMusicView")
             ]
         )
     ]
@@ -138,7 +138,7 @@ For local development or when working with the source code directly:
 ```swift
 // Package.swift
 dependencies: [
-    .package(path: "../SwiftUIOSMD")  // Adjust path as needed
+    .package(path: "../SheetMusicView")  // Adjust path as needed
 ]
 ```
 
@@ -148,7 +148,7 @@ After successful integration, import the library in your Swift files:
 
 ```swift
 import SwiftUI
-import SwiftUIOSMD
+import SheetMusicView
 
 struct ContentView: View {
     @State private var musicXML: String = ""
@@ -156,7 +156,7 @@ struct ContentView: View {
     @State private var isLoading: Bool = false
 
     var body: some View {
-        OSMDView(
+        SheetMusicView(
             xml: $musicXML,
             transposeSteps: $transposeSteps,
             isLoading: $isLoading
@@ -171,8 +171,8 @@ struct ContentView: View {
 To verify the integration was successful:
 
 1. **Build your project** (`Cmd+B`) - it should compile without errors
-2. **Check imports** - `import SwiftUIOSMD` should not show any errors
-3. **Test basic functionality** - Try creating an `OSMDView` in a preview or simulator
+2. **Check imports** - `import SheetMusicView` should not show any errors
+3. **Test basic functionality** - Try creating a `SheetMusicView` in a preview or simulator
 
 ### App Configuration
 
@@ -197,9 +197,9 @@ If your app loads MusicXML files from remote servers, you may need to configure 
 
 #### Common Integration Issues
 
-**Problem**: "No such module 'SwiftUIOSMD'"
+**Problem**: "No such module 'SheetMusicView'"
 - **Solution**: Ensure the package was added correctly and your target includes the dependency
-- **Check**: Project Navigator → Package Dependencies → SwiftUIOSMD should be visible
+- **Check**: Project Navigator → Package Dependencies → SheetMusicView should be visible
 
 **Problem**: Build errors related to minimum deployment target
 - **Solution**: Ensure your app's deployment target is iOS 15.0+ or macOS 12.0+
@@ -216,7 +216,7 @@ If your app loads MusicXML files from remote servers, you may need to configure 
 #### Getting Help
 
 If you encounter issues:
-1. Check the [Issues](https://github.com/dervaux/SwiftUIOSMD/issues) page
+1. Check the [Issues](https://github.com/dervaux/SheetMusicView/issues) page
 2. Review the example projects in `TestApp/` and `ResponsiveDemo/` directories
 3. Ensure you're using compatible versions of Xcode and Swift
 
@@ -224,38 +224,38 @@ If you encounter issues:
 
 For experienced developers, here's the fastest way to get started:
 
-1. **Add Package**: In Xcode, `File` → `Add Package Dependencies` → `https://github.com/dervaux/SwiftUIOSMD.git`
-2. **Import**: Add `import SwiftUIOSMD` to your Swift file
-3. **Use**: Create an `OSMDView(xml: $musicXML, transposeSteps: $transposeSteps, isLoading: $isLoading)`
+1. **Add Package**: In Xcode, `File` → `Add Package Dependencies` → `https://github.com/dervaux/SheetMusicView.git`
+2. **Import**: Add `import SheetMusicView` to your Swift file
+3. **Use**: Create a `SheetMusicView(xml: $musicXML, transposeSteps: $transposeSteps, isLoading: $isLoading)`
 4. **Test**: Load some MusicXML content and verify rendering
 
 That's it! The package handles all the complex WebKit and OSMD integration automatically.
 
 ## Complete API Reference
 
-> **⚠️ IMPORTANT**: This section documents ALL available functionality in SwiftUIOSMD. When new features are implemented, they MUST be documented here immediately. This ensures users always have access to the complete, up-to-date API reference.
+> **⚠️ IMPORTANT**: This section documents ALL available functionality in SheetMusicView. When new features are implemented, they MUST be documented here immediately. This ensures users always have access to the complete, up-to-date API reference.
 
 ### Core Components
 
-#### OSMDView (SwiftUI View)
+#### SheetMusicView (SwiftUI View)
 
 The main SwiftUI component for displaying music notation.
 
 **Initializers:**
 ```swift
 // Basic initialization
-OSMDView(
+SheetMusicView(
     xml: Binding<String>,
     transposeSteps: Binding<Int> = .constant(0),
     isLoading: Binding<Bool> = .constant(false)
 )
 
 // Full initialization with callbacks
-OSMDView(
+SheetMusicView(
     xml: Binding<String>,
     transposeSteps: Binding<Int> = .constant(0),
     isLoading: Binding<Bool> = .constant(false),
-    onError: ((OSMDError) -> Void)? = nil,
+    onError: ((SheetMusicError) -> Void)? = nil,
     onReady: (() -> Void)? = nil
 )
 ```
@@ -264,24 +264,24 @@ OSMDView(
 - `xml: Binding<String>` - MusicXML content to display
 - `transposeSteps: Binding<Int>` - Number of semitones to transpose (-12 to +12)
 - `isLoading: Binding<Bool>` - Loading state indicator
-- `onError: ((OSMDError) -> Void)?` - Error callback handler
+- `onError: ((SheetMusicError) -> Void)?` - Error callback handler
 - `onReady: (() -> Void)?` - Ready state callback
 
-#### OSMDCoordinator (JavaScript Bridge)
+#### SheetMusicCoordinator (JavaScript Bridge)
 
 Low-level coordinator for direct OSMD control.
 
 **Published Properties:**
 ```swift
-@Published public var isLoading: Bool        // Current loading state
-@Published public var lastError: OSMDError?  // Last error encountered
-@Published public var isReady: Bool          // OSMD initialization state
+@Published public var isLoading: Bool             // Current loading state
+@Published public var lastError: SheetMusicError? // Last error encountered
+@Published public var isReady: Bool               // OSMD initialization state
 ```
 
 **Callback Properties:**
 ```swift
-public var onReady: (() -> Void)?           // Called when OSMD is ready
-public var onError: ((OSMDError) -> Void)?  // Called on errors
+public var onReady: (() -> Void)?                    // Called when OSMD is ready
+public var onError: ((SheetMusicError) -> Void)?    // Called on errors
 ```
 
 **Methods:**
@@ -305,13 +305,13 @@ func updateContainerSize(width: CGFloat, height: CGFloat) async throws
 func setPageFormat(_ format: String) async throws
 ```
 
-#### OSMDError (Error Handling)
+#### SheetMusicError (Error Handling)
 
 Comprehensive error types for all OSMD operations.
 
 **Error Cases:**
 ```swift
-case notReady                              // OSMD not initialized
+case notReady                              // Sheet music display not initialized
 case webViewNotAvailable                   // WebView not accessible
 case webViewLoadingFailed(String)          // WebView failed to load
 case javascriptEvaluationFailed(String)    // JS evaluation error
@@ -325,7 +325,7 @@ case operationFailed(String)               // General operation error
 **Error Descriptions:**
 All errors conform to `LocalizedError` and provide descriptive error messages.
 
-#### SwiftUIOSMDInfo (Library Information)
+#### SheetMusicViewInfo (Library Information)
 
 Static information about the library.
 
@@ -388,26 +388,26 @@ public static let description: String          // Library description
 
 When implementing new features, follow these requirements:
 
-1. **Add to OSMDCoordinator**: Implement the JavaScript bridge method
-2. **Update OSMDView**: Add SwiftUI bindings if needed
+1. **Add to SheetMusicCoordinator**: Implement the JavaScript bridge method
+2. **Update SheetMusicView**: Add SwiftUI bindings if needed
 3. **Document in README**: Update this API reference section immediately
-4. **Add Error Handling**: Include appropriate OSMDError cases
+4. **Add Error Handling**: Include appropriate SheetMusicError cases
 5. **Write Tests**: Add unit tests for new functionality
 6. **Update Examples**: Show usage in example applications
 
 **Example of proper API extension:**
 ```swift
-// 1. Add to OSMDCoordinator
+// 1. Add to SheetMusicCoordinator
 public func setTempo(_ bpm: Int) async throws {
     // Implementation
 }
 
-// 2. Add to OSMDView if needed
+// 2. Add to SheetMusicView if needed
 @Binding private var tempo: Int
 
 // 3. Document here in README (this section)
-// 4. Add OSMDError.tempoChangeFailed if needed
-// 5. Add tests in SwiftUIOSMDTests
+// 4. Add SheetMusicError.tempoChangeFailed if needed
+// 5. Add tests in SheetMusicViewTests
 // 6. Update TestApp example
 ```
 
@@ -415,7 +415,7 @@ This ensures the API reference remains complete and accurate for all users.
 
 ## Responsive Line Wrapping
 
-The SwiftUI-OSMD bridge includes comprehensive responsive line wrapping functionality that automatically adapts music notation layout to different screen sizes and orientations.
+The SheetMusicView bridge includes comprehensive responsive line wrapping functionality that automatically adapts music notation layout to different screen sizes and orientations.
 
 ### Key Features
 
@@ -427,7 +427,7 @@ The SwiftUI-OSMD bridge includes comprehensive responsive line wrapping function
 
 ### How It Works
 
-1. **Container Monitoring**: The `OSMDView` uses `GeometryReader` to monitor container size changes
+1. **Container Monitoring**: The `SheetMusicView` uses `GeometryReader` to monitor container size changes
 2. **Intelligent Updates**: Only meaningful size changes (>1px) trigger layout updates to optimize performance
 3. **Dynamic Page Format**: Automatically selects optimal page format based on container dimensions and aspect ratio
 4. **OSMD Integration**: Leverages OSMD's built-in `autoResize` and "Endless" page format for optimal line wrapping
@@ -454,7 +454,7 @@ swift run ResponsiveDemo
 
 ```swift
 import SwiftUI
-import SwiftUIOSMD
+import SheetMusicView
 
 struct ContentView: View {
     @State private var musicXML: String = ""
@@ -463,7 +463,7 @@ struct ContentView: View {
 
     var body: some View {
         VStack {
-            OSMDView(
+            SheetMusicView(
                 xml: $musicXML,
                 transposeSteps: $transposeSteps,
                 isLoading: $isLoading
@@ -496,27 +496,27 @@ struct ContentView: View {
 ### Advanced Usage with Error Handling
 
 ```swift
-struct AdvancedOSMDView: View {
-    @StateObject private var osmdManager = OSMDManager()
+struct AdvancedSheetMusicView: View {
+    @StateObject private var sheetMusicManager = SheetMusicManager()
 
     var body: some View {
         VStack {
-            if osmdManager.isLoading {
+            if sheetMusicManager.isLoading {
                 ProgressView("Loading music...")
             } else {
-                OSMDView(
-                    xml: $osmdManager.currentXML,
-                    transposeSteps: $osmdManager.transposeSteps,
+                SheetMusicView(
+                    xml: $sheetMusicManager.currentXML,
+                    transposeSteps: $sheetMusicManager.transposeSteps,
                     onError: { error in
-                        osmdManager.handleError(error)
+                        sheetMusicManager.handleError(error)
                     },
                     onReady: {
-                        osmdManager.onOSMDReady()
+                        sheetMusicManager.onSheetMusicReady()
                     }
                 )
             }
 
-            if let error = osmdManager.lastError {
+            if let error = sheetMusicManager.lastError {
                 Text("Error: \(error.localizedDescription)")
                     .foregroundColor(.red)
                     .padding()
@@ -525,7 +525,7 @@ struct AdvancedOSMDView: View {
     }
 }
 
-class OSMDManager: ObservableObject {
+class SheetMusicManager: ObservableObject {
     @Published var currentXML: String = ""
     @Published var transposeSteps: Int = 0
     @Published var isLoading: Bool = false
@@ -536,7 +536,7 @@ class OSMDManager: ObservableObject {
         isLoading = false
     }
 
-    func onOSMDReady() {
+    func onSheetMusicReady() {
         isLoading = false
         lastError = nil
     }
@@ -548,11 +548,11 @@ class OSMDManager: ObservableObject {
 ### Project Structure
 
 ```
-SwiftUIOSMD/
+SheetMusicView/
 ├── Sources/
-│   └── SwiftUIOSMD/
-│       ├── OSMDView.swift
-│       ├── OSMDCoordinator.swift
+│   └── SheetMusicView/
+│       ├── SheetMusicView.swift
+│       ├── SheetMusicCoordinator.swift
 │       └── Resources/
 │           ├── osmd.html
 │           └── opensheetmusicdisplay.min.js
@@ -578,8 +578,8 @@ If you're setting up this package for distribution:
 
 1. **Clone the repository**:
    ```bash
-   git clone https://github.com/dervaux/SwiftUIOSMD.git
-   cd SwiftUIOSMD
+   git clone https://github.com/dervaux/SheetMusicView.git
+   cd SheetMusicView
    ```
 
 2. **Build the package**:

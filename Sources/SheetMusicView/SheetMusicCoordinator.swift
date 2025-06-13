@@ -3,22 +3,22 @@ import WebKit
 
 /// Coordinator class that manages the communication bridge between Swift and the OSMD JavaScript engine
 @MainActor
-public class OSMDCoordinator: NSObject, ObservableObject {
-    
+public class SheetMusicCoordinator: NSObject, ObservableObject {
+
     // MARK: - Published Properties
     @Published public var isLoading: Bool = false
-    @Published public var lastError: OSMDError?
+    @Published public var lastError: SheetMusicError?
     @Published public var isReady: Bool = false
-    
+
     // MARK: - Private Properties
     private weak var webView: WKWebView?
-    private var pendingOperations: [String: (Result<Any?, OSMDError>) -> Void] = [:]
+    private var pendingOperations: [String: (Result<Any?, SheetMusicError>) -> Void] = [:]
     private var operationCounter: Int = 0
     private var currentTransposition: Int = 0
-    
+
     // MARK: - Callbacks
     public var onReady: (() -> Void)?
-    public var onError: ((OSMDError) -> Void)?
+    public var onError: ((SheetMusicError) -> Void)?
     
     // MARK: - Initialization
     public override init() {
@@ -32,7 +32,7 @@ public class OSMDCoordinator: NSObject, ObservableObject {
         webView.navigationDelegate = self
 
         #if DEBUG
-        print("OSMDCoordinator: WebView setup complete")
+        print("SheetMusicCoordinator: WebView setup complete")
         #endif
     }
     
@@ -41,7 +41,7 @@ public class OSMDCoordinator: NSObject, ObservableObject {
     /// Load MusicXML content into OSMD
     public func loadMusicXML(_ xml: String) async throws {
         guard isReady else {
-            throw OSMDError.notReady
+            throw SheetMusicError.notReady
         }
 
         isLoading = true
@@ -61,17 +61,17 @@ public class OSMDCoordinator: NSObject, ObservableObject {
             isLoading = false
         } catch {
             isLoading = false
-            let osmdError = error as? OSMDError ?? OSMDError.loadingFailed(error.localizedDescription)
-            lastError = osmdError
-            onError?(osmdError)
-            throw osmdError
+            let sheetMusicError = error as? SheetMusicError ?? SheetMusicError.loadingFailed(error.localizedDescription)
+            lastError = sheetMusicError
+            onError?(sheetMusicError)
+            throw sheetMusicError
         }
     }
     
     /// Transpose the music by the specified number of semitones
     public func transpose(_ steps: Int) async throws {
         guard isReady else {
-            throw OSMDError.notReady
+            throw SheetMusicError.notReady
         }
 
         do {
@@ -80,78 +80,78 @@ public class OSMDCoordinator: NSObject, ObservableObject {
             let script = "osmdSetTranspose(\(steps))"
             _ = try await evaluateJavaScript(script)
         } catch {
-            let osmdError = error as? OSMDError ?? OSMDError.transpositionFailed(error.localizedDescription)
-            lastError = osmdError
-            onError?(osmdError)
-            throw osmdError
+            let sheetMusicError = error as? SheetMusicError ?? SheetMusicError.transpositionFailed(error.localizedDescription)
+            lastError = sheetMusicError
+            onError?(sheetMusicError)
+            throw sheetMusicError
         }
     }
     
     /// Render the loaded music
     public func render() async throws {
         guard isReady else {
-            throw OSMDError.notReady
+            throw SheetMusicError.notReady
         }
-        
+
         do {
             let script = "osmdRender()"
             _ = try await evaluateJavaScript(script)
         } catch {
-            let osmdError = error as? OSMDError ?? OSMDError.renderingFailed(error.localizedDescription)
-            lastError = osmdError
-            onError?(osmdError)
-            throw osmdError
+            let sheetMusicError = error as? SheetMusicError ?? SheetMusicError.renderingFailed(error.localizedDescription)
+            lastError = sheetMusicError
+            onError?(sheetMusicError)
+            throw sheetMusicError
         }
     }
     
     /// Clear the current music display
     public func clear() async throws {
         guard isReady else {
-            throw OSMDError.notReady
+            throw SheetMusicError.notReady
         }
 
         do {
             let script = "osmdClear()"
             _ = try await evaluateJavaScript(script)
         } catch {
-            let osmdError = error as? OSMDError ?? OSMDError.operationFailed(error.localizedDescription)
-            lastError = osmdError
-            onError?(osmdError)
-            throw osmdError
+            let sheetMusicError = error as? SheetMusicError ?? SheetMusicError.operationFailed(error.localizedDescription)
+            lastError = sheetMusicError
+            onError?(sheetMusicError)
+            throw sheetMusicError
         }
     }
 
     /// Update the container size for responsive layout
     public func updateContainerSize(width: CGFloat, height: CGFloat) async throws {
         guard isReady else {
-            throw OSMDError.notReady
+            throw SheetMusicError.notReady
         }
 
         do {
             let script = "osmdUpdateContainerSize(\(width), \(height))"
             _ = try await evaluateJavaScript(script)
         } catch {
-            let osmdError = error as? OSMDError ?? OSMDError.operationFailed(error.localizedDescription)
-            lastError = osmdError
-            onError?(osmdError)
-            throw osmdError
+            let sheetMusicError = error as? SheetMusicError ?? SheetMusicError.operationFailed(error.localizedDescription)
+            lastError = sheetMusicError
+            onError?(sheetMusicError)
+            throw sheetMusicError
         }
     }
 
     /// Set page format for responsive layout
     public func setPageFormat(_ format: String) async throws {
         guard isReady else {
-            throw OSMDError.notReady
+            throw SheetMusicError.notReady
         }
 
         do {
             let script = "osmdSetPageFormat('\(format)')"
             _ = try await evaluateJavaScript(script)
         } catch {
-            let osmdError = error as? OSMDError ?? OSMDError.operationFailed(error.localizedDescription)
-            lastError = osmdError
-            onError?(osmdError)
-            throw osmdError
+            let sheetMusicError = error as? SheetMusicError ?? SheetMusicError.operationFailed(error.localizedDescription)
+            lastError = sheetMusicError
+            onError?(sheetMusicError)
+            throw sheetMusicError
         }
     }
     
@@ -159,7 +159,7 @@ public class OSMDCoordinator: NSObject, ObservableObject {
     
     private func evaluateJavaScript(_ script: String) async throws -> Any? {
         guard let webView = webView else {
-            throw OSMDError.webViewNotAvailable
+            throw SheetMusicError.webViewNotAvailable
         }
 
         return try await withCheckedThrowingContinuation { continuation in
@@ -191,7 +191,7 @@ public class OSMDCoordinator: NSObject, ObservableObject {
                 if let error = error {
                     // Only resume if the operation is still pending
                     if self.pendingOperations.removeValue(forKey: operationId) != nil {
-                        continuation.resume(throwing: OSMDError.javascriptEvaluationFailed(error.localizedDescription))
+                        continuation.resume(throwing: SheetMusicError.javascriptEvaluationFailed(error.localizedDescription))
                     }
                 }
                 // If no error, the success/error will be handled by the message handler
@@ -200,7 +200,7 @@ public class OSMDCoordinator: NSObject, ObservableObject {
             // Add a timeout to prevent hanging
             DispatchQueue.main.asyncAfter(deadline: .now() + 10) {
                 if self.pendingOperations.removeValue(forKey: operationId) != nil {
-                    continuation.resume(throwing: OSMDError.operationFailed("Operation timed out"))
+                    continuation.resume(throwing: SheetMusicError.operationFailed("Operation timed out"))
                 }
             }
         }
@@ -208,17 +208,17 @@ public class OSMDCoordinator: NSObject, ObservableObject {
 }
 
 // MARK: - WKScriptMessageHandler
-extension OSMDCoordinator: WKScriptMessageHandler {
+extension SheetMusicCoordinator: WKScriptMessageHandler {
     public func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
         guard let body = message.body as? [String: Any] else {
             #if DEBUG
-            print("OSMDCoordinator: Received invalid message body")
+            print("SheetMusicCoordinator: Received invalid message body")
             #endif
             return
         }
 
         #if DEBUG
-        print("OSMDCoordinator: Received message: \(body)")
+        print("SheetMusicCoordinator: Received message: \(body)")
         #endif
 
         if let type = body["type"] as? String {
@@ -226,13 +226,13 @@ extension OSMDCoordinator: WKScriptMessageHandler {
             case "test":
                 #if DEBUG
                 if let message = body["message"] as? String {
-                    print("OSMDCoordinator: Test message received: \(message)")
+                    print("SheetMusicCoordinator: Test message received: \(message)")
                 }
                 #endif
 
             case "ready":
                 #if DEBUG
-                print("OSMDCoordinator: OSMD is ready!")
+                print("SheetMusicCoordinator: OSMD is ready!")
                 #endif
                 isReady = true
                 onReady?()
@@ -247,13 +247,13 @@ extension OSMDCoordinator: WKScriptMessageHandler {
                 if let operationId = body["operationId"] as? String,
                    let completion = pendingOperations.removeValue(forKey: operationId) {
                     let errorMessage = body["error"] as? String ?? "Unknown error"
-                    completion(.failure(OSMDError.javascriptError(errorMessage)))
+                    completion(.failure(SheetMusicError.javascriptError(errorMessage)))
                 } else if let errorMessage = body["error"] as? String {
-                    let error = OSMDError.javascriptError(errorMessage)
+                    let error = SheetMusicError.javascriptError(errorMessage)
                     lastError = error
                     onError?(error)
                 }
-                
+
             default:
                 break
             }
@@ -262,26 +262,26 @@ extension OSMDCoordinator: WKScriptMessageHandler {
 }
 
 // MARK: - WKNavigationDelegate
-extension OSMDCoordinator: WKNavigationDelegate {
+extension SheetMusicCoordinator: WKNavigationDelegate {
     public func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
         #if DEBUG
-        print("OSMDCoordinator: WebView finished loading")
+        print("SheetMusicCoordinator: WebView finished loading")
         #endif
         // Web view finished loading, OSMD initialization will be handled by JavaScript
     }
 
     public func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
         #if DEBUG
-        print("OSMDCoordinator: WebView failed to load: \(error.localizedDescription)")
+        print("SheetMusicCoordinator: WebView failed to load: \(error.localizedDescription)")
         #endif
-        let osmdError = OSMDError.webViewLoadingFailed(error.localizedDescription)
-        lastError = osmdError
-        onError?(osmdError)
+        let sheetMusicError = SheetMusicError.webViewLoadingFailed(error.localizedDescription)
+        lastError = sheetMusicError
+        onError?(sheetMusicError)
     }
 }
 
 // MARK: - Error Types
-public enum OSMDError: Error, LocalizedError {
+public enum SheetMusicError: Error, LocalizedError {
     case notReady
     case webViewNotAvailable
     case webViewLoadingFailed(String)
@@ -291,11 +291,11 @@ public enum OSMDError: Error, LocalizedError {
     case renderingFailed(String)
     case transpositionFailed(String)
     case operationFailed(String)
-    
+
     public var errorDescription: String? {
         switch self {
         case .notReady:
-            return "OSMD is not ready. Please wait for initialization to complete."
+            return "Sheet music display is not ready. Please wait for initialization to complete."
         case .webViewNotAvailable:
             return "WebView is not available."
         case .webViewLoadingFailed(let message):

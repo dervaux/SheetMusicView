@@ -1,29 +1,29 @@
 import SwiftUI
-import SwiftUIOSMD
+import SheetMusicView
 
 struct ContentView: View {
     @State private var musicXML: String = ""
     @State private var transposeSteps: Int = 0
     @State private var isLoading: Bool = false
-    @State private var lastError: OSMDError?
+    @State private var lastError: SheetMusicError?
     @State private var showingError: Bool = false
     
     var body: some View {
         VStack(spacing: 20) {
             // Header
             VStack {
-                Text("SwiftUI-OSMD Bridge Demo")
+                Text("SheetMusicView Demo")
                     .font(.largeTitle)
                     .fontWeight(.bold)
-                
+
                 Text("OpenSheetMusicDisplay in SwiftUI")
                     .font(.subheadline)
                     .foregroundColor(.secondary)
             }
             .padding()
             
-            // OSMD View
-            OSMDView(
+            // Sheet Music View
+            SheetMusicView(
                 xml: $musicXML,
                 transposeSteps: $transposeSteps,
                 isLoading: $isLoading,
@@ -32,7 +32,7 @@ struct ContentView: View {
                     showingError = true
                 },
                 onReady: {
-                    print("OSMD is ready!")
+                    print("Sheet music display is ready!")
                 }
             )
             .frame(minHeight: 400)

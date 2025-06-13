@@ -4,7 +4,7 @@
 import PackageDescription
 
 let package = Package(
-    name: "SwiftUIOSMD",
+    name: "SheetMusicView",
     platforms: [
         .iOS(.v15),
         .macOS(.v12)
@@ -12,8 +12,8 @@ let package = Package(
     products: [
         // Products define the executables and libraries a package produces, making them visible to other packages.
         .library(
-            name: "SwiftUIOSMD",
-            targets: ["SwiftUIOSMD"]),
+            name: "SheetMusicView",
+            targets: ["SheetMusicView"]),
     ],
     dependencies: [
         // Dependencies declare other packages that this package depends on.
@@ -22,14 +22,14 @@ let package = Package(
         // Targets are the basic building blocks of a package, defining a module or a test suite.
         // Targets can depend on other targets in this package and products from dependencies.
         .target(
-            name: "SwiftUIOSMD",
+            name: "SheetMusicView",
             dependencies: [],
             resources: [
                 .process("Resources")
             ]
         ),
         .testTarget(
-            name: "SwiftUIOSMDTests",
-            dependencies: ["SwiftUIOSMD"]),
+            name: "SheetMusicViewTests",
+            dependencies: ["SheetMusicView"]),
     ]
 )

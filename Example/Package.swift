@@ -14,13 +14,13 @@ let package = Package(
             targets: ["OSMDExample"]),
     ],
     dependencies: [
-        .package(name: "OSMD_Swift", path: "../")
+        .package(name: "SheetMusicView", path: "../")
     ],
     targets: [
         .executableTarget(
             name: "OSMDExample",
             dependencies: [
-                .product(name: "SwiftUIOSMD", package: "OSMD_Swift")
+                .product(name: "SheetMusicView", package: "SheetMusicView")
             ]
         ),
     ]

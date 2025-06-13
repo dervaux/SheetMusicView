@@ -1,8 +1,8 @@
-# SwiftUI-OSMD Bridge - Implementation Complete! 🎉
+# SheetMusicView - Implementation Complete! 🎉
 
 ## ✅ **Successfully Implemented**
 
-The SwiftUI-OSMD Bridge is now **fully functional** with a comprehensive test application demonstrating all features.
+The SheetMusicView bridge is now **fully functional** with a comprehensive test application demonstrating all features.
 
 ### **🏗️ Core Components Built**
 
@@ -11,13 +11,13 @@ The SwiftUI-OSMD Bridge is now **fully functional** with a comprehensive test ap
    - Proper resource bundling for HTML template
    - Test target configuration
 
-2. **OSMDCoordinator.swift** - JavaScript Bridge (247 lines)
+2. **SheetMusicCoordinator.swift** - JavaScript Bridge (247 lines)
    - Async/await Swift ↔ JavaScript communication
-   - Comprehensive error handling with custom `OSMDError` types
+   - Comprehensive error handling with custom `SheetMusicError` types
    - MainActor isolation for thread safety
    - Core operations: `loadMusicXML()`, `transpose()`, `render()`, `clear()`
 
-3. **OSMDView.swift** - SwiftUI Component (200+ lines)
+3. **SheetMusicView.swift** - SwiftUI Component (200+ lines)
    - Cross-platform `UIViewRepresentable`/`NSViewRepresentable`
    - Reactive SwiftUI bindings (`@Binding`, `@State`)
    - Automatic change detection and updates
@@ -29,7 +29,7 @@ The SwiftUI-OSMD Bridge is now **fully functional** with a comprehensive test ap
    - Proper error handling and Swift messaging
    - Responsive design with auto-resize
 
-5. **SwiftUIOSMDTests.swift** - Test Suite
+5. **SheetMusicViewTests.swift** - Test Suite
    - Error handling validation
    - Coordinator initialization testing
    - Async operation testing with MainActor
@@ -146,14 +146,14 @@ swift run OSMDTestApp
 ### **Basic Usage**
 ```swift
 import SwiftUI
-import SwiftUIOSMD
+import SheetMusicView
 
 struct ContentView: View {
     @State private var musicXML: String = ""
     @State private var transposeSteps: Int = 0
     
     var body: some View {
-        OSMDView(
+        SheetMusicView(
             xml: $musicXML,
             transposeSteps: $transposeSteps
         )
@@ -164,15 +164,15 @@ struct ContentView: View {
 
 ### **Advanced Usage with Error Handling**
 ```swift
-OSMDView(
+SheetMusicView(
     xml: $musicXML,
     transposeSteps: $transposeSteps,
     isLoading: $isLoading,
     onError: { error in
-        print("OSMD Error: \(error.localizedDescription)")
+        print("Sheet Music Error: \(error.localizedDescription)")
     },
     onReady: {
-        print("OSMD is ready!")
+        print("Sheet music display is ready!")
     }
 )
 ```

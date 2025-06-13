@@ -1,10 +1,10 @@
 import XCTest
-@testable import SwiftUIOSMD
+@testable import SheetMusicView
 
-final class SwiftUIOSMDTests: XCTestCase {
-    
-    func testOSMDErrorDescriptions() {
-        let errors: [OSMDError] = [
+final class SheetMusicViewTests: XCTestCase {
+
+    func testSheetMusicErrorDescriptions() {
+        let errors: [SheetMusicError] = [
             .notReady,
             .webViewNotAvailable,
             .webViewLoadingFailed("Test error"),
@@ -15,57 +15,57 @@ final class SwiftUIOSMDTests: XCTestCase {
             .transpositionFailed("Transpose error"),
             .operationFailed("Operation error")
         ]
-        
+
         for error in errors {
             XCTAssertNotNil(error.errorDescription)
             XCTAssertFalse(error.errorDescription!.isEmpty)
         }
     }
-    
+
     @MainActor
-    func testOSMDCoordinatorInitialization() {
-        let coordinator = OSMDCoordinator()
+    func testSheetMusicCoordinatorInitialization() {
+        let coordinator = SheetMusicCoordinator()
 
         XCTAssertFalse(coordinator.isLoading)
         XCTAssertFalse(coordinator.isReady)
         XCTAssertNil(coordinator.lastError)
     }
     
-    func testOSMDCoordinatorNotReadyOperations() async {
-        let coordinator = await OSMDCoordinator()
-        
+    func testSheetMusicCoordinatorNotReadyOperations() async {
+        let coordinator = await SheetMusicCoordinator()
+
         // Test operations when not ready
         do {
             try await coordinator.loadMusicXML("<musicxml></musicxml>")
             XCTFail("Should throw notReady error")
-        } catch OSMDError.notReady {
+        } catch SheetMusicError.notReady {
             // Expected
         } catch {
             XCTFail("Unexpected error: \(error)")
         }
-        
+
         do {
             try await coordinator.transpose(2)
             XCTFail("Should throw notReady error")
-        } catch OSMDError.notReady {
+        } catch SheetMusicError.notReady {
             // Expected
         } catch {
             XCTFail("Unexpected error: \(error)")
         }
-        
+
         do {
             try await coordinator.render()
             XCTFail("Should throw notReady error")
-        } catch OSMDError.notReady {
+        } catch SheetMusicError.notReady {
             // Expected
         } catch {
             XCTFail("Unexpected error: \(error)")
         }
-        
+
         do {
             try await coordinator.clear()
             XCTFail("Should throw notReady error")
-        } catch OSMDError.notReady {
+        } catch SheetMusicError.notReady {
             // Expected
         } catch {
             XCTFail("Unexpected error: \(error)")

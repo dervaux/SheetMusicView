@@ -1,6 +1,6 @@
 # Responsive Line Wrapping Demo
 
-This demo showcases the automatic line wrapping functionality implemented in the SwiftUI-OSMD bridge project.
+This demo showcases the automatic line wrapping functionality implemented in the SheetMusicView bridge project.
 
 ## Features Demonstrated
 
@@ -64,12 +64,12 @@ This demo showcases the automatic line wrapping functionality implemented in the
 
 ### Key Components
 
-1. **Enhanced OSMDView**
+1. **Enhanced SheetMusicView**
    - Uses `GeometryReader` to monitor container size changes
    - Implements debounced size change detection
    - Automatically determines optimal page format
 
-2. **Extended OSMDCoordinator**
+2. **Extended SheetMusicCoordinator**
    - New `updateContainerSize()` method
    - New `setPageFormat()` method
    - Seamless integration with existing functionality
@@ -120,15 +120,15 @@ The demo displays real-time container information including:
 To add responsive line wrapping to your own SwiftUI app:
 
 ```swift
-import SwiftUIOSMD
+import SheetMusicView
 
 struct MyMusicView: View {
     @State private var musicXML: String = "..."
     @State private var transposeSteps: Int = 0
     @State private var isLoading: Bool = false
-    
+
     var body: some View {
-        OSMDView(
+        SheetMusicView(
             xml: $musicXML,
             transposeSteps: $transposeSteps,
             isLoading: $isLoading

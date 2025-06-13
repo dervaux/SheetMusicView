@@ -1,40 +1,40 @@
 import XCTest
 import SwiftUI
-@testable import SwiftUIOSMD
+@testable import SheetMusicView
 
 @MainActor
 final class ResponsiveLayoutTests: XCTestCase {
-    
-    var coordinator: OSMDCoordinator!
-    
+
+    var coordinator: SheetMusicCoordinator!
+
     override func setUp() async throws {
-        coordinator = OSMDCoordinator()
+        coordinator = SheetMusicCoordinator()
     }
-    
+
     override func tearDown() async throws {
         coordinator = nil
     }
-    
+
     func testContainerSizeUpdateMethod() async throws {
         // Test that the container size update method exists and can be called
         // Note: This will fail until OSMD is actually initialized in a WebView
         do {
             try await coordinator.updateContainerSize(width: 800, height: 600)
             XCTFail("Should have thrown notReady error")
-        } catch OSMDError.notReady {
+        } catch SheetMusicError.notReady {
             // Expected behavior when OSMD is not ready
             XCTAssertTrue(true)
         } catch {
             XCTFail("Unexpected error: \(error)")
         }
     }
-    
+
     func testPageFormatUpdateMethod() async throws {
         // Test that the page format update method exists and can be called
         do {
             try await coordinator.setPageFormat("Endless")
             XCTFail("Should have thrown notReady error")
-        } catch OSMDError.notReady {
+        } catch SheetMusicError.notReady {
             // Expected behavior when OSMD is not ready
             XCTAssertTrue(true)
         } catch {
@@ -82,7 +82,7 @@ final class ResponsiveLayoutTests: XCTestCase {
 
 // MARK: - Test Helper
 
-/// Helper class to test private methods from OSMDView
+/// Helper class to test private methods from SheetMusicView
 private class ResponsiveTestHelper {
     
     func determineOptimalPageFormat(for size: CGSize) -> String {
