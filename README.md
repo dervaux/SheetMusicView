@@ -307,8 +307,8 @@ func setPageFormat(_ format: String) async throws
 
 // Zoom functionality
 func setZoom(_ level: Double) async throws        // Set specific zoom level (0.1 to 5.0)
-func zoomIn() async throws                        // Zoom in by 0.2
-func zoomOut() async throws                       // Zoom out by 0.2
+func zoomIn() async throws                        // Zoom in by 0.02 (2%)
+func zoomOut() async throws                       // Zoom out by 0.02 (2%)
 func resetZoom() async throws                     // Reset to 1.0 (100%)
 var zoomLevel: Double { get }                     // Get current zoom level
 ```

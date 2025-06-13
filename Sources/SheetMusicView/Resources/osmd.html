@@ -321,25 +321,25 @@
             }
         }
 
-        // Zoom in by 20%
+        // Zoom in by 2%
         function osmdZoomIn() {
             if (!isInitialized || !osmd) {
                 throw new Error('OSMD is not initialized');
             }
 
             const currentZoom = osmd.Zoom || 1.0;
-            const newZoom = Math.min(currentZoom + 0.2, 5.0);
+            const newZoom = Math.min(currentZoom + 0.02, 5.0);
             return osmdSetZoom(newZoom);
         }
 
-        // Zoom out by 20%
+        // Zoom out by 2%
         function osmdZoomOut() {
             if (!isInitialized || !osmd) {
                 throw new Error('OSMD is not initialized');
             }
 
             const currentZoom = osmd.Zoom || 1.0;
-            const newZoom = Math.max(currentZoom - 0.2, 0.1);
+            const newZoom = Math.max(currentZoom - 0.02, 0.1);
             return osmdSetZoom(newZoom);
         }
 

@@ -129,15 +129,15 @@ public class SheetMusicCoordinator: NSObject, ObservableObject {
         }
     }
 
-    /// Zoom in by increasing the zoom level by 0.2
+    /// Zoom in by increasing the zoom level by 0.02
     public func zoomIn() async throws {
-        let newZoom = min(currentZoom + 0.2, 5.0)
+        let newZoom = min(currentZoom + 0.02, 5.0)
         try await setZoom(newZoom)
     }
 
-    /// Zoom out by decreasing the zoom level by 0.2
+    /// Zoom out by decreasing the zoom level by 0.02
     public func zoomOut() async throws {
-        let newZoom = max(currentZoom - 0.2, 0.1)
+        let newZoom = max(currentZoom - 0.02, 0.1)
         try await setZoom(newZoom)
     }
 
