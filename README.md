@@ -293,16 +293,30 @@ SheetMusicView(
 SheetMusicView supports SwiftUI-style view modifiers to control the display of musical score elements:
 
 ```swift
+// Basic usage - all elements hidden by default
 SheetMusicView(xml: $musicXML)
-    .showTitle(false)                    // Hide the piece title
-    .showInstrumentName(true)            // Show instrument names (default)
-    .showDebugPanel(true)                // Show debug status panel (default: false)
+
+// Show specific elements using modifiers
+SheetMusicView(xml: $musicXML)
+    .showTitle()                         // Show title (equivalent to .showTitle(true))
+    .showInstrumentName()                // Show instrument names
+    .showComposer(false)                 // Explicitly hide composer
+    .showDebugPanel()                    // Show debug panel
 ```
 
 **Available View Modifiers:**
-- `.showTitle(Bool)` - Controls whether the piece title is displayed (default: true)
-- `.showInstrumentName(Bool)` - Controls whether instrument names are shown (default: true)
-- `.showDebugPanel(Bool)` - Controls whether the debug status panel is displayed (default: false)
+
+By default, all display elements are **hidden** unless you use their corresponding modifier. When you use a modifier without parameters, the element is shown. You can also explicitly control visibility with true/false parameters.
+
+**Default Behavior:**
+- **No modifiers used**: All elements hidden (clean, minimal display)
+- **Modifier without parameter**: Element shown (e.g., `.showTitle()` = `.showTitle(true)`)
+- **Modifier with explicit parameter**: Use specified value (e.g., `.showTitle(false)` hides title)
+
+- `.showTitle()` or `.showTitle(Bool)` - Controls whether the piece title is displayed
+- `.showInstrumentName()` or `.showInstrumentName(Bool)` - Controls whether instrument names are shown
+- `.showComposer()` or `.showComposer(Bool)` - Controls whether the composer name is displayed
+- `.showDebugPanel()` or `.showDebugPanel(Bool)` - Controls whether the debug status panel is displayed
 
 #### Debug Panel
 
@@ -315,16 +329,26 @@ The debug panel provides real-time information about the OSMD engine status and 
 The debug panel appears as a semi-transparent overlay in the top-right corner of the view when enabled. It's hidden by default to keep the production interface clean.
 
 **Available Modifiers:**
-- `.showTitle(_ show: Bool)` - Controls whether the piece title is displayed (default: true)
-- `.showInstrumentName(_ show: Bool)` - Controls whether instrument names are shown (default: true)
+- `.showTitle()` or `.showTitle(_ show: Bool)` - Controls whether the piece title is displayed
+- `.showInstrumentName()` or `.showInstrumentName(_ show: Bool)` - Controls whether instrument names are shown
+- `.showComposer()` or `.showComposer(_ show: Bool)` - Controls whether the composer name is displayed
+- `.showDebugPanel()` or `.showDebugPanel(_ show: Bool)` - Controls whether the debug status panel is displayed
 
 **Modifier Chaining:**
 Modifiers can be chained together and applied in any order:
 
 ```swift
+// Dynamic control with state variables
 SheetMusicView(xml: $musicXML, transposeSteps: $transpose)
     .showTitle(showTitleToggle)
     .showInstrumentName(showInstrumentsToggle)
+    .showComposer(showComposerToggle)
+
+// Mixed usage - some with parameters, some without
+SheetMusicView(xml: $musicXML)
+    .showTitle()                         // Show title (no parameter = true)
+    .showInstrumentName(false)           // Explicitly hide instruments
+    .showComposer()                      // Show composer (no parameter = true)
 ```
 
 #### SheetMusicCoordinator (JavaScript Bridge)
@@ -747,4 +771,4 @@ The included OpenSheetMusicDisplay library is also licensed under BSD-3-Clause. 
 
 - [OpenSheetMusicDisplay](https://opensheetmusicdisplay.org) team for the excellent music notation engine
 - [VexFlow](https://vexflow.com) for the underlying music rendering technology
-- The Swift and SwiftUI communities for inspiration and best practicesw
+- The Swift and SwiftUI communities for inspiration and best practices

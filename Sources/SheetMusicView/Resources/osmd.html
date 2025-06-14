@@ -159,13 +159,13 @@
                     autoResize: true,
                     backend: 'svg',
                     pageFormat: 'Endless', // Enable vertical scrolling for long pieces
-                    drawTitle: true,
-                    drawSubtitle: true,
-                    drawComposer: true,
-                    drawLyricist: true,
-                    drawCredits: true,
-                    drawPartNames: true,
-                    drawPartAbbreviations: true,
+                    drawTitle: false,
+                    drawSubtitle: false,
+                    drawComposer: false,
+                    drawLyricist: false,
+                    drawCredits: false,
+                    drawPartNames: false,
+                    drawPartAbbreviations: false,
                     drawMeasureNumbers: true,
                     measureNumberInterval: 5,
                     drawTimeSignatures: true,
@@ -475,20 +475,21 @@
             }
         }
 
-        // Update display options for title and instrument names
-        function osmdUpdateDisplayOptions(showTitle, showInstrumentName) {
+        // Update display options for title, instrument names, and composer
+        function osmdUpdateDisplayOptions(showTitle, showInstrumentName, showComposer) {
             if (!isInitialized || !osmd) {
                 throw new Error('OSMD is not initialized');
             }
 
             try {
-                console.log(`Updating display options - Title: ${showTitle}, Instrument Names: ${showInstrumentName}`);
+                console.log(`Updating display options - Title: ${showTitle}, Instrument Names: ${showInstrumentName}, Composer: ${showComposer}`);
 
                 // Update OSMD rules for display options
                 if (osmd.rules) {
                     osmd.rules.RenderTitle = showTitle;
                     osmd.rules.RenderPartNames = showInstrumentName;
                     osmd.rules.RenderPartAbbreviations = showInstrumentName;
+                    osmd.rules.RenderComposer = showComposer;
                 }
 
                 // Re-render to apply the changes

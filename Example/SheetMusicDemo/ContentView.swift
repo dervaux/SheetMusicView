@@ -17,8 +17,9 @@ struct ContentView: View {
     @State private var lastError: SheetMusicError?
     @State private var showingError: Bool = false
     @State private var showingMusicPicker: Bool = false
-    @State private var showTitle: Bool = true
-    @State private var showInstrumentName: Bool = true
+    @State private var showTitle: Bool = false
+    @State private var showInstrumentName: Bool = false
+    @State private var showComposer: Bool = false
     @State private var showDebugPanel: Bool = false
     
     var body: some View {
@@ -97,6 +98,10 @@ struct ContentView: View {
                 Color(.systemBackground)
                 
                 // Sheet Music View
+                // Demonstrates the new modifier API:
+                // - Without modifiers: all elements hidden by default
+                // - With modifier but no parameter: element shown (.showTitle() = .showTitle(true))
+                // - With explicit parameter: use specified value (.showTitle(false))
                 if !currentXML.isEmpty {
                     SheetMusicView(
                         xml: $currentXML,
@@ -113,6 +118,7 @@ struct ContentView: View {
                     )
                     .showTitle(showTitle)
                     .showInstrumentName(showInstrumentName)
+                    .showComposer(showComposer)
                     .showDebugPanel(showDebugPanel)
                     .background(Color.white)
                     .cornerRadius(8)
@@ -243,6 +249,7 @@ struct ContentView: View {
                 VStack(spacing: 8) {
                     Toggle("Show Title", isOn: $showTitle)
                     Toggle("Show Instrument Names", isOn: $showInstrumentName)
+                    Toggle("Show Composer", isOn: $showComposer)
                     Toggle("Show Debug Panel", isOn: $showDebugPanel)
                 }
             }

@@ -202,14 +202,14 @@ public class SheetMusicCoordinator: NSObject, ObservableObject {
         }
     }
 
-    /// Update display options for title and instrument names
-    public func updateDisplayOptions(showTitle: Bool, showInstrumentName: Bool) async throws {
+    /// Update display options for title, instrument names, and composer
+    public func updateDisplayOptions(showTitle: Bool, showInstrumentName: Bool, showComposer: Bool) async throws {
         guard isReady else {
             throw SheetMusicError.notReady
         }
 
         do {
-            let script = "osmdUpdateDisplayOptions(\(showTitle ? "true" : "false"), \(showInstrumentName ? "true" : "false"))"
+            let script = "osmdUpdateDisplayOptions(\(showTitle ? "true" : "false"), \(showInstrumentName ? "true" : "false"), \(showComposer ? "true" : "false"))"
             _ = try await evaluateJavaScript(script)
         } catch {
             let sheetMusicError = error as? SheetMusicError ?? SheetMusicError.operationFailed(error.localizedDescription)
