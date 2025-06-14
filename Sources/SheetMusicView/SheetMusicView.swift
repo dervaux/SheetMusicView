@@ -48,12 +48,20 @@ public struct SheetMusicView: View {
     private let onError: ((SheetMusicError) -> Void)?
     private let onReady: (() -> Void)?
 
+    // MARK: - Display Options
+    private let showTitle: Bool
+    private let showInstrumentName: Bool
+    private let showDebugPanel: Bool
+
     // MARK: - Private State
     @State private var lastXML: String = ""
     @State private var lastTransposeSteps: Int = 0
     @State private var lastZoomLevel: Double = 1.0
     @State private var containerSize: CGSize = .zero
     @State private var lastContainerSize: CGSize = .zero
+    @State private var lastShowTitle: Bool = true
+    @State private var lastShowInstrumentName: Bool = true
+    @State private var lastShowDebugPanel: Bool = false
 
     // MARK: - Initialization
 
@@ -81,6 +89,9 @@ public struct SheetMusicView: View {
         }
         self.onError = nil
         self.onReady = nil
+        self.showTitle = true
+        self.showInstrumentName = true
+        self.showDebugPanel = false
     }
 
     /// Initialize SheetMusicView with callbacks
@@ -109,6 +120,43 @@ public struct SheetMusicView: View {
         }
         self.onError = onError
         self.onReady = onReady
+        self.showTitle = true
+        self.showInstrumentName = true
+        self.showDebugPanel = false
+    }
+
+    /// Private initializer for view modifiers
+    private init(
+        xml: Binding<String>,
+        transposeSteps: Binding<Int>,
+        isLoading: Binding<Bool>,
+        zoomLevel: Binding<Double>?,
+        onError: ((SheetMusicError) -> Void)?,
+        onReady: (() -> Void)?,
+        showTitle: Bool,
+        showInstrumentName: Bool,
+        showDebugPanel: Bool
+    ) {
+        self._xml = xml
+        self._transposeSteps = transposeSteps
+        self._isLoading = isLoading
+        if let zoomLevel = zoomLevel {
+            self._zoomLevel = Binding(
+                get: { zoomLevel.wrappedValue },
+                set: { newValue in
+                    if let newValue = newValue {
+                        zoomLevel.wrappedValue = newValue
+                    }
+                }
+            )
+        } else {
+            self._zoomLevel = .constant(nil)
+        }
+        self.onError = onError
+        self.onReady = onReady
+        self.showTitle = showTitle
+        self.showInstrumentName = showInstrumentName
+        self.showDebugPanel = showDebugPanel
     }
 
     // MARK: - Body
@@ -134,7 +182,90 @@ public struct SheetMusicView: View {
                 .onChange(of: geometry.size) { newSize in
                     handleContainerSizeChange(newSize)
                 }
+                .onAppear {
+                    handleDisplayOptionsChange()
+                }
+                .task(id: "\(showTitle)-\(showInstrumentName)-\(showDebugPanel)") {
+                    // This task will be cancelled and restarted whenever the display options change
+                    // The small delay ensures the view has fully updated before calling the coordinator
+                    try? await Task.sleep(nanoseconds: 1_000_000) // 1ms delay
+                    handleDisplayOptionsChange(showTitle: showTitle, showInstrumentName: showInstrumentName, showDebugPanel: showDebugPanel)
+                }
         }
+    }
+
+    // MARK: - View Modifiers
+
+    /// Controls whether the piece title is displayed
+    /// - Parameter show: Whether to show the title (default: true)
+    /// - Returns: A modified SheetMusicView instance
+    public func showTitle(_ show: Bool) -> SheetMusicView {
+        // Create a proper zoom binding if we have a non-nil zoom level
+        let zoomBinding: Binding<Double>? = _zoomLevel.wrappedValue != nil ?
+            Binding<Double>(
+                get: { self._zoomLevel.wrappedValue ?? 1.0 },
+                set: { newValue in self._zoomLevel.wrappedValue = newValue }
+            ) : nil
+
+        return SheetMusicView(
+            xml: _xml,
+            transposeSteps: _transposeSteps,
+            isLoading: _isLoading,
+            zoomLevel: zoomBinding,
+            onError: onError,
+            onReady: onReady,
+            showTitle: show,
+            showInstrumentName: showInstrumentName,
+            showDebugPanel: showDebugPanel
+        )
+    }
+
+    /// Controls whether instrument names are shown
+    /// - Parameter show: Whether to show instrument names (default: true)
+    /// - Returns: A modified SheetMusicView instance
+    public func showInstrumentName(_ show: Bool) -> SheetMusicView {
+        // Create a proper zoom binding if we have a non-nil zoom level
+        let zoomBinding: Binding<Double>? = _zoomLevel.wrappedValue != nil ?
+            Binding<Double>(
+                get: { self._zoomLevel.wrappedValue ?? 1.0 },
+                set: { newValue in self._zoomLevel.wrappedValue = newValue }
+            ) : nil
+
+        return SheetMusicView(
+            xml: _xml,
+            transposeSteps: _transposeSteps,
+            isLoading: _isLoading,
+            zoomLevel: zoomBinding,
+            onError: onError,
+            onReady: onReady,
+            showTitle: showTitle,
+            showInstrumentName: show,
+            showDebugPanel: showDebugPanel
+        )
+    }
+
+    /// Controls whether the debug status panel is displayed
+    /// - Parameter show: Whether to show the debug panel (default: false)
+    /// - Returns: A modified SheetMusicView instance
+    public func showDebugPanel(_ show: Bool) -> SheetMusicView {
+        // Create a proper zoom binding if we have a non-nil zoom level
+        let zoomBinding: Binding<Double>? = _zoomLevel.wrappedValue != nil ?
+            Binding<Double>(
+                get: { self._zoomLevel.wrappedValue ?? 1.0 },
+                set: { newValue in self._zoomLevel.wrappedValue = newValue }
+            ) : nil
+
+        return SheetMusicView(
+            xml: _xml,
+            transposeSteps: _transposeSteps,
+            isLoading: _isLoading,
+            zoomLevel: zoomBinding,
+            onError: onError,
+            onReady: onReady,
+            showTitle: showTitle,
+            showInstrumentName: showInstrumentName,
+            showDebugPanel: show
+        )
     }
 
     // MARK: - Private Methods
@@ -142,6 +273,8 @@ public struct SheetMusicView: View {
     private func setupCoordinator() {
         coordinator.onReady = {
             onReady?()
+            // Apply display options when ready
+            handleDisplayOptionsChange()
             // Load initial XML if available
             if !xml.isEmpty && xml != lastXML {
                 handleXMLChange(xml)
@@ -178,6 +311,9 @@ public struct SheetMusicView: View {
                 } else {
                     lastZoomLevel = 1.0
                 }
+
+                // Apply display options after loading new music
+                try await coordinator.updateDisplayOptions(showTitle: showTitle, showInstrumentName: showInstrumentName)
             } catch {
                 // Error handling is done in coordinator
             }
@@ -238,6 +374,32 @@ public struct SheetMusicView: View {
                 try await coordinator.render()
             } catch {
                 // Error handling is done in coordinator
+            }
+        }
+    }
+
+    private func handleDisplayOptionsChange() {
+        handleDisplayOptionsChange(showTitle: showTitle, showInstrumentName: showInstrumentName, showDebugPanel: showDebugPanel)
+    }
+
+    private func handleDisplayOptionsChange(showTitle: Bool, showInstrumentName: Bool, showDebugPanel: Bool) {
+        guard coordinator.isReady else { return }
+
+        // Only update if display options actually changed
+        if showTitle != lastShowTitle || showInstrumentName != lastShowInstrumentName || showDebugPanel != lastShowDebugPanel {
+            lastShowTitle = showTitle
+            lastShowInstrumentName = showInstrumentName
+            lastShowDebugPanel = showDebugPanel
+
+            Task {
+                do {
+                    try await coordinator.updateDisplayOptions(showTitle: showTitle, showInstrumentName: showInstrumentName)
+                    try await coordinator.setDebugPanelVisible(showDebugPanel)
+                } catch {
+                    #if DEBUG
+                    print("SheetMusicView: Failed to update display options: \(error)")
+                    #endif
+                }
             }
         }
     }

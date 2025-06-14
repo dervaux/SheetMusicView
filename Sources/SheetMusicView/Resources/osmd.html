@@ -70,7 +70,7 @@
     </div>
 
     <!-- Debug info -->
-    <div id="debugInfo" style="position: fixed; top: 10px; right: 10px; background: rgba(0,0,0,0.8); color: white; padding: 10px; font-size: 12px; border-radius: 5px; max-width: 300px;">
+    <div id="debugInfo" style="position: fixed; top: 10px; right: 10px; background: rgba(0,0,0,0.8); color: white; padding: 10px; font-size: 12px; border-radius: 5px; max-width: 300px; display: none;">
         <div>Status: <span id="status">Loading...</span></div>
         <div>OSMD: <span id="osmdStatus">Not loaded</span></div>
         <div>Messages: <span id="messageCount">0</span></div>
@@ -471,6 +471,53 @@
                 return true;
             } catch (error) {
                 console.error('Failed to set page format:', error);
+                throw error;
+            }
+        }
+
+        // Update display options for title and instrument names
+        function osmdUpdateDisplayOptions(showTitle, showInstrumentName) {
+            if (!isInitialized || !osmd) {
+                throw new Error('OSMD is not initialized');
+            }
+
+            try {
+                console.log(`Updating display options - Title: ${showTitle}, Instrument Names: ${showInstrumentName}`);
+
+                // Update OSMD rules for display options
+                if (osmd.rules) {
+                    osmd.rules.RenderTitle = showTitle;
+                    osmd.rules.RenderPartNames = showInstrumentName;
+                    osmd.rules.RenderPartAbbreviations = showInstrumentName;
+                }
+
+                // Re-render to apply the changes
+                if (osmd.sheet) {
+                    osmd.render();
+                }
+
+                console.log('Display options updated successfully');
+                return true;
+            } catch (error) {
+                console.error('Failed to update display options:', error);
+                throw error;
+            }
+        }
+
+        // Show or hide the debug info panel
+        function osmdSetDebugPanelVisible(visible) {
+            try {
+                const debugPanel = document.getElementById('debugInfo');
+                if (debugPanel) {
+                    debugPanel.style.display = visible ? 'block' : 'none';
+                    console.log(`Debug panel ${visible ? 'shown' : 'hidden'}`);
+                    return true;
+                } else {
+                    console.warn('Debug panel not found');
+                    return false;
+                }
+            } catch (error) {
+                console.error('Failed to toggle debug panel:', error);
                 throw error;
             }
         }

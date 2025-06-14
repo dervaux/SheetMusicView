@@ -201,6 +201,40 @@ public class SheetMusicCoordinator: NSObject, ObservableObject {
             throw sheetMusicError
         }
     }
+
+    /// Update display options for title and instrument names
+    public func updateDisplayOptions(showTitle: Bool, showInstrumentName: Bool) async throws {
+        guard isReady else {
+            throw SheetMusicError.notReady
+        }
+
+        do {
+            let script = "osmdUpdateDisplayOptions(\(showTitle ? "true" : "false"), \(showInstrumentName ? "true" : "false"))"
+            _ = try await evaluateJavaScript(script)
+        } catch {
+            let sheetMusicError = error as? SheetMusicError ?? SheetMusicError.operationFailed(error.localizedDescription)
+            lastError = sheetMusicError
+            onError?(sheetMusicError)
+            throw sheetMusicError
+        }
+    }
+
+    /// Show or hide the debug status panel
+    public func setDebugPanelVisible(_ visible: Bool) async throws {
+        guard isReady else {
+            throw SheetMusicError.notReady
+        }
+
+        do {
+            let script = "osmdSetDebugPanelVisible(\(visible ? "true" : "false"))"
+            _ = try await evaluateJavaScript(script)
+        } catch {
+            let sheetMusicError = error as? SheetMusicError ?? SheetMusicError.operationFailed(error.localizedDescription)
+            lastError = sheetMusicError
+            onError?(sheetMusicError)
+            throw sheetMusicError
+        }
+    }
     
     // MARK: - Private Methods
     

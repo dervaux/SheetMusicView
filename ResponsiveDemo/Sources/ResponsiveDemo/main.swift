@@ -17,6 +17,8 @@ struct ResponsiveDemoView: View {
     @State private var lastError: SheetMusicError?
     @State private var showingError: Bool = false
     @State private var containerInfo: String = "Container: Not measured"
+    @State private var showTitle: Bool = true
+    @State private var showInstrumentName: Bool = true
 
     // Sample MusicXML with multiple measures for testing line wrapping
     private let sampleXML = """
@@ -175,25 +177,36 @@ struct ResponsiveDemoView: View {
 
                 Spacer()
 
+                // Simplified transpose controls
                 VStack {
                     Text("Transpose: \(transposeSteps)")
                         .font(.caption)
 
                     HStack {
-                        Button("-") {
+                        Button("-1") {
                             transposeSteps = max(-12, transposeSteps - 1)
                         }
                         .buttonStyle(.bordered)
 
-                        Button("+") {
+                        Button("+1") {
                             transposeSteps = min(12, transposeSteps + 1)
                         }
                         .buttonStyle(.bordered)
+                    }
+                }
 
-                        Button("Reset") {
-                            transposeSteps = 0
-                        }
-                        .buttonStyle(.bordered)
+                Spacer()
+
+                // Display options
+                VStack {
+                    Text("Display")
+                        .font(.caption)
+
+                    HStack {
+                        Toggle("Title", isOn: $showTitle)
+                            .toggleStyle(.button)
+                        Toggle("Instruments", isOn: $showInstrumentName)
+                            .toggleStyle(.button)
                     }
                 }
             }
@@ -213,6 +226,8 @@ struct ResponsiveDemoView: View {
                         print("Sheet music display is ready for responsive demo!")
                     }
                 )
+                .showTitle(showTitle)
+                .showInstrumentName(showInstrumentName)
                 .background(Color.gray.opacity(0.1))
                 .cornerRadius(10)
                 .overlay(

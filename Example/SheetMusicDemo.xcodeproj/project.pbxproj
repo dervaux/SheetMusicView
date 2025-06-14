@@ -1,0 +1,408 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		1A000001294A0000000000001 /* SheetMusicDemoApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A000002294A0000000000001 /* SheetMusicDemoApp.swift */; };
+		1A000003294A0000000000001 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A000004294A0000000000001 /* ContentView.swift */; };
+		1A000005294A0000000000001 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1A000006294A0000000000001 /* Assets.xcassets */; };
+		1A000007294A0000000000001 /* MusicLibrary.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A000008294A0000000000001 /* MusicLibrary.swift */; };
+		1A000009294A0000000000001 /* SampleMusicXML.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A00000A294A0000000000001 /* SampleMusicXML.swift */; };
+		1A00000B294A0000000000001 /* TranspositionControlsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A00000C294A0000000000001 /* TranspositionControlsView.swift */; };
+		1A00000D294A0000000000001 /* ZoomControlsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A00000E294A0000000000001 /* ZoomControlsView.swift */; };
+		1A00000F294A0000000000001 /* MusicPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A000010294A0000000000001 /* MusicPickerView.swift */; };
+		1A000011294A0000000000001 /* SheetMusicView in Frameworks */ = {isa = PBXBuildFile; productRef = 1A000012294A0000000000001 /* SheetMusicView */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		1A000013294A0000000000001 /* SheetMusicDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SheetMusicDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		1A000002294A0000000000001 /* SheetMusicDemoApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SheetMusicDemoApp.swift; sourceTree = "<group>"; };
+		1A000004294A0000000000001 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		1A000006294A0000000000001 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		1A000008294A0000000000001 /* MusicLibrary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicLibrary.swift; sourceTree = "<group>"; };
+		1A00000A294A0000000000001 /* SampleMusicXML.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SampleMusicXML.swift; sourceTree = "<group>"; };
+		1A00000C294A0000000000001 /* TranspositionControlsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TranspositionControlsView.swift; sourceTree = "<group>"; };
+		1A00000E294A0000000000001 /* ZoomControlsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZoomControlsView.swift; sourceTree = "<group>"; };
+		1A000010294A0000000000001 /* MusicPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicPickerView.swift; sourceTree = "<group>"; };
+		1A000014294A0000000000001 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		1A000015294A0000000000001 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1A000011294A0000000000001 /* SheetMusicView in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		1A000016294A0000000000001 = {
+			isa = PBXGroup;
+			children = (
+				1A000017294A0000000000001 /* SheetMusicDemo */,
+				1A000018294A0000000000001 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		1A000017294A0000000000001 /* SheetMusicDemo */ = {
+			isa = PBXGroup;
+			children = (
+				1A000002294A0000000000001 /* SheetMusicDemoApp.swift */,
+				1A000004294A0000000000001 /* ContentView.swift */,
+				1A000019294A0000000000001 /* Views */,
+				1A00001A294A0000000000001 /* Models */,
+				1A00001B294A0000000000001 /* Resources */,
+				1A000006294A0000000000001 /* Assets.xcassets */,
+				1A000014294A0000000000001 /* Info.plist */,
+			);
+			path = SheetMusicDemo;
+			sourceTree = "<group>";
+		};
+		1A000018294A0000000000001 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				1A000013294A0000000000001 /* SheetMusicDemo.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		1A000019294A0000000000001 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				1A00000C294A0000000000001 /* TranspositionControlsView.swift */,
+				1A00000E294A0000000000001 /* ZoomControlsView.swift */,
+				1A000010294A0000000000001 /* MusicPickerView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		1A00001A294A0000000000001 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				1A000008294A0000000000001 /* MusicLibrary.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		1A00001B294A0000000000001 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				1A00000A294A0000000000001 /* SampleMusicXML.swift */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		1A00001C294A0000000000001 /* SheetMusicDemo */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 1A00001D294A0000000000001 /* Build configuration list for PBXNativeTarget "SheetMusicDemo" */;
+			buildPhases = (
+				1A00001E294A0000000000001 /* Sources */,
+				1A000015294A0000000000001 /* Frameworks */,
+				1A00001F294A0000000000001 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = SheetMusicDemo;
+			packageProductDependencies = (
+				1A000012294A0000000000001 /* SheetMusicView */,
+			);
+			productName = SheetMusicDemo;
+			productReference = 1A000013294A0000000000001 /* SheetMusicDemo.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		1A000020294A0000000000001 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1500;
+				LastUpgradeCheck = 1500;
+				TargetAttributes = {
+					1A00001C294A0000000000001 = {
+						CreatedOnToolsVersion = 15.0;
+					};
+				};
+			};
+			buildConfigurationList = 1A000021294A0000000000001 /* Build configuration list for PBXProject "SheetMusicDemo" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 1A000016294A0000000000001;
+			packageReferences = (
+				1A000022294A0000000000001 /* XCLocalSwiftPackageReference "../" */,
+			);
+			productRefGroup = 1A000018294A0000000000001 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				1A00001C294A0000000000001 /* SheetMusicDemo */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		1A00001F294A0000000000001 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1A000005294A0000000000001 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		1A00001E294A0000000000001 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1A000003294A0000000000001 /* ContentView.swift in Sources */,
+				1A000001294A0000000000001 /* SheetMusicDemoApp.swift in Sources */,
+				1A000007294A0000000000001 /* MusicLibrary.swift in Sources */,
+				1A000009294A0000000000001 /* SampleMusicXML.swift in Sources */,
+				1A00000B294A0000000000001 /* TranspositionControlsView.swift in Sources */,
+				1A00000D294A0000000000001 /* ZoomControlsView.swift in Sources */,
+				1A00000F294A0000000000001 /* MusicPickerView.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		1A000023294A0000000000001 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		1A000024294A0000000000001 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		1A000025294A0000000000001 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = SheetMusicDemo/Info.plist;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.example.SheetMusicDemo;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		1A000026294A0000000000001 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = SheetMusicDemo/Info.plist;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.example.SheetMusicDemo;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		1A000021294A0000000000001 /* Build configuration list for PBXProject "SheetMusicDemo" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1A000023294A0000000000001 /* Debug */,
+				1A000024294A0000000000001 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		1A00001D294A0000000000001 /* Build configuration list for PBXNativeTarget "SheetMusicDemo" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1A000025294A0000000000001 /* Debug */,
+				1A000026294A0000000000001 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		1A000022294A0000000000001 /* XCLocalSwiftPackageReference "../" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = ../;
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		1A000012294A0000000000001 /* SheetMusicView */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 1A000022294A0000000000001 /* XCLocalSwiftPackageReference "../" */;
+			productName = SheetMusicView;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = 1A000020294A0000000000001 /* Project object */;
+}

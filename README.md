@@ -154,14 +154,34 @@ struct ContentView: View {
     @State private var musicXML: String = ""
     @State private var transposeSteps: Int = 0
     @State private var isLoading: Bool = false
+    @State private var showTitle: Bool = true
+    @State private var showInstruments: Bool = true
 
     var body: some View {
-        SheetMusicView(
-            xml: $musicXML,
-            transposeSteps: $transposeSteps,
-            isLoading: $isLoading
-        )
-        .frame(height: 400)
+        VStack {
+            SheetMusicView(
+                xml: $musicXML,
+                transposeSteps: $transposeSteps,
+                isLoading: $isLoading
+            )
+            .showTitle(showTitle)
+            .showInstrumentName(showInstruments)
+            .frame(height: 400)
+
+            HStack {
+                Button("Load Sample") {
+                    musicXML = """
+                    <?xml version="1.0" encoding="UTF-8"?>
+                    <score-partwise version="3.1">
+                        <!-- Your MusicXML content here -->
+                    </score-partwise>
+                    """
+                }
+
+                Toggle("Title", isOn: $showTitle)
+                Toggle("Instruments", isOn: $showInstruments)
+            }
+        }
     }
 }
 ```
@@ -267,6 +287,45 @@ SheetMusicView(
 - `zoomLevel: Binding<Double>?` - Optional zoom level (0.1 to 5.0, default: 1.0)
 - `onError: ((SheetMusicError) -> Void)?` - Error callback handler
 - `onReady: (() -> Void)?` - Ready state callback
+
+#### View Modifiers
+
+SheetMusicView supports SwiftUI-style view modifiers to control the display of musical score elements:
+
+```swift
+SheetMusicView(xml: $musicXML)
+    .showTitle(false)                    // Hide the piece title
+    .showInstrumentName(true)            // Show instrument names (default)
+    .showDebugPanel(true)                // Show debug status panel (default: false)
+```
+
+**Available View Modifiers:**
+- `.showTitle(Bool)` - Controls whether the piece title is displayed (default: true)
+- `.showInstrumentName(Bool)` - Controls whether instrument names are shown (default: true)
+- `.showDebugPanel(Bool)` - Controls whether the debug status panel is displayed (default: false)
+
+#### Debug Panel
+
+The debug panel provides real-time information about the OSMD engine status and is useful during development and troubleshooting:
+
+- **Status**: Current zoom level and operational state
+- **OSMD**: Loading progress and engine status
+- **Messages**: Count of internal messages (useful for debugging)
+
+The debug panel appears as a semi-transparent overlay in the top-right corner of the view when enabled. It's hidden by default to keep the production interface clean.
+
+**Available Modifiers:**
+- `.showTitle(_ show: Bool)` - Controls whether the piece title is displayed (default: true)
+- `.showInstrumentName(_ show: Bool)` - Controls whether instrument names are shown (default: true)
+
+**Modifier Chaining:**
+Modifiers can be chained together and applied in any order:
+
+```swift
+SheetMusicView(xml: $musicXML, transposeSteps: $transpose)
+    .showTitle(showTitleToggle)
+    .showInstrumentName(showInstrumentsToggle)
+```
 
 #### SheetMusicCoordinator (JavaScript Bridge)
 
@@ -468,6 +527,8 @@ struct ContentView: View {
     @State private var musicXML: String = ""
     @State private var transposeSteps: Int = 0
     @State private var isLoading: Bool = false
+    @State private var showTitle: Bool = true
+    @State private var showInstruments: Bool = true
 
     var body: some View {
         VStack {
@@ -476,16 +537,25 @@ struct ContentView: View {
                 transposeSteps: $transposeSteps,
                 isLoading: $isLoading
             )
+            .showTitle(showTitle)
+            .showInstrumentName(showInstruments)
             .frame(height: 400)
 
-            HStack {
-                Button("Load Sample") {
-                    loadSampleMusic()
+            VStack(spacing: 10) {
+                HStack {
+                    Button("Load Sample") {
+                        loadSampleMusic()
+                    }
+
+                    Stepper("Transpose: \(transposeSteps)",
+                           value: $transposeSteps,
+                           in: -12...12)
                 }
 
-                Stepper("Transpose: \(transposeSteps)",
-                       value: $transposeSteps,
-                       in: -12...12)
+                HStack {
+                    Toggle("Show Title", isOn: $showTitle)
+                    Toggle("Show Instruments", isOn: $showInstruments)
+                }
             }
             .padding()
         }
