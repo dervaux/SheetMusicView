@@ -288,7 +288,7 @@ SheetMusicView(
 ```swift
 // Basic initialization with filename
 SheetMusicView(
-    fileName: String,
+    musicXMLfileName: String,
     transposeSteps: Binding<Int> = .constant(0),
     isLoading: Binding<Bool> = .constant(false),
     zoomLevel: Binding<Double>? = nil,
@@ -297,7 +297,7 @@ SheetMusicView(
 
 // Full initialization with filename and callbacks
 SheetMusicView(
-    fileName: String,
+    musicXMLfileName: String,
     transposeSteps: Binding<Int> = .constant(0),
     isLoading: Binding<Bool> = .constant(false),
     zoomLevel: Binding<Double>? = nil,
@@ -649,7 +649,7 @@ struct FileBasedContentView: View {
         VStack {
             // Simply provide the filename without extension!
             SheetMusicView(
-                fileName: "sample", // Looks for sample.musicxml or sample.xml
+                musicXMLfileName: "sample", // Looks for sample.musicxml or sample.xml
                 transposeSteps: $transposeSteps,
                 isLoading: $isLoading,
                 zoomLevel: $zoomLevel,
