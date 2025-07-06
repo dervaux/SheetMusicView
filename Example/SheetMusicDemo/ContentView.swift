@@ -21,7 +21,7 @@ struct ContentView: View {
             FileURLDemoView()
                 .tabItem {
                     Image(systemName: "doc.badge.plus")
-                    Text("File Picker")
+                    Text("Pick File")
                 }
         }
     }
