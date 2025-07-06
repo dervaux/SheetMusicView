@@ -54,7 +54,7 @@ final class SheetMusicViewTests: XCTestCase {
         let testBundle = Bundle.module
 
         // Test the file loading method with a non-existent file
-        let view = SheetMusicView(musicXMLfileName: "nonexistent", bundle: testBundle)
+        let view = SheetMusicView(fileName: "nonexistent", bundle: testBundle)
 
         // The view should be created successfully even with a non-existent file
         // Error handling happens at runtime when the file is actually loaded
@@ -68,7 +68,7 @@ final class SheetMusicViewTests: XCTestCase {
         let bundle = Bundle.main
 
         let view = SheetMusicView(
-            musicXMLfileName: fileName,
+            fileName: fileName,
             transposeSteps: .constant(2),
             isLoading: .constant(false),
             bundle: bundle
@@ -81,7 +81,7 @@ final class SheetMusicViewTests: XCTestCase {
         var readyCalled = false
 
         let viewWithCallbacks = SheetMusicView(
-            musicXMLfileName: fileName,
+            fileName: fileName,
             transposeSteps: .constant(0),
             isLoading: .constant(false),
             bundle: bundle,
@@ -105,9 +105,9 @@ final class SheetMusicViewTests: XCTestCase {
         // Initially coordinator should not be ready
         XCTAssertFalse(coordinator.isReady)
 
-        // Create a view with musicXMLfileName - this should not crash or fail
+        // Create a view with fileName - this should not crash or fail
         let view = SheetMusicView(
-            musicXMLfileName: "sample",
+            fileName: "sample",
             bundle: Bundle.main
         )
 
