@@ -43,6 +43,12 @@ public struct SheetMusicView: View {
 
     // MARK: - State
     @StateObject private var coordinator = SheetMusicCoordinator()
+    @State private var loadedXML: String = ""
+    @State private var loadedFileName: String = ""
+
+    // MARK: - File Loading Properties
+    private let fileName: String?
+    private let bundle: Bundle
 
     // MARK: - Callbacks
     private let onError: ((SheetMusicError) -> Void)?
@@ -89,6 +95,41 @@ public struct SheetMusicView: View {
         } else {
             self._zoomLevel = .constant(nil)
         }
+        self.fileName = nil
+        self.bundle = Bundle.main
+        self.onError = nil
+        self.onReady = nil
+        self.showTitle = false
+        self.showInstrumentName = false
+        self.showComposer = false
+        self.showDebugPanel = false
+    }
+
+    /// Initialize SheetMusicView with a filename (without .musicxml extension)
+    public init(
+        fileName: String,
+        transposeSteps: Binding<Int> = .constant(0),
+        isLoading: Binding<Bool> = .constant(false),
+        zoomLevel: Binding<Double>? = nil,
+        bundle: Bundle = Bundle.main
+    ) {
+        self._xml = .constant("")
+        self._transposeSteps = transposeSteps
+        self._isLoading = isLoading
+        if let zoomLevel = zoomLevel {
+            self._zoomLevel = Binding(
+                get: { zoomLevel.wrappedValue },
+                set: { newValue in
+                    if let newValue = newValue {
+                        zoomLevel.wrappedValue = newValue
+                    }
+                }
+            )
+        } else {
+            self._zoomLevel = .constant(nil)
+        }
+        self.fileName = fileName
+        self.bundle = bundle
         self.onError = nil
         self.onReady = nil
         self.showTitle = false
@@ -121,6 +162,43 @@ public struct SheetMusicView: View {
         } else {
             self._zoomLevel = .constant(nil)
         }
+        self.fileName = nil
+        self.bundle = Bundle.main
+        self.onError = onError
+        self.onReady = onReady
+        self.showTitle = false
+        self.showInstrumentName = false
+        self.showComposer = false
+        self.showDebugPanel = false
+    }
+
+    /// Initialize SheetMusicView with filename and callbacks
+    public init(
+        fileName: String,
+        transposeSteps: Binding<Int> = .constant(0),
+        isLoading: Binding<Bool> = .constant(false),
+        zoomLevel: Binding<Double>? = nil,
+        bundle: Bundle = Bundle.main,
+        onError: ((SheetMusicError) -> Void)? = nil,
+        onReady: (() -> Void)? = nil
+    ) {
+        self._xml = .constant("")
+        self._transposeSteps = transposeSteps
+        self._isLoading = isLoading
+        if let zoomLevel = zoomLevel {
+            self._zoomLevel = Binding(
+                get: { zoomLevel.wrappedValue },
+                set: { newValue in
+                    if let newValue = newValue {
+                        zoomLevel.wrappedValue = newValue
+                    }
+                }
+            )
+        } else {
+            self._zoomLevel = .constant(nil)
+        }
+        self.fileName = fileName
+        self.bundle = bundle
         self.onError = onError
         self.onReady = onReady
         self.showTitle = false
@@ -135,6 +213,8 @@ public struct SheetMusicView: View {
         transposeSteps: Binding<Int>,
         isLoading: Binding<Bool>,
         zoomLevel: Binding<Double>?,
+        fileName: String?,
+        bundle: Bundle,
         onError: ((SheetMusicError) -> Void)?,
         onReady: (() -> Void)?,
         showTitle: Bool,
@@ -157,6 +237,8 @@ public struct SheetMusicView: View {
         } else {
             self._zoomLevel = .constant(nil)
         }
+        self.fileName = fileName
+        self.bundle = bundle
         self.onError = onError
         self.onReady = onReady
         self.showTitle = showTitle
@@ -172,6 +254,9 @@ public struct SheetMusicView: View {
                 .onAppear {
                     setupCoordinator()
                     containerSize = geometry.size
+                    handleDisplayOptionsChange()
+                    // Load file when view appears (handles initial load and view recreation with new fileName)
+                    loadFileIfNeeded()
                 }
                 .onChange(of: xml) { newXML in
                     handleXMLChange(newXML)
@@ -188,14 +273,18 @@ public struct SheetMusicView: View {
                 .onChange(of: geometry.size) { newSize in
                     handleContainerSizeChange(newSize)
                 }
-                .onAppear {
-                    handleDisplayOptionsChange()
-                }
                 .task(id: "\(showTitle)-\(showInstrumentName)-\(showComposer)-\(showDebugPanel)") {
                     // This task will be cancelled and restarted whenever the display options change
                     // The small delay ensures the view has fully updated before calling the coordinator
                     try? await Task.sleep(nanoseconds: 1_000_000) // 1ms delay
                     handleDisplayOptionsChange(showTitle: showTitle, showInstrumentName: showInstrumentName, showComposer: showComposer, showDebugPanel: showDebugPanel)
+                }
+                .task(id: fileName) {
+                    // This task will be cancelled and restarted whenever the fileName changes
+                    // This handles the case where the view is recreated with a new fileName
+                    if let fileName = fileName, !fileName.isEmpty {
+                        loadFileIfNeeded()
+                    }
                 }
         }
     }
@@ -218,6 +307,8 @@ public struct SheetMusicView: View {
             transposeSteps: _transposeSteps,
             isLoading: _isLoading,
             zoomLevel: zoomBinding,
+            fileName: fileName,
+            bundle: bundle,
             onError: onError,
             onReady: onReady,
             showTitle: show,
@@ -243,6 +334,8 @@ public struct SheetMusicView: View {
             transposeSteps: _transposeSteps,
             isLoading: _isLoading,
             zoomLevel: zoomBinding,
+            fileName: fileName,
+            bundle: bundle,
             onError: onError,
             onReady: onReady,
             showTitle: showTitle,
@@ -268,6 +361,8 @@ public struct SheetMusicView: View {
             transposeSteps: _transposeSteps,
             isLoading: _isLoading,
             zoomLevel: zoomBinding,
+            fileName: fileName,
+            bundle: bundle,
             onError: onError,
             onReady: onReady,
             showTitle: showTitle,
@@ -293,6 +388,8 @@ public struct SheetMusicView: View {
             transposeSteps: _transposeSteps,
             isLoading: _isLoading,
             zoomLevel: zoomBinding,
+            fileName: fileName,
+            bundle: bundle,
             onError: onError,
             onReady: onReady,
             showTitle: showTitle,
@@ -309,9 +406,19 @@ public struct SheetMusicView: View {
             onReady?()
             // Apply display options when ready
             handleDisplayOptionsChange()
-            // Load initial XML if available
+            // Load initial XML if available (for xml-based API)
             if !xml.isEmpty && xml != lastXML {
                 handleXMLChange(xml)
+            }
+            // For fileName-based API, check if we have loaded content or need to load
+            else if let fileName = fileName, !fileName.isEmpty {
+                if !loadedXML.isEmpty {
+                    print("SheetMusicView: Coordinator ready, loading previously loaded XML for '\(fileName)'")
+                    handleXMLChange(loadedXML)
+                } else {
+                    print("SheetMusicView: Coordinator ready, loading file '\(fileName)'")
+                    loadFileIfNeeded()
+                }
             }
         }
 
@@ -320,10 +427,74 @@ public struct SheetMusicView: View {
         }
     }
 
+    private func loadFileIfNeeded() {
+        print("SheetMusicView: loadFileIfNeeded called - fileName: \(fileName ?? "nil"), loadedFileName: \(loadedFileName)")
+
+        guard let fileName = fileName, !fileName.isEmpty else {
+            print("SheetMusicView: No fileName provided, clearing loadedFileName")
+            loadedFileName = ""
+            return
+        }
+
+        // Check if we need to load a different file
+        guard fileName != loadedFileName else {
+            print("SheetMusicView: File '\(fileName)' already loaded, skipping")
+            return
+        }
+
+        print("SheetMusicView: Starting to load file '\(fileName).musicxml'")
+
+        Task {
+            do {
+                let xmlContent = try loadMusicXMLFile(fileName: fileName, from: bundle)
+                loadedXML = xmlContent
+                loadedFileName = fileName
+
+                print("SheetMusicView: Successfully loaded file '\(fileName).musicxml', content length: \(xmlContent.count)")
+
+                // Load the XML content regardless of coordinator state
+                // handleXMLChange will check if coordinator is ready
+                handleXMLChange(xmlContent)
+            } catch {
+                print("SheetMusicView: Failed to load file '\(fileName).musicxml': \(error.localizedDescription)")
+                let sheetMusicError = SheetMusicError.loadingFailed("Failed to load file '\(fileName).musicxml': \(error.localizedDescription)")
+                onError?(sheetMusicError)
+            }
+        }
+    }
+
+    private func loadMusicXMLFile(fileName: String, from bundle: Bundle) throws -> String {
+        // Try different possible file extensions and locations
+        let possibleExtensions = ["musicxml", "xml"]
+        let possibleSubdirectories = [nil, "Resources", "MusicXML"]
+
+        for subdirectory in possibleSubdirectories {
+            for ext in possibleExtensions {
+                if let url = bundle.url(forResource: fileName, withExtension: ext, subdirectory: subdirectory) {
+                    return try String(contentsOf: url, encoding: .utf8)
+                }
+            }
+        }
+
+        // If not found in bundle, throw an error with helpful information
+        throw NSError(
+            domain: "SheetMusicView",
+            code: 404,
+            userInfo: [
+                NSLocalizedDescriptionKey: "Could not find '\(fileName).musicxml' or '\(fileName).xml' in bundle",
+                NSLocalizedRecoverySuggestionErrorKey: "Make sure the file is added to your app bundle. Tried extensions: \(possibleExtensions.joined(separator: ", "))"
+            ]
+        )
+    }
+
     private func handleXMLChange(_ newXML: String) {
-        guard coordinator.isReady, !newXML.isEmpty, newXML != lastXML else { return }
+        guard coordinator.isReady, !newXML.isEmpty, newXML != lastXML else {
+            print("SheetMusicView: handleXMLChange early return - coordinator.isReady: \(coordinator.isReady), newXML.isEmpty: \(newXML.isEmpty), newXML == lastXML: \(newXML == lastXML)")
+            return
+        }
 
         lastXML = newXML
+        print("SheetMusicView: handleXMLChange proceeding to load XML")
 
         Task {
             do {

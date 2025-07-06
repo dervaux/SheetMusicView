@@ -262,31 +262,66 @@ That's it! The package handles all the complex WebKit and OSMD integration autom
 The main SwiftUI component for displaying music notation.
 
 **Initializers:**
-```swift
-// Basic initialization
-SheetMusicView(
-    xml: Binding<String>,
-    transposeSteps: Binding<Int> = .constant(0),
-    isLoading: Binding<Bool> = .constant(false)
-)
 
-// Full initialization with callbacks
+**XML Content-Based (Original API):**
+```swift
+// Basic initialization with XML content
 SheetMusicView(
     xml: Binding<String>,
     transposeSteps: Binding<Int> = .constant(0),
     isLoading: Binding<Bool> = .constant(false),
+    zoomLevel: Binding<Double>? = nil
+)
+
+// Full initialization with XML content and callbacks
+SheetMusicView(
+    xml: Binding<String>,
+    transposeSteps: Binding<Int> = .constant(0),
+    isLoading: Binding<Bool> = .constant(false),
+    zoomLevel: Binding<Double>? = nil,
+    onError: ((SheetMusicError) -> Void)? = nil,
+    onReady: (() -> Void)? = nil
+)
+```
+
+**File-Based (New API):**
+```swift
+// Basic initialization with filename
+SheetMusicView(
+    fileName: String,
+    transposeSteps: Binding<Int> = .constant(0),
+    isLoading: Binding<Bool> = .constant(false),
+    zoomLevel: Binding<Double>? = nil,
+    bundle: Bundle = Bundle.main
+)
+
+// Full initialization with filename and callbacks
+SheetMusicView(
+    fileName: String,
+    transposeSteps: Binding<Int> = .constant(0),
+    isLoading: Binding<Bool> = .constant(false),
+    zoomLevel: Binding<Double>? = nil,
+    bundle: Bundle = Bundle.main,
     onError: ((SheetMusicError) -> Void)? = nil,
     onReady: (() -> Void)? = nil
 )
 ```
 
 **Parameters:**
-- `xml: Binding<String>` - MusicXML content to display
+- `xml: Binding<String>` - MusicXML content to display (for XML-based API)
+- `fileName: String` - Name of .musicxml file without extension (for file-based API)
 - `transposeSteps: Binding<Int>` - Number of semitones to transpose (-12 to +12)
 - `isLoading: Binding<Bool>` - Loading state indicator
 - `zoomLevel: Binding<Double>?` - Optional zoom level (0.1 to 5.0, default: 1.0)
+- `bundle: Bundle` - Bundle to search for the file (default: Bundle.main)
 - `onError: ((SheetMusicError) -> Void)?` - Error callback handler
 - `onReady: (() -> Void)?` - Ready state callback
+
+**File Loading Notes:**
+- The file-based API automatically searches for files with `.musicxml` or `.xml` extensions
+- Files are searched in the main bundle by default, or in the specified bundle
+- The API tries multiple subdirectories: root, "Resources", and "MusicXML"
+- If the file is not found, an error is passed to the `onError` callback
 
 #### View Modifiers
 
@@ -594,6 +629,70 @@ struct ContentView: View {
     }
 }
 ```
+
+### File-Based Implementation (New!)
+
+The new file-based API makes it even easier to load MusicXML files from your app bundle:
+
+```swift
+import SwiftUI
+import SheetMusicView
+
+struct FileBasedContentView: View {
+    @State private var transposeSteps: Int = 0
+    @State private var isLoading: Bool = false
+    @State private var zoomLevel: Double = 1.0
+    @State private var lastError: SheetMusicError?
+    @State private var showingError: Bool = false
+
+    var body: some View {
+        VStack {
+            // Simply provide the filename without extension!
+            SheetMusicView(
+                fileName: "sample", // Looks for sample.musicxml or sample.xml
+                transposeSteps: $transposeSteps,
+                isLoading: $isLoading,
+                zoomLevel: $zoomLevel,
+                onError: { error in
+                    lastError = error
+                    showingError = true
+                },
+                onReady: {
+                    print("Music loaded from file!")
+                }
+            )
+            .showTitle()
+            .showComposer()
+            .frame(height: 400)
+
+            VStack(spacing: 10) {
+                Stepper("Transpose: \(transposeSteps)",
+                       value: $transposeSteps,
+                       in: -12...12)
+
+                HStack {
+                    Text("Zoom:")
+                    Slider(value: $zoomLevel, in: 0.5...3.0)
+                    Text("\(zoomLevel, specifier: "%.1f")x")
+                }
+            }
+            .padding()
+        }
+        .alert("Error", isPresented: $showingError) {
+            Button("OK") { }
+        } message: {
+            Text(lastError?.localizedDescription ?? "Unknown error")
+        }
+    }
+}
+```
+
+**Benefits of the File-Based API:**
+- No need to manually load file contents
+- Automatic file extension detection (.musicxml, .xml)
+- Built-in error handling for missing files
+- Cleaner, more declarative code
+- Automatic bundle resource management
 
 ### Zoom Functionality
 
