@@ -307,9 +307,23 @@ SheetMusicView(
 )
 ```
 
+**File URL-Based (New API):**
+```swift
+// Initialization with file URL
+SheetMusicView(
+    fileURL: URL,
+    transposeSteps: Binding<Int> = .constant(0),
+    isLoading: Binding<Bool> = .constant(false),
+    zoomLevel: Binding<Double>? = nil,
+    onError: ((SheetMusicError) -> Void)? = nil,
+    onReady: (() -> Void)? = nil
+)
+```
+
 **Parameters:**
 - `xml: Binding<String>` - MusicXML content to display (for XML-based API)
 - `fileName: String` - Name of .musicxml file without extension (for file-based API)
+- `fileURL: URL` - Direct URL to a MusicXML file (for URL-based API)
 - `transposeSteps: Binding<Int>` - Number of semitones to transpose (-12 to +12)
 - `isLoading: Binding<Bool>` - Loading state indicator
 - `zoomLevel: Binding<Double>?` - Optional zoom level (0.1 to 5.0, default: 1.0)
@@ -693,6 +707,76 @@ struct FileBasedContentView: View {
 - Built-in error handling for missing files
 - Cleaner, more declarative code
 - Automatic bundle resource management
+
+### File URL-Based Implementation (New!)
+
+For loading MusicXML files from custom locations, document directories, or external sources:
+
+```swift
+import SwiftUI
+import SheetMusicView
+
+struct FileURLBasedContentView: View {
+    @State private var transposeSteps: Int = 0
+    @State private var isLoading: Bool = false
+    @State private var zoomLevel: Double = 1.0
+    @State private var lastError: SheetMusicError?
+    @State private var showingError: Bool = false
+
+    var body: some View {
+        VStack {
+            // Load from a specific file URL
+            SheetMusicView(
+                fileURL: getDocumentURL(for: "user_composition.musicxml"),
+                transposeSteps: $transposeSteps,
+                isLoading: $isLoading,
+                zoomLevel: $zoomLevel,
+                onError: { error in
+                    lastError = error
+                    showingError = true
+                },
+                onReady: {
+                    print("Music loaded from URL!")
+                }
+            )
+            .showTitle()
+            .showComposer()
+            .frame(height: 400)
+
+            VStack(spacing: 10) {
+                Stepper("Transpose: \(transposeSteps)",
+                       value: $transposeSteps,
+                       in: -12...12)
+
+                HStack {
+                    Text("Zoom:")
+                    Slider(value: $zoomLevel, in: 0.5...3.0)
+                    Text("\(zoomLevel, specifier: "%.1f")x")
+                }
+            }
+            .padding()
+        }
+        .alert("Error", isPresented: $showingError) {
+            Button("OK") { }
+        } message: {
+            Text(lastError?.localizedDescription ?? "Unknown error")
+        }
+    }
+
+    private func getDocumentURL(for fileName: String) -> URL {
+        let documentsPath = FileManager.default.urls(for: .documentDirectory,
+                                                   in: .userDomainMask)[0]
+        return documentsPath.appendingPathComponent(fileName)
+    }
+}
+```
+
+**Benefits of the File URL-Based API:**
+- Load files from any accessible location (Documents, Downloads, etc.)
+- Support for user-generated content
+- Integration with file pickers and document browsers
+- Direct file system access
+- Flexible file source management
 
 ### Zoom Functionality
 

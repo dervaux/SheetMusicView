@@ -97,6 +97,38 @@ final class SheetMusicViewTests: XCTestCase {
     }
 
     @MainActor
+    func testFileURLBasedInitializer() {
+        // Test that the fileURL-based initializer creates a view with correct properties
+        let testURL = URL(fileURLWithPath: "/path/to/test.musicxml")
+
+        let view = SheetMusicView(
+            fileURL: testURL,
+            transposeSteps: .constant(2),
+            isLoading: .constant(false)
+        )
+
+        XCTAssertNotNil(view)
+
+        // Test with callbacks
+        var errorCalled = false
+        var readyCalled = false
+
+        let viewWithCallbacks = SheetMusicView(
+            fileURL: testURL,
+            transposeSteps: .constant(0),
+            isLoading: .constant(false),
+            onError: { _ in errorCalled = true },
+            onReady: { readyCalled = true }
+        )
+
+        XCTAssertNotNil(viewWithCallbacks)
+
+        // Suppress warnings about unused variables
+        _ = errorCalled
+        _ = readyCalled
+    }
+
+    @MainActor
     func testFileNameInitializerTimingFix() {
         // Test that the fileName initializer properly waits for coordinator to be ready
         // before attempting to load the file

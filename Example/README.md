@@ -7,6 +7,8 @@ A comprehensive iOS demo application showcasing the **SheetMusicView** Swift pac
 The SheetMusicView Demo App demonstrates:
 
 - **MusicXML Loading**: Display various types of musical notation from MusicXML files
+- **Bundle-based Loading**: Load files from app bundle using the fileName-based API
+- **File URL Loading**: **NEW!** Load files from any location using the fileURL-based API with file picker
 - **Transposition**: Real-time transposition of music by semitones (-12 to +12)
 - **Zoom Controls**: Interactive zoom functionality with slider and button controls
 - **Error Handling**: Comprehensive error handling with user-friendly messages
@@ -24,12 +26,26 @@ The SheetMusicView Demo App demonstrates:
 - **Transposition Controls**: Transpose music up or down by semitones with visual feedback
 - **Zoom Controls**: Zoom from 10% to 500% with slider and preset buttons
 - **Music Selection**: Easy-to-use picker for selecting from sample music pieces
+- **File Picker**: **NEW!** Native iOS file picker for loading external MusicXML files
 
 ### 📱 iOS Integration
 - Native SwiftUI interface with iOS design patterns
 - Support for both iPhone and iPad
 - Proper error handling with native alert dialogs
 - Loading states with progress indicators
+- **Tab-based Interface**: **NEW!** Two tabs demonstrating different loading approaches
+
+### 📁 Bundle Files Tab
+- Demonstrates the traditional fileName-based API
+- Loads MusicXML files from the app bundle
+- Automatic file discovery and metadata extraction
+- Curated sample library with various musical styles
+
+### 📂 File Picker Tab (NEW!)
+- Demonstrates the new fileURL-based API
+- Native iOS file picker integration
+- Support for external files from Documents, iCloud Drive, etc.
+- Load user-generated content and files from other apps
 
 ## Requirements
 

@@ -1,51 +1,32 @@
 //
-//  ContentView.swift
+//  FileURLDemoView.swift
 //  SheetMusicDemo
 //
-//  Main view that demonstrates the SheetMusicView package functionality.
-//  Now includes both bundle-based and file URL-based demos.
+//  Demonstrates the new fileURL-based initializer with file picker integration.
 //
 
 import SwiftUI
 import SheetMusicView
+import UniformTypeIdentifiers
 
-struct ContentView: View {
-    var body: some View {
-        TabView {
-            BundleFileDemoView()
-                .tabItem {
-                    Image(systemName: "folder")
-                    Text("Bundle Files")
-                }
-
-            FileURLDemoView()
-                .tabItem {
-                    Image(systemName: "doc.badge.plus")
-                    Text("File Picker")
-                }
-        }
-    }
-}
-
-struct BundleFileDemoView: View {
-    @StateObject private var musicLibrary = MusicLibrary()
-    @State private var currentFileName: String = ""
+struct FileURLDemoView: View {
+    @State private var selectedFileURL: URL?
     @State private var transposeSteps: Int = 0
     @State private var zoomLevel: Double = 1.0
     @State private var isLoading: Bool = false
     @State private var lastError: SheetMusicError?
     @State private var showingError: Bool = false
-    @State private var showingMusicPicker: Bool = false
-    @State private var showTitle: Bool = false
-    @State private var showInstrumentName: Bool = false
-    @State private var showComposer: Bool = false
+    @State private var showingFilePicker: Bool = false
+    @State private var showTitle: Bool = true
+    @State private var showInstrumentName: Bool = true
+    @State private var showComposer: Bool = true
     @State private var showDebugPanel: Bool = false
     @State private var isControlPanelExpanded: Bool = false
-
+    
     var body: some View {
         NavigationView {
             VStack(spacing: 0) {
-                // Header with music selection and controls
+                // Header with file selection info
                 headerSection
                 
                 // Sheet Music Display
@@ -54,31 +35,29 @@ struct BundleFileDemoView: View {
                 // Control Panel
                 controlPanelSection
             }
-            .navigationTitle("SheetMusicView Demo")
+            .navigationTitle("File URL Demo")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Select Music") {
-                        showingMusicPicker = true
+                    Button("Pick File") {
+                        showingFilePicker = true
                     }
                 }
             }
-            .sheet(isPresented: $showingMusicPicker) {
-                MusicPickerView(musicLibrary: musicLibrary) { piece in
-                    loadMusicPiece(piece)
-                    showingMusicPicker = false
-                }
+            .fileImporter(
+                isPresented: $showingFilePicker,
+                allowedContentTypes: [
+                    UTType(filenameExtension: "musicxml") ?? UTType.xml,
+                    UTType.xml
+                ],
+                allowsMultipleSelection: false
+            ) { result in
+                handleFileSelection(result)
             }
             .alert("Error", isPresented: $showingError) {
                 Button("OK") { }
             } message: {
                 Text(lastError?.localizedDescription ?? "Unknown error occurred")
-            }
-            .onAppear {
-                // Load the first piece by default
-                if let firstPiece = musicLibrary.pieces.first {
-                    loadMusicPiece(firstPiece)
-                }
             }
         }
         .navigationViewStyle(StackNavigationViewStyle())
@@ -88,35 +67,53 @@ struct BundleFileDemoView: View {
     
     private var headerSection: some View {
         VStack(spacing: 12) {
-            // Current music info
-            if let selectedPiece = musicLibrary.selectedPiece {
+            // Current file info
+            if let fileURL = selectedFileURL {
                 VStack(spacing: 4) {
-                    Text(selectedPiece.title)
+                    Text(fileURL.lastPathComponent)
                         .font(.headline)
                         .foregroundColor(.primary)
-                    Text("by \(selectedPiece.composer)")
+                    
+                    Text("from \(fileURL.deletingLastPathComponent().lastPathComponent)")
                         .font(.subheadline)
                         .foregroundColor(.secondary)
-                    Text(selectedPiece.description)
+                    
+                    Text("Loaded using fileURL initializer")
                         .font(.caption)
                         .foregroundColor(.secondary)
                         .multilineTextAlignment(.center)
 
-                    // Show filename and indicate we're using the new API
+                    // Show file path and indicate we're using the new fileURL API
                     HStack(spacing: 4) {
-                        Image(systemName: "doc.text")
-                            .foregroundColor(.green)
+                        Image(systemName: "folder")
+                            .foregroundColor(.blue)
                             .font(.caption)
-                        Text("\(selectedPiece.filename).musicxml")
+                        Text(fileURL.path)
                             .font(.caption)
-                            .foregroundColor(.green)
+                            .foregroundColor(.blue)
                             .fontWeight(.medium)
-                        Text("(File-based API)")
+                            .lineLimit(1)
+                            .truncationMode(.middle)
+                        Text("(URL-based API)")
                             .font(.caption2)
-                            .foregroundColor(.green)
+                            .foregroundColor(.blue)
                             .italic()
                     }
                     .padding(.top, 2)
+                }
+                .padding(.horizontal)
+            } else {
+                VStack(spacing: 8) {
+                    Image(systemName: "doc.badge.plus")
+                        .font(.title)
+                        .foregroundColor(.secondary)
+                    Text("No file selected")
+                        .font(.headline)
+                        .foregroundColor(.secondary)
+                    Text("Use the 'Pick File' button to select a MusicXML file")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                        .multilineTextAlignment(.center)
                 }
                 .padding(.horizontal)
             }
@@ -133,15 +130,10 @@ struct BundleFileDemoView: View {
                 // Background
                 Color(.systemBackground)
                 
-                // Sheet Music View using the NEW fileName-based API!
-                // Demonstrates both the new file-based API and modifier API:
-                // - fileName parameter loads .musicxml files directly from bundle
-                // - Without modifiers: all elements hidden by default
-                // - With modifier but no parameter: element shown (.showTitle() = .showTitle(true))
-                // - With explicit parameter: use specified value (.showTitle(false))
-                if !currentFileName.isEmpty {
+                // Sheet Music View using the NEW fileURL-based API!
+                if let fileURL = selectedFileURL {
                     SheetMusicView(
-                        fileName: currentFileName, // Using the new fileName parameter!
+                        fileURL: fileURL, // Using the new fileURL parameter!
                         transposeSteps: $transposeSteps,
                         isLoading: $isLoading,
                         zoomLevel: $zoomLevel,
@@ -150,7 +142,7 @@ struct BundleFileDemoView: View {
                             showingError = true
                         },
                         onReady: {
-                            print("Sheet music loaded from file: \(currentFileName).musicxml")
+                            print("Sheet music loaded from URL: \(fileURL.path)")
                         }
                     )
                     .showTitle(showTitle)
@@ -162,16 +154,19 @@ struct BundleFileDemoView: View {
                     .shadow(radius: 2)
                     .padding()
                 } else {
-                    // Placeholder when no music is loaded
+                    // Placeholder when no file is selected
                     VStack(spacing: 16) {
-                        Image(systemName: "music.note")
+                        Image(systemName: "doc.badge.plus")
                             .font(.system(size: 48))
                             .foregroundColor(.secondary)
-                        Text("Select a piece of music to get started")
+                        Text("Select a MusicXML file to get started")
                             .font(.headline)
                             .foregroundColor(.secondary)
-                        Button("Choose Music") {
-                            showingMusicPicker = true
+                        Text("Supports .musicxml and .xml files")
+                            .font(.subheadline)
+                            .foregroundColor(.secondary)
+                        Button("Pick File") {
+                            showingFilePicker = true
                         }
                         .buttonStyle(.borderedProminent)
                     }
@@ -215,6 +210,13 @@ struct BundleFileDemoView: View {
                     // Quick controls when collapsed
                     if !isControlPanelExpanded {
                         HStack(spacing: 12) {
+                            // File action button
+                            Button("Pick File") {
+                                showingFilePicker = true
+                            }
+                            .buttonStyle(.bordered)
+                            .controlSize(.mini)
+
                             // Quick transpose
                             HStack(spacing: 4) {
                                 Button("-") {
@@ -222,7 +224,7 @@ struct BundleFileDemoView: View {
                                 }
                                 .buttonStyle(.bordered)
                                 .controlSize(.mini)
-                                .disabled(isLoading || currentFileName.isEmpty || transposeSteps <= -12)
+                                .disabled(isLoading || selectedFileURL == nil || transposeSteps <= -12)
 
                                 Text("\(transposeSteps)")
                                     .font(.caption)
@@ -233,7 +235,7 @@ struct BundleFileDemoView: View {
                                 }
                                 .buttonStyle(.bordered)
                                 .controlSize(.mini)
-                                .disabled(isLoading || currentFileName.isEmpty || transposeSteps >= 12)
+                                .disabled(isLoading || selectedFileURL == nil || transposeSteps >= 12)
                             }
 
                             // Quick zoom
@@ -257,6 +259,34 @@ struct BundleFileDemoView: View {
             // Expandable content
             if isControlPanelExpanded {
                 VStack(spacing: 16) {
+                    // File Actions
+                    VStack(spacing: 12) {
+                        Text("File Actions")
+                            .font(.headline)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+
+                        HStack {
+                            Button("Pick New File") {
+                                showingFilePicker = true
+                            }
+                            .buttonStyle(.bordered)
+
+                            Spacer()
+
+                            if selectedFileURL != nil {
+                                Button("Clear File") {
+                                    selectedFileURL = nil
+                                    transposeSteps = 0
+                                    zoomLevel = 1.0
+                                }
+                                .buttonStyle(.bordered)
+                                .foregroundColor(.red)
+                            }
+                        }
+                    }
+
+                    Divider()
+
                     // Transposition Controls
                     VStack(spacing: 12) {
                         Text("Transposition")
@@ -268,7 +298,7 @@ struct BundleFileDemoView: View {
                                 transposeSteps = max(transposeSteps - 1, -12)
                             }
                             .buttonStyle(.bordered)
-                            .disabled(isLoading || currentFileName.isEmpty || transposeSteps <= -12)
+                            .disabled(isLoading || selectedFileURL == nil || transposeSteps <= -12)
 
                             Text("\(transposeSteps)")
                                 .frame(minWidth: 40)
@@ -281,7 +311,7 @@ struct BundleFileDemoView: View {
                                 transposeSteps = min(transposeSteps + 1, 12)
                             }
                             .buttonStyle(.bordered)
-                            .disabled(isLoading || currentFileName.isEmpty || transposeSteps >= 12)
+                            .disabled(isLoading || selectedFileURL == nil || transposeSteps >= 12)
 
                             Spacer()
 
@@ -306,7 +336,7 @@ struct BundleFileDemoView: View {
                                 zoomLevel = max(zoomLevel - 0.1, 0.1)
                             }
                             .buttonStyle(.bordered)
-                            .disabled(isLoading || currentFileName.isEmpty || zoomLevel <= 0.1)
+                            .disabled(isLoading || selectedFileURL == nil || zoomLevel <= 0.1)
 
                             Text("\(Int(zoomLevel * 100))%")
                                 .frame(minWidth: 50)
@@ -319,7 +349,7 @@ struct BundleFileDemoView: View {
                                 zoomLevel = min(zoomLevel + 0.1, 5.0)
                             }
                             .buttonStyle(.bordered)
-                            .disabled(isLoading || currentFileName.isEmpty || zoomLevel >= 5.0)
+                            .disabled(isLoading || selectedFileURL == nil || zoomLevel >= 5.0)
 
                             Spacer()
 
@@ -358,9 +388,24 @@ struct BundleFileDemoView: View {
     
     // MARK: - Helper Methods
     
-    private func loadMusicPiece(_ piece: MusicPiece) {
-        musicLibrary.selectPiece(piece)
-        currentFileName = piece.filename
-        print("Loading music file: \(piece.filename).musicxml")
+    private func handleFileSelection(_ result: Result<[URL], Error>) {
+        switch result {
+        case .success(let urls):
+            if let url = urls.first {
+                selectedFileURL = url
+                print("Selected file: \(url.path)")
+            }
+        case .failure(let error):
+            lastError = SheetMusicError.loadingFailed("Failed to select file: \(error.localizedDescription)")
+            showingError = true
+        }
     }
 }
+
+#if DEBUG
+struct FileURLDemoView_Previews: PreviewProvider {
+    static var previews: some View {
+        FileURLDemoView()
+    }
+}
+#endif
