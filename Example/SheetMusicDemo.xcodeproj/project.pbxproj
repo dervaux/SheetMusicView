@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 56;
+	objectVersion = 60;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -16,10 +16,15 @@
 		1A00000D294A0000000000001 /* ZoomControlsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A00000E294A0000000000001 /* ZoomControlsView.swift */; };
 		1A00000F294A0000000000001 /* MusicPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A000010294A0000000000001 /* MusicPickerView.swift */; };
 		1A000011294A0000000000001 /* SheetMusicView in Frameworks */ = {isa = PBXBuildFile; productRef = 1A000012294A0000000000001 /* SheetMusicView */; };
+		9DF9EFB92E19FDB4001B4C26 /* chord_progression.musicxml in Resources */ = {isa = PBXBuildFile; fileRef = 9DF9EFB42E19FDB4001B4C26 /* chord_progression.musicxml */; };
+		9DF9EFBA2E19FDB4001B4C26 /* Horn.musicxml in Resources */ = {isa = PBXBuildFile; fileRef = 9DF9EFB52E19FDB4001B4C26 /* Horn.musicxml */; };
+		9DF9EFBB2E19FDB4001B4C26 /* bach_minuet.musicxml in Resources */ = {isa = PBXBuildFile; fileRef = 9DF9EFB32E19FDB4001B4C26 /* bach_minuet.musicxml */; };
+		9DF9EFBC2E19FDB4001B4C26 /* sample.musicxml in Resources */ = {isa = PBXBuildFile; fileRef = 9DF9EFB62E19FDB4001B4C26 /* sample.musicxml */; };
+		9DF9EFBD2E19FDB4001B4C26 /* twinkle.musicxml in Resources */ = {isa = PBXBuildFile; fileRef = 9DF9EFB82E19FDB4001B4C26 /* twinkle.musicxml */; };
+		9DF9EFBE2E19FDB4001B4C26 /* simple_scale.musicxml in Resources */ = {isa = PBXBuildFile; fileRef = 9DF9EFB72E19FDB4001B4C26 /* simple_scale.musicxml */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		1A000013294A0000000000001 /* SheetMusicDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SheetMusicDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		1A000002294A0000000000001 /* SheetMusicDemoApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SheetMusicDemoApp.swift; sourceTree = "<group>"; };
 		1A000004294A0000000000001 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		1A000006294A0000000000001 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -28,7 +33,14 @@
 		1A00000C294A0000000000001 /* TranspositionControlsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TranspositionControlsView.swift; sourceTree = "<group>"; };
 		1A00000E294A0000000000001 /* ZoomControlsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZoomControlsView.swift; sourceTree = "<group>"; };
 		1A000010294A0000000000001 /* MusicPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicPickerView.swift; sourceTree = "<group>"; };
+		1A000013294A0000000000001 /* SheetMusicDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SheetMusicDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		1A000014294A0000000000001 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		9DF9EFB32E19FDB4001B4C26 /* bach_minuet.musicxml */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = bach_minuet.musicxml; sourceTree = "<group>"; };
+		9DF9EFB42E19FDB4001B4C26 /* chord_progression.musicxml */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = chord_progression.musicxml; sourceTree = "<group>"; };
+		9DF9EFB52E19FDB4001B4C26 /* Horn.musicxml */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = Horn.musicxml; sourceTree = "<group>"; };
+		9DF9EFB62E19FDB4001B4C26 /* sample.musicxml */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = sample.musicxml; sourceTree = "<group>"; };
+		9DF9EFB72E19FDB4001B4C26 /* simple_scale.musicxml */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = simple_scale.musicxml; sourceTree = "<group>"; };
+		9DF9EFB82E19FDB4001B4C26 /* twinkle.musicxml */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = twinkle.musicxml; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -94,6 +106,12 @@
 		1A00001B294A0000000000001 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				9DF9EFB32E19FDB4001B4C26 /* bach_minuet.musicxml */,
+				9DF9EFB42E19FDB4001B4C26 /* chord_progression.musicxml */,
+				9DF9EFB52E19FDB4001B4C26 /* Horn.musicxml */,
+				9DF9EFB62E19FDB4001B4C26 /* sample.musicxml */,
+				9DF9EFB72E19FDB4001B4C26 /* simple_scale.musicxml */,
+				9DF9EFB82E19FDB4001B4C26 /* twinkle.musicxml */,
 				1A00000A294A0000000000001 /* SampleMusicXML.swift */,
 			);
 			path = Resources;
@@ -163,6 +181,12 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9DF9EFB92E19FDB4001B4C26 /* chord_progression.musicxml in Resources */,
+				9DF9EFBA2E19FDB4001B4C26 /* Horn.musicxml in Resources */,
+				9DF9EFBB2E19FDB4001B4C26 /* bach_minuet.musicxml in Resources */,
+				9DF9EFBC2E19FDB4001B4C26 /* sample.musicxml in Resources */,
+				9DF9EFBD2E19FDB4001B4C26 /* twinkle.musicxml in Resources */,
+				9DF9EFBE2E19FDB4001B4C26 /* simple_scale.musicxml in Resources */,
 				1A000005294A0000000000001 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -313,7 +337,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = BRB4J6X2V3;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = SheetMusicDemo/Info.plist;
@@ -328,7 +352,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.example.SheetMusicDemo;
+				PRODUCT_BUNDLE_IDENTIFIER = com.dervaux.SheetMusicDemo;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -343,7 +367,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = BRB4J6X2V3;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = SheetMusicDemo/Info.plist;
@@ -358,7 +382,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.example.SheetMusicDemo;
+				PRODUCT_BUNDLE_IDENTIFIER = com.dervaux.SheetMusicDemo;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -369,20 +393,20 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		1A000021294A0000000000001 /* Build configuration list for PBXProject "SheetMusicDemo" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				1A000023294A0000000000001 /* Debug */,
-				1A000024294A0000000000001 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
 		1A00001D294A0000000000001 /* Build configuration list for PBXNativeTarget "SheetMusicDemo" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				1A000025294A0000000000001 /* Debug */,
 				1A000026294A0000000000001 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		1A000021294A0000000000001 /* Build configuration list for PBXProject "SheetMusicDemo" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1A000023294A0000000000001 /* Debug */,
+				1A000024294A0000000000001 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

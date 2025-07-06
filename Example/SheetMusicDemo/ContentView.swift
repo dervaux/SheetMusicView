@@ -10,7 +10,7 @@ import SheetMusicView
 
 struct ContentView: View {
     @StateObject private var musicLibrary = MusicLibrary()
-    @State private var currentXML: String = ""
+    @State private var currentFileName: String = ""
     @State private var transposeSteps: Int = 0
     @State private var zoomLevel: Double = 1.0
     @State private var isLoading: Bool = false
@@ -81,6 +81,22 @@ struct ContentView: View {
                         .font(.caption)
                         .foregroundColor(.secondary)
                         .multilineTextAlignment(.center)
+
+                    // Show filename and indicate we're using the new API
+                    HStack(spacing: 4) {
+                        Image(systemName: "doc.text")
+                            .foregroundColor(.green)
+                            .font(.caption)
+                        Text("\(selectedPiece.filename).musicxml")
+                            .font(.caption)
+                            .foregroundColor(.green)
+                            .fontWeight(.medium)
+                        Text("(File-based API)")
+                            .font(.caption2)
+                            .foregroundColor(.green)
+                            .italic()
+                    }
+                    .padding(.top, 2)
                 }
                 .padding(.horizontal)
             }
@@ -97,23 +113,24 @@ struct ContentView: View {
                 // Background
                 Color(.systemBackground)
                 
-                // Sheet Music View
-                // Demonstrates the new modifier API:
+                // Sheet Music View using the NEW fileName-based API!
+                // Demonstrates both the new file-based API and modifier API:
+                // - fileName parameter loads .musicxml files directly from bundle
                 // - Without modifiers: all elements hidden by default
                 // - With modifier but no parameter: element shown (.showTitle() = .showTitle(true))
                 // - With explicit parameter: use specified value (.showTitle(false))
-                if !currentXML.isEmpty {
+                if !currentFileName.isEmpty {
                     SheetMusicView(
-                        xml: $currentXML,
+                        fileName: currentFileName, // Using the new fileName parameter!
                         transposeSteps: $transposeSteps,
                         isLoading: $isLoading,
                         zoomLevel: $zoomLevel,
                         onError: { error in
                             lastError = error
-                            showingError = false
+                            showingError = true
                         },
                         onReady: {
-                            print("Sheet music display is ready!")
+                            print("Sheet music loaded from file: \(currentFileName).musicxml")
                         }
                     )
                     .showTitle(showTitle)
@@ -175,7 +192,7 @@ struct ContentView: View {
                         transposeSteps = max(transposeSteps - 1, -12)
                     }
                     .buttonStyle(.bordered)
-                    .disabled(isLoading || currentXML.isEmpty || transposeSteps <= -12)
+                    .disabled(isLoading || currentFileName.isEmpty || transposeSteps <= -12)
 
                     Text("\(transposeSteps)")
                         .frame(minWidth: 40)
@@ -188,7 +205,7 @@ struct ContentView: View {
                         transposeSteps = min(transposeSteps + 1, 12)
                     }
                     .buttonStyle(.bordered)
-                    .disabled(isLoading || currentXML.isEmpty || transposeSteps >= 12)
+                    .disabled(isLoading || currentFileName.isEmpty || transposeSteps >= 12)
 
                     Spacer()
 
@@ -213,7 +230,7 @@ struct ContentView: View {
                         zoomLevel = max(zoomLevel - 0.02, 0.1)
                     }
                     .buttonStyle(.bordered)
-                    .disabled(isLoading || currentXML.isEmpty || zoomLevel <= 0.1)
+                    .disabled(isLoading || currentFileName.isEmpty || zoomLevel <= 0.1)
 
                     Text("\(Int(zoomLevel * 100))%")
                         .frame(minWidth: 50)
@@ -226,7 +243,7 @@ struct ContentView: View {
                         zoomLevel = min(zoomLevel + 0.02, 5.0)
                     }
                     .buttonStyle(.bordered)
-                    .disabled(isLoading || currentXML.isEmpty || zoomLevel >= 5.0)
+                    .disabled(isLoading || currentFileName.isEmpty || zoomLevel >= 5.0)
 
                     Spacer()
 
@@ -263,6 +280,7 @@ struct ContentView: View {
     
     private func loadMusicPiece(_ piece: MusicPiece) {
         musicLibrary.selectPiece(piece)
-        currentXML = piece.xmlContent
+        currentFileName = piece.filename
+        print("Loading music file: \(piece.filename).musicxml")
     }
 }
