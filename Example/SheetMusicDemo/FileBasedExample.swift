@@ -56,7 +56,7 @@ struct FileBasedExample: View {
                     
                     // This is the new filename-based API!
                     SheetMusicView(
-                        fileName: "sample", // No need for .musicxml extension
+                        musicXMLfileName: "sample", // No need for .musicxml extension
                         transposeSteps: $transposeSteps,
                         isLoading: $isLoading,
                         zoomLevel: $zoomLevel,

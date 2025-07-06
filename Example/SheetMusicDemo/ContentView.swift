@@ -121,7 +121,7 @@ struct ContentView: View {
                 // - With explicit parameter: use specified value (.showTitle(false))
                 if !currentFileName.isEmpty {
                     SheetMusicView(
-                        fileName: currentFileName, // Using the new fileName parameter!
+                        musicXMLfileName: currentFileName, // Using the new musicXMLfileName parameter!
                         transposeSteps: $transposeSteps,
                         isLoading: $isLoading,
                         zoomLevel: $zoomLevel,

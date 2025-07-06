@@ -42,7 +42,6 @@ class MusicLibrary: ObservableObject {
         let musicXMLPaths = Bundle.main.paths(forResourcesOfType: "musicxml", inDirectory: nil)
         for path in musicXMLPaths {
             let url = URL(fileURLWithPath: path)
-            let filenameWithExtension = url.lastPathComponent
             let filename = url.deletingPathExtension().lastPathComponent
 
             // Create a user-friendly title from the filename

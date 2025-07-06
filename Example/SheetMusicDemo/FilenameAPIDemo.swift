@@ -78,7 +78,7 @@ struct FilenameAPIDemo: View {
                         
                         // This demonstrates the new API!
                         SheetMusicView(
-                            fileName: selectedFileName, // Just the filename, no extension needed!
+                            musicXMLfileName: selectedFileName, // Just the filename, no extension needed!
                             transposeSteps: $transposeSteps,
                             isLoading: $isLoading,
                             zoomLevel: $zoomLevel,
@@ -166,7 +166,7 @@ struct APIComparisonView: View {
                     
                     Text("""
                     // That's it! No manual file loading needed.
-                    SheetMusicView(fileName: "sample", ...)
+                    SheetMusicView(musicXMLfileName: "sample", ...)
                     """)
                     .font(.system(.caption, design: .monospaced))
                     .padding()
