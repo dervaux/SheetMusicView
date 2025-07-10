@@ -575,7 +575,7 @@ public struct SheetMusicView: View {
 
             Task {
                 do {
-                    let xmlContent = try loadMusicXMLFile(fileName: fileName, from: bundle)
+                    let xmlContent = try await loadMusicXMLFile(fileName: fileName, from: bundle)
                     loadedXML = xmlContent
                     loadedFileName = fileName
 
@@ -605,7 +605,7 @@ public struct SheetMusicView: View {
 
             Task {
                 do {
-                    let xmlContent = try loadMusicXMLFile(from: fileURL)
+                    let xmlContent = try await loadMusicXMLFile(from: fileURL)
                     loadedXML = xmlContent
                     loadedFileName = urlString
 
@@ -627,7 +627,7 @@ public struct SheetMusicView: View {
         }
     }
 
-    private func loadMusicXMLFile(fileName: String, from bundle: Bundle) throws -> String {
+    private func loadMusicXMLFile(fileName: String, from bundle: Bundle) async throws -> String {
         // Try different possible file extensions and locations
         let possibleExtensions = ["musicxml", "xml"]
         let possibleSubdirectories = [nil, "Resources", "MusicXML"]
@@ -635,6 +635,7 @@ public struct SheetMusicView: View {
         for subdirectory in possibleSubdirectories {
             for ext in possibleExtensions {
                 if let url = bundle.url(forResource: fileName, withExtension: ext, subdirectory: subdirectory) {
+                    // For local bundle files, we can still use String(contentsOf:) since they're local
                     return try String(contentsOf: url, encoding: .utf8)
                 }
             }
@@ -651,8 +652,23 @@ public struct SheetMusicView: View {
         )
     }
 
-    private func loadMusicXMLFile(from url: URL) throws -> String {
-        return try String(contentsOf: url, encoding: .utf8)
+    private func loadMusicXMLFile(from url: URL) async throws -> String {
+        // Check if this is a local file URL or a remote URL
+        if url.isFileURL {
+            // For local files, use synchronous loading since it's fast
+            return try String(contentsOf: url, encoding: .utf8)
+        } else {
+            // For remote URLs, use async URLSession to avoid blocking the main thread
+            let (data, _) = try await URLSession.shared.data(from: url)
+            guard let content = String(data: data, encoding: .utf8) else {
+                throw NSError(
+                    domain: "SheetMusicView",
+                    code: -1,
+                    userInfo: [NSLocalizedDescriptionKey: "Failed to decode XML content from URL: \(url.absoluteString)"]
+                )
+            }
+            return content
+        }
     }
 
     private func handleXMLChange(_ newXML: String) {
