@@ -832,8 +832,8 @@ struct ZoomableSheetMusicView: View {
 ```swift
 struct PageMarginsSheetMusicView: View {
     @State private var musicXML: String = ""
-    @State private var leftMargin: Double = 10.0
-    @State private var rightMargin: Double = 10.0
+    @State private var leftMargin: Double = 1.0
+    @State private var rightMargin: Double = 1.0
 
     var body: some View {
         VStack {
@@ -859,8 +859,8 @@ struct PageMarginsSheetMusicView: View {
                 }
 
                 Button("Reset to Default") {
-                    leftMargin = 10.0
-                    rightMargin = 10.0
+                    leftMargin = 1.0
+                    rightMargin = 1.0
                 }
             }
             .padding()

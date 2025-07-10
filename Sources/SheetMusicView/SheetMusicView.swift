@@ -82,8 +82,8 @@ public struct SheetMusicView: View {
     @State private var lastShowInstrumentName: Bool = false
     @State private var lastShowComposer: Bool = false
     @State private var lastShowDebugPanel: Bool = false
-    @State private var lastPageLeftMargin: Double = 10.0
-    @State private var lastPageRightMargin: Double = 10.0
+    @State private var lastPageLeftMargin: Double = 1.0
+    @State private var lastPageRightMargin: Double = 1.0
 
     // MARK: - Initialization
 
@@ -105,8 +105,8 @@ public struct SheetMusicView: View {
         self.showInstrumentName = false
         self.showComposer = false
         self.showDebugPanel = false
-        self.pageLeftMargin = 10.0
-        self.pageRightMargin = 10.0
+        self.pageLeftMargin = 1.0
+        self.pageRightMargin = 1.0
         self.zoomLevelBinding = nil
     }
 
@@ -129,8 +129,8 @@ public struct SheetMusicView: View {
         self.showInstrumentName = false
         self.showComposer = false
         self.showDebugPanel = false
-        self.pageLeftMargin = 10.0
-        self.pageRightMargin = 10.0
+        self.pageLeftMargin = 1.0
+        self.pageRightMargin = 1.0
         self.zoomLevelBinding = nil
     }
 
@@ -154,8 +154,8 @@ public struct SheetMusicView: View {
         self.showInstrumentName = false
         self.showComposer = false
         self.showDebugPanel = false
-        self.pageLeftMargin = 10.0
-        self.pageRightMargin = 10.0
+        self.pageLeftMargin = 1.0
+        self.pageRightMargin = 1.0
         self.zoomLevelBinding = nil
     }
 
@@ -180,8 +180,8 @@ public struct SheetMusicView: View {
         self.showInstrumentName = false
         self.showComposer = false
         self.showDebugPanel = false
-        self.pageLeftMargin = 10.0
-        self.pageRightMargin = 10.0
+        self.pageLeftMargin = 1.0
+        self.pageRightMargin = 1.0
         self.zoomLevelBinding = nil
     }
 
@@ -204,8 +204,8 @@ public struct SheetMusicView: View {
         self.showInstrumentName = false
         self.showComposer = false
         self.showDebugPanel = false
-        self.pageLeftMargin = 10.0
-        self.pageRightMargin = 10.0
+        self.pageLeftMargin = 1.0
+        self.pageRightMargin = 1.0
         self.zoomLevelBinding = nil
 
         // Store the file URL for loading
@@ -421,10 +421,10 @@ public struct SheetMusicView: View {
 
     /// Controls the page margins for the sheet music display
     /// - Parameters:
-    ///   - left: Left page margin in units (default: 10.0)
-    ///   - right: Right page margin in units (default: 10.0)
+    ///   - left: Left page margin in units (default: 1.0)
+    ///   - right: Right page margin in units (default: 1.0)
     /// - Returns: A modified SheetMusicView instance
-    public func pageMargins(left: Double = 10.0, right: Double = 10.0) -> SheetMusicView {
+    public func pageMargins(left: Double = 1.0, right: Double = 1.0) -> SheetMusicView {
         return SheetMusicView(
             xml: _xml,
             transposeSteps: _transposeSteps,
@@ -451,7 +451,9 @@ public struct SheetMusicView: View {
             onReady?()
             // Apply display options when ready
             handleDisplayOptionsChange()
-            // Apply page margins when ready
+            // Force apply page margins when ready (reset lastPageMargins to ensure they get applied)
+            lastPageLeftMargin = -1.0  // Force update by using impossible values
+            lastPageRightMargin = -1.0  // Force update by using impossible values
             handlePageMarginsChange(left: pageLeftMargin, right: pageRightMargin)
             // Load initial XML if available (for xml-based API)
             if !xml.isEmpty && xml != lastXML {

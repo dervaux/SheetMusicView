@@ -45,10 +45,10 @@ struct FileURLDemoView: View {
                         }
                     )
                     .zoomLevel($zoomLevel)
+//                    .pageMargins(left: -3, right: 4)
                     .background(Color.white)
                     .cornerRadius(8)
                     .shadow(radius: 2)
-                    .padding()
                 } else {
                     // Placeholder when no file is selected
                     VStack(spacing: 24) {

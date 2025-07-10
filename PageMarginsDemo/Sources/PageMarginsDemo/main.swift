@@ -112,8 +112,8 @@ struct PageMarginsDemoView: View {
     </score-partwise>
     """
     
-    @State private var leftMargin: Double = 10.0
-    @State private var rightMargin: Double = 10.0
+    @State private var leftMargin: Double = 1.0
+    @State private var rightMargin: Double = 1.0
     @State private var isLoading: Bool = false
     @State private var showTitle: Bool = true
     @State private var showComposer: Bool = true
@@ -236,7 +236,7 @@ struct PageMarginsDemoView: View {
                 
                 HStack {
                     Button("Reset") {
-                        leftMargin = 10.0
+                        leftMargin = 1.0
                     }
                     .buttonStyle(.bordered)
                     .controlSize(.small)
@@ -285,7 +285,7 @@ struct PageMarginsDemoView: View {
                 
                 HStack {
                     Button("Reset") {
-                        rightMargin = 10.0
+                        rightMargin = 1.0
                     }
                     .buttonStyle(.bordered)
                     .controlSize(.small)
@@ -314,9 +314,9 @@ struct PageMarginsDemoView: View {
                     .font(.headline)
                 
                 VStack(spacing: 6) {
-                    Button("Default (10, 10)") {
-                        leftMargin = 10.0
-                        rightMargin = 10.0
+                    Button("Default (1, 1)") {
+                        leftMargin = 1.0
+                        rightMargin = 1.0
                     }
                     .buttonStyle(.bordered)
                     .frame(maxWidth: .infinity)

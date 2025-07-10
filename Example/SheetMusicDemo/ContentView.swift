@@ -41,8 +41,8 @@ struct BundleFileDemoView: View {
     @State private var showComposer: Bool = false
     @State private var showDebugPanel: Bool = false
     @State private var isControlPanelExpanded: Bool = false
-    @State private var leftMargin: Double = 10.0
-    @State private var rightMargin: Double = 10.0
+    @State private var leftMargin: Double = 1.0
+    @State private var rightMargin: Double = 1.0
 
     var body: some View {
         NavigationView {
@@ -159,7 +159,7 @@ struct BundleFileDemoView: View {
                     .showInstrumentName(showInstrumentName)
                     .showComposer(showComposer)
                     .showDebugPanel(showDebugPanel)
-                    .pageMargins(left: leftMargin, right: rightMargin)
+                    // .pageMargins(left: leftMargin, right: rightMargin)
                     .background(Color.white)
                     .cornerRadius(8)
                     .shadow(radius: 2)
@@ -348,11 +348,11 @@ struct BundleFileDemoView: View {
                                     .frame(width: 80, alignment: .leading)
                                 Slider(value: $leftMargin, in: 0...50)
                                 Button("Reset") {
-                                    leftMargin = 10.0
+                                    leftMargin = 1.0
                                 }
                                 .buttonStyle(.bordered)
                                 .controlSize(.mini)
-                                .disabled(isLoading || abs(leftMargin - 10.0) < 0.1)
+                                .disabled(isLoading || abs(leftMargin - 1.0) < 0.1)
                             }
 
                             HStack {
@@ -360,11 +360,11 @@ struct BundleFileDemoView: View {
                                     .frame(width: 80, alignment: .leading)
                                 Slider(value: $rightMargin, in: 0...50)
                                 Button("Reset") {
-                                    rightMargin = 10.0
+                                    rightMargin = 1.0
                                 }
                                 .buttonStyle(.bordered)
                                 .controlSize(.mini)
-                                .disabled(isLoading || abs(rightMargin - 10.0) < 0.1)
+                                .disabled(isLoading || abs(rightMargin - 1.0) < 0.1)
                             }
                         }
                     }
