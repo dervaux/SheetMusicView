@@ -522,6 +522,37 @@
                 throw error;
             }
         }
+
+        // Set page margins using OSMD's EngravingRules
+        function osmdSetPageMargins(leftMargin, rightMargin) {
+            if (!isInitialized || !osmd) {
+                throw new Error('OSMD is not initialized');
+            }
+
+            try {
+                console.log(`Setting page margins - Left: ${leftMargin}, Right: ${rightMargin}`);
+
+                // Set the page margins using EngravingRules
+                if (osmd.EngravingRules) {
+                    osmd.EngravingRules.PageLeftMargin = leftMargin;
+                    osmd.EngravingRules.PageRightMargin = rightMargin;
+                } else {
+                    console.warn('EngravingRules not available');
+                    return false;
+                }
+
+                // Re-render to apply the changes
+                if (osmd.sheet) {
+                    osmd.render();
+                }
+
+                console.log('Page margins set successfully');
+                return true;
+            } catch (error) {
+                console.error('Failed to set page margins:', error);
+                throw error;
+            }
+        }
         
         // Enhanced window resize handling with debouncing
         let resizeTimeout;

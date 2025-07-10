@@ -366,6 +366,7 @@ By default, all display elements are **hidden** unless you use their correspondi
 - `.showInstrumentName()` or `.showInstrumentName(Bool)` - Controls whether instrument names are shown
 - `.showComposer()` or `.showComposer(Bool)` - Controls whether the composer name is displayed
 - `.showDebugPanel()` or `.showDebugPanel(Bool)` - Controls whether the debug status panel is displayed
+- `.pageMargins(left: Double, right: Double)` - Controls the page margins for the sheet music display
 
 #### Debug Panel
 
@@ -382,6 +383,7 @@ The debug panel appears as a semi-transparent overlay in the top-right corner of
 - `.showInstrumentName()` or `.showInstrumentName(_ show: Bool)` - Controls whether instrument names are shown
 - `.showComposer()` or `.showComposer(_ show: Bool)` - Controls whether the composer name is displayed
 - `.showDebugPanel()` or `.showDebugPanel(_ show: Bool)` - Controls whether the debug status panel is displayed
+- `.pageMargins(left: Double, right: Double)` - Controls the page margins for the sheet music display
 
 **Modifier Chaining:**
 Modifiers can be chained together and applied in any order:
@@ -398,6 +400,7 @@ SheetMusicView(xml: $musicXML)
     .showTitle()                         // Show title (no parameter = true)
     .showInstrumentName(false)           // Explicitly hide instruments
     .showComposer()                      // Show composer (no parameter = true)
+    .pageMargins(left: 15.0, right: 15.0) // Set custom page margins
 ```
 
 #### SheetMusicCoordinator (JavaScript Bridge)
@@ -443,6 +446,9 @@ func zoomIn() async throws                        // Zoom in by 0.02 (2%)
 func zoomOut() async throws                       // Zoom out by 0.02 (2%)
 func resetZoom() async throws                     // Reset to 1.0 (100%)
 var zoomLevel: Double { get }                     // Get current zoom level
+
+// Page margin functionality
+func setPageMargins(left: Double, right: Double) async throws  // Set page margins using OSMD's EngravingRules
 ```
 
 #### SheetMusicError (Error Handling)
@@ -813,6 +819,48 @@ struct ZoomableSheetMusicView: View {
 
                 Button("Reset") {
                     zoomLevel = 1.0
+                }
+            }
+            .padding()
+        }
+    }
+}
+```
+
+### Page Margins Control
+
+```swift
+struct PageMarginsSheetMusicView: View {
+    @State private var musicXML: String = ""
+    @State private var leftMargin: Double = 10.0
+    @State private var rightMargin: Double = 10.0
+
+    var body: some View {
+        VStack {
+            SheetMusicView(
+                xml: $musicXML,
+                transposeSteps: .constant(0),
+                isLoading: .constant(false)
+            )
+            .pageMargins(left: leftMargin, right: rightMargin)
+            .frame(height: 400)
+
+            VStack(spacing: 10) {
+                HStack {
+                    Text("Left Margin:")
+                    Slider(value: $leftMargin, in: 0...50)
+                    Text("\(leftMargin, specifier: "%.1f")")
+                }
+
+                HStack {
+                    Text("Right Margin:")
+                    Slider(value: $rightMargin, in: 0...50)
+                    Text("\(rightMargin, specifier: "%.1f")")
+                }
+
+                Button("Reset to Default") {
+                    leftMargin = 10.0
+                    rightMargin = 10.0
                 }
             }
             .padding()

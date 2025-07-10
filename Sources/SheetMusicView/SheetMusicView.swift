@@ -61,6 +61,10 @@ public struct SheetMusicView: View {
     private let showComposer: Bool
     private let showDebugPanel: Bool
 
+    // MARK: - Page Margins
+    private let pageLeftMargin: Double
+    private let pageRightMargin: Double
+
     // MARK: - Private State
     @State private var lastXML: String = ""
     @State private var lastTransposeSteps: Int = 0
@@ -71,6 +75,8 @@ public struct SheetMusicView: View {
     @State private var lastShowInstrumentName: Bool = false
     @State private var lastShowComposer: Bool = false
     @State private var lastShowDebugPanel: Bool = false
+    @State private var lastPageLeftMargin: Double = 10.0
+    @State private var lastPageRightMargin: Double = 10.0
 
     // MARK: - Initialization
 
@@ -105,6 +111,8 @@ public struct SheetMusicView: View {
         self.showInstrumentName = false
         self.showComposer = false
         self.showDebugPanel = false
+        self.pageLeftMargin = 10.0
+        self.pageRightMargin = 10.0
     }
 
     /// Initialize SheetMusicView with a filename (without .musicxml extension)
@@ -139,6 +147,8 @@ public struct SheetMusicView: View {
         self.showInstrumentName = false
         self.showComposer = false
         self.showDebugPanel = false
+        self.pageLeftMargin = 10.0
+        self.pageRightMargin = 10.0
     }
 
     /// Initialize SheetMusicView with callbacks
@@ -174,6 +184,8 @@ public struct SheetMusicView: View {
         self.showInstrumentName = false
         self.showComposer = false
         self.showDebugPanel = false
+        self.pageLeftMargin = 10.0
+        self.pageRightMargin = 10.0
     }
 
     /// Initialize SheetMusicView with filename and callbacks
@@ -210,6 +222,8 @@ public struct SheetMusicView: View {
         self.showInstrumentName = false
         self.showComposer = false
         self.showDebugPanel = false
+        self.pageLeftMargin = 10.0
+        self.pageRightMargin = 10.0
     }
 
     /// Initialize SheetMusicView with a file URL
@@ -244,6 +258,8 @@ public struct SheetMusicView: View {
         self.showInstrumentName = false
         self.showComposer = false
         self.showDebugPanel = false
+        self.pageLeftMargin = 10.0
+        self.pageRightMargin = 10.0
 
         // Store the file URL for loading
         self.fileURL = fileURL
@@ -263,7 +279,9 @@ public struct SheetMusicView: View {
         showTitle: Bool,
         showInstrumentName: Bool,
         showComposer: Bool,
-        showDebugPanel: Bool
+        showDebugPanel: Bool,
+        pageLeftMargin: Double,
+        pageRightMargin: Double
     ) {
         self._xml = xml
         self._transposeSteps = transposeSteps
@@ -289,6 +307,8 @@ public struct SheetMusicView: View {
         self.showInstrumentName = showInstrumentName
         self.showComposer = showComposer
         self.showDebugPanel = showDebugPanel
+        self.pageLeftMargin = pageLeftMargin
+        self.pageRightMargin = pageRightMargin
     }
 
     // MARK: - Body
@@ -322,6 +342,12 @@ public struct SheetMusicView: View {
                     // The small delay ensures the view has fully updated before calling the coordinator
                     try? await Task.sleep(nanoseconds: 1_000_000) // 1ms delay
                     handleDisplayOptionsChange(showTitle: showTitle, showInstrumentName: showInstrumentName, showComposer: showComposer, showDebugPanel: showDebugPanel)
+                }
+                .task(id: "\(pageLeftMargin)-\(pageRightMargin)") {
+                    // This task will be cancelled and restarted whenever the page margins change
+                    // The small delay ensures the view has fully updated before calling the coordinator
+                    try? await Task.sleep(nanoseconds: 1_000_000) // 1ms delay
+                    handlePageMarginsChange(left: pageLeftMargin, right: pageRightMargin)
                 }
                 .task(id: fileName) {
                     // This task will be cancelled and restarted whenever the fileName changes
@@ -366,7 +392,9 @@ public struct SheetMusicView: View {
             showTitle: show,
             showInstrumentName: showInstrumentName,
             showComposer: showComposer,
-            showDebugPanel: showDebugPanel
+            showDebugPanel: showDebugPanel,
+            pageLeftMargin: pageLeftMargin,
+            pageRightMargin: pageRightMargin
         )
     }
 
@@ -394,7 +422,9 @@ public struct SheetMusicView: View {
             showTitle: showTitle,
             showInstrumentName: show,
             showComposer: showComposer,
-            showDebugPanel: showDebugPanel
+            showDebugPanel: showDebugPanel,
+            pageLeftMargin: pageLeftMargin,
+            pageRightMargin: pageRightMargin
         )
     }
 
@@ -422,7 +452,9 @@ public struct SheetMusicView: View {
             showTitle: showTitle,
             showInstrumentName: showInstrumentName,
             showComposer: show,
-            showDebugPanel: showDebugPanel
+            showDebugPanel: showDebugPanel,
+            pageLeftMargin: pageLeftMargin,
+            pageRightMargin: pageRightMargin
         )
     }
 
@@ -450,7 +482,41 @@ public struct SheetMusicView: View {
             showTitle: showTitle,
             showInstrumentName: showInstrumentName,
             showComposer: showComposer,
-            showDebugPanel: show
+            showDebugPanel: show,
+            pageLeftMargin: pageLeftMargin,
+            pageRightMargin: pageRightMargin
+        )
+    }
+
+    /// Controls the page margins for the sheet music display
+    /// - Parameters:
+    ///   - left: Left page margin in units (default: 10.0)
+    ///   - right: Right page margin in units (default: 10.0)
+    /// - Returns: A modified SheetMusicView instance
+    public func pageMargins(left: Double = 10.0, right: Double = 10.0) -> SheetMusicView {
+        // Create a proper zoom binding if we have a non-nil zoom level
+        let zoomBinding: Binding<Double>? = _zoomLevel.wrappedValue != nil ?
+            Binding<Double>(
+                get: { self._zoomLevel.wrappedValue ?? 1.0 },
+                set: { newValue in self._zoomLevel.wrappedValue = newValue }
+            ) : nil
+
+        return SheetMusicView(
+            xml: _xml,
+            transposeSteps: _transposeSteps,
+            isLoading: _isLoading,
+            zoomLevel: zoomBinding,
+            fileName: fileName,
+            bundle: bundle,
+            fileURL: fileURL,
+            onError: onError,
+            onReady: onReady,
+            showTitle: showTitle,
+            showInstrumentName: showInstrumentName,
+            showComposer: showComposer,
+            showDebugPanel: showDebugPanel,
+            pageLeftMargin: left,
+            pageRightMargin: right
         )
     }
 
@@ -461,6 +527,8 @@ public struct SheetMusicView: View {
             onReady?()
             // Apply display options when ready
             handleDisplayOptionsChange()
+            // Apply page margins when ready
+            handlePageMarginsChange(left: pageLeftMargin, right: pageRightMargin)
             // Load initial XML if available (for xml-based API)
             if !xml.isEmpty && xml != lastXML {
                 handleXMLChange(xml)
@@ -704,6 +772,26 @@ public struct SheetMusicView: View {
                 } catch {
                     #if DEBUG
                     print("SheetMusicView: Failed to update display options: \(error)")
+                    #endif
+                }
+            }
+        }
+    }
+
+    private func handlePageMarginsChange(left: Double, right: Double) {
+        guard coordinator.isReady else { return }
+
+        // Only update if page margins actually changed
+        if left != lastPageLeftMargin || right != lastPageRightMargin {
+            lastPageLeftMargin = left
+            lastPageRightMargin = right
+
+            Task {
+                do {
+                    try await coordinator.setPageMargins(left: left, right: right)
+                } catch {
+                    #if DEBUG
+                    print("SheetMusicView: Failed to update page margins: \(error)")
                     #endif
                 }
             }
