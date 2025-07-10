@@ -59,7 +59,6 @@ struct FileBasedExample: View {
                         fileName: "sample", // No need for .musicxml extension
                         transposeSteps: $transposeSteps,
                         isLoading: $isLoading,
-                        zoomLevel: $zoomLevel,
                         onError: { error in
                             lastError = error
                             showingError = true
@@ -68,6 +67,7 @@ struct FileBasedExample: View {
                             print("Sheet music loaded from file!")
                         }
                     )
+                    .zoomLevel($zoomLevel)
                     .showTitle()
                     .showComposer()
                     

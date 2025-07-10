@@ -39,7 +39,6 @@ public struct SheetMusicView: View {
     @Binding private var xml: String
     @Binding private var transposeSteps: Int
     @Binding private var isLoading: Bool
-    @Binding private var zoomLevel: Double?
 
     // MARK: - State
     @StateObject private var coordinator = SheetMusicCoordinator()
@@ -65,6 +64,14 @@ public struct SheetMusicView: View {
     private let pageLeftMargin: Double
     private let pageRightMargin: Double
 
+    // MARK: - Zoom Level
+    private let zoomLevelBinding: Binding<Double>?
+
+    // MARK: - Computed Properties
+    private var zoomLevel: Double? {
+        return zoomLevelBinding?.wrappedValue
+    }
+
     // MARK: - Private State
     @State private var lastXML: String = ""
     @State private var lastTransposeSteps: Int = 0
@@ -84,24 +91,11 @@ public struct SheetMusicView: View {
     public init(
         xml: Binding<String>,
         transposeSteps: Binding<Int> = .constant(0),
-        isLoading: Binding<Bool> = .constant(false),
-        zoomLevel: Binding<Double>? = nil
+        isLoading: Binding<Bool> = .constant(false)
     ) {
         self._xml = xml
         self._transposeSteps = transposeSteps
         self._isLoading = isLoading
-        if let zoomLevel = zoomLevel {
-            self._zoomLevel = Binding(
-                get: { zoomLevel.wrappedValue },
-                set: { newValue in
-                    if let newValue = newValue {
-                        zoomLevel.wrappedValue = newValue
-                    }
-                }
-            )
-        } else {
-            self._zoomLevel = .constant(nil)
-        }
         self.fileName = nil
         self.bundle = Bundle.main
         self.fileURL = nil
@@ -113,6 +107,7 @@ public struct SheetMusicView: View {
         self.showDebugPanel = false
         self.pageLeftMargin = 10.0
         self.pageRightMargin = 10.0
+        self.zoomLevelBinding = nil
     }
 
     /// Initialize SheetMusicView with a filename (without .musicxml extension)
@@ -120,24 +115,11 @@ public struct SheetMusicView: View {
         fileName: String,
         transposeSteps: Binding<Int> = .constant(0),
         isLoading: Binding<Bool> = .constant(false),
-        zoomLevel: Binding<Double>? = nil,
         bundle: Bundle = Bundle.main
     ) {
         self._xml = .constant("")
         self._transposeSteps = transposeSteps
         self._isLoading = isLoading
-        if let zoomLevel = zoomLevel {
-            self._zoomLevel = Binding(
-                get: { zoomLevel.wrappedValue },
-                set: { newValue in
-                    if let newValue = newValue {
-                        zoomLevel.wrappedValue = newValue
-                    }
-                }
-            )
-        } else {
-            self._zoomLevel = .constant(nil)
-        }
         self.fileName = fileName
         self.bundle = bundle
         self.fileURL = nil
@@ -149,6 +131,7 @@ public struct SheetMusicView: View {
         self.showDebugPanel = false
         self.pageLeftMargin = 10.0
         self.pageRightMargin = 10.0
+        self.zoomLevelBinding = nil
     }
 
     /// Initialize SheetMusicView with callbacks
@@ -156,25 +139,12 @@ public struct SheetMusicView: View {
         xml: Binding<String>,
         transposeSteps: Binding<Int> = .constant(0),
         isLoading: Binding<Bool> = .constant(false),
-        zoomLevel: Binding<Double>? = nil,
         onError: ((SheetMusicError) -> Void)? = nil,
         onReady: (() -> Void)? = nil
     ) {
         self._xml = xml
         self._transposeSteps = transposeSteps
         self._isLoading = isLoading
-        if let zoomLevel = zoomLevel {
-            self._zoomLevel = Binding(
-                get: { zoomLevel.wrappedValue },
-                set: { newValue in
-                    if let newValue = newValue {
-                        zoomLevel.wrappedValue = newValue
-                    }
-                }
-            )
-        } else {
-            self._zoomLevel = .constant(nil)
-        }
         self.fileName = nil
         self.bundle = Bundle.main
         self.fileURL = nil
@@ -186,6 +156,7 @@ public struct SheetMusicView: View {
         self.showDebugPanel = false
         self.pageLeftMargin = 10.0
         self.pageRightMargin = 10.0
+        self.zoomLevelBinding = nil
     }
 
     /// Initialize SheetMusicView with filename and callbacks
@@ -193,7 +164,6 @@ public struct SheetMusicView: View {
         fileName: String,
         transposeSteps: Binding<Int> = .constant(0),
         isLoading: Binding<Bool> = .constant(false),
-        zoomLevel: Binding<Double>? = nil,
         bundle: Bundle = Bundle.main,
         onError: ((SheetMusicError) -> Void)? = nil,
         onReady: (() -> Void)? = nil
@@ -201,18 +171,6 @@ public struct SheetMusicView: View {
         self._xml = .constant("")
         self._transposeSteps = transposeSteps
         self._isLoading = isLoading
-        if let zoomLevel = zoomLevel {
-            self._zoomLevel = Binding(
-                get: { zoomLevel.wrappedValue },
-                set: { newValue in
-                    if let newValue = newValue {
-                        zoomLevel.wrappedValue = newValue
-                    }
-                }
-            )
-        } else {
-            self._zoomLevel = .constant(nil)
-        }
         self.fileName = fileName
         self.bundle = bundle
         self.fileURL = nil
@@ -224,6 +182,7 @@ public struct SheetMusicView: View {
         self.showDebugPanel = false
         self.pageLeftMargin = 10.0
         self.pageRightMargin = 10.0
+        self.zoomLevelBinding = nil
     }
 
     /// Initialize SheetMusicView with a file URL
@@ -231,25 +190,12 @@ public struct SheetMusicView: View {
         fileURL: URL,
         transposeSteps: Binding<Int> = .constant(0),
         isLoading: Binding<Bool> = .constant(false),
-        zoomLevel: Binding<Double>? = nil,
         onError: ((SheetMusicError) -> Void)? = nil,
         onReady: (() -> Void)? = nil
     ) {
         self._xml = .constant("")
         self._transposeSteps = transposeSteps
         self._isLoading = isLoading
-        if let zoomLevel = zoomLevel {
-            self._zoomLevel = Binding(
-                get: { zoomLevel.wrappedValue },
-                set: { newValue in
-                    if let newValue = newValue {
-                        zoomLevel.wrappedValue = newValue
-                    }
-                }
-            )
-        } else {
-            self._zoomLevel = .constant(nil)
-        }
         self.fileName = nil
         self.bundle = Bundle.main
         self.onError = onError
@@ -260,6 +206,7 @@ public struct SheetMusicView: View {
         self.showDebugPanel = false
         self.pageLeftMargin = 10.0
         self.pageRightMargin = 10.0
+        self.zoomLevelBinding = nil
 
         // Store the file URL for loading
         self.fileURL = fileURL
@@ -270,7 +217,6 @@ public struct SheetMusicView: View {
         xml: Binding<String>,
         transposeSteps: Binding<Int>,
         isLoading: Binding<Bool>,
-        zoomLevel: Binding<Double>?,
         fileName: String?,
         bundle: Bundle,
         fileURL: URL?,
@@ -281,23 +227,12 @@ public struct SheetMusicView: View {
         showComposer: Bool,
         showDebugPanel: Bool,
         pageLeftMargin: Double,
-        pageRightMargin: Double
+        pageRightMargin: Double,
+        zoomLevelBinding: Binding<Double>?
     ) {
         self._xml = xml
         self._transposeSteps = transposeSteps
         self._isLoading = isLoading
-        if let zoomLevel = zoomLevel {
-            self._zoomLevel = Binding(
-                get: { zoomLevel.wrappedValue },
-                set: { newValue in
-                    if let newValue = newValue {
-                        zoomLevel.wrappedValue = newValue
-                    }
-                }
-            )
-        } else {
-            self._zoomLevel = .constant(nil)
-        }
         self.fileName = fileName
         self.bundle = bundle
         self.fileURL = fileURL
@@ -309,6 +244,7 @@ public struct SheetMusicView: View {
         self.showDebugPanel = showDebugPanel
         self.pageLeftMargin = pageLeftMargin
         self.pageRightMargin = pageRightMargin
+        self.zoomLevelBinding = zoomLevelBinding
     }
 
     // MARK: - Body
@@ -328,7 +264,7 @@ public struct SheetMusicView: View {
                 .onChange(of: transposeSteps) { newSteps in
                     handleTransposeChange(newSteps)
                 }
-                .onChange(of: zoomLevel) { newZoom in
+                .onChange(of: zoomLevelBinding?.wrappedValue) { newZoom in
                     handleZoomChange(newZoom)
                 }
                 .onChange(of: coordinator.isLoading) { loading in
@@ -368,22 +304,37 @@ public struct SheetMusicView: View {
 
     // MARK: - View Modifiers
 
-    /// Controls whether the piece title is displayed
-    /// - Parameter show: Whether to show the title (default: true when modifier is used)
+    /// Controls the zoom level of the sheet music display
+    /// - Parameter zoomLevel: A binding to the zoom level (1.0 = 100%)
     /// - Returns: A modified SheetMusicView instance
-    public func showTitle(_ show: Bool = true) -> SheetMusicView {
-        // Create a proper zoom binding if we have a non-nil zoom level
-        let zoomBinding: Binding<Double>? = _zoomLevel.wrappedValue != nil ?
-            Binding<Double>(
-                get: { self._zoomLevel.wrappedValue ?? 1.0 },
-                set: { newValue in self._zoomLevel.wrappedValue = newValue }
-            ) : nil
-
+    public func zoomLevel(_ zoomLevel: Binding<Double>) -> SheetMusicView {
         return SheetMusicView(
             xml: _xml,
             transposeSteps: _transposeSteps,
             isLoading: _isLoading,
-            zoomLevel: zoomBinding,
+            fileName: fileName,
+            bundle: bundle,
+            fileURL: fileURL,
+            onError: onError,
+            onReady: onReady,
+            showTitle: showTitle,
+            showInstrumentName: showInstrumentName,
+            showComposer: showComposer,
+            showDebugPanel: showDebugPanel,
+            pageLeftMargin: pageLeftMargin,
+            pageRightMargin: pageRightMargin,
+            zoomLevelBinding: zoomLevel
+        )
+    }
+
+    /// Controls whether the piece title is displayed
+    /// - Parameter show: Whether to show the title (default: true when modifier is used)
+    /// - Returns: A modified SheetMusicView instance
+    public func showTitle(_ show: Bool = true) -> SheetMusicView {
+        return SheetMusicView(
+            xml: _xml,
+            transposeSteps: _transposeSteps,
+            isLoading: _isLoading,
             fileName: fileName,
             bundle: bundle,
             fileURL: fileURL,
@@ -394,7 +345,8 @@ public struct SheetMusicView: View {
             showComposer: showComposer,
             showDebugPanel: showDebugPanel,
             pageLeftMargin: pageLeftMargin,
-            pageRightMargin: pageRightMargin
+            pageRightMargin: pageRightMargin,
+            zoomLevelBinding: zoomLevelBinding
         )
     }
 
@@ -402,18 +354,10 @@ public struct SheetMusicView: View {
     /// - Parameter show: Whether to show instrument names (default: true when modifier is used)
     /// - Returns: A modified SheetMusicView instance
     public func showInstrumentName(_ show: Bool = true) -> SheetMusicView {
-        // Create a proper zoom binding if we have a non-nil zoom level
-        let zoomBinding: Binding<Double>? = _zoomLevel.wrappedValue != nil ?
-            Binding<Double>(
-                get: { self._zoomLevel.wrappedValue ?? 1.0 },
-                set: { newValue in self._zoomLevel.wrappedValue = newValue }
-            ) : nil
-
         return SheetMusicView(
             xml: _xml,
             transposeSteps: _transposeSteps,
             isLoading: _isLoading,
-            zoomLevel: zoomBinding,
             fileName: fileName,
             bundle: bundle,
             fileURL: fileURL,
@@ -424,7 +368,8 @@ public struct SheetMusicView: View {
             showComposer: showComposer,
             showDebugPanel: showDebugPanel,
             pageLeftMargin: pageLeftMargin,
-            pageRightMargin: pageRightMargin
+            pageRightMargin: pageRightMargin,
+            zoomLevelBinding: zoomLevelBinding
         )
     }
 
@@ -432,18 +377,10 @@ public struct SheetMusicView: View {
     /// - Parameter show: Whether to show the composer (default: true when modifier is used)
     /// - Returns: A modified SheetMusicView instance
     public func showComposer(_ show: Bool = true) -> SheetMusicView {
-        // Create a proper zoom binding if we have a non-nil zoom level
-        let zoomBinding: Binding<Double>? = _zoomLevel.wrappedValue != nil ?
-            Binding<Double>(
-                get: { self._zoomLevel.wrappedValue ?? 1.0 },
-                set: { newValue in self._zoomLevel.wrappedValue = newValue }
-            ) : nil
-
         return SheetMusicView(
             xml: _xml,
             transposeSteps: _transposeSteps,
             isLoading: _isLoading,
-            zoomLevel: zoomBinding,
             fileName: fileName,
             bundle: bundle,
             fileURL: fileURL,
@@ -454,7 +391,8 @@ public struct SheetMusicView: View {
             showComposer: show,
             showDebugPanel: showDebugPanel,
             pageLeftMargin: pageLeftMargin,
-            pageRightMargin: pageRightMargin
+            pageRightMargin: pageRightMargin,
+            zoomLevelBinding: zoomLevelBinding
         )
     }
 
@@ -462,18 +400,10 @@ public struct SheetMusicView: View {
     /// - Parameter show: Whether to show the debug panel (default: true when modifier is used)
     /// - Returns: A modified SheetMusicView instance
     public func showDebugPanel(_ show: Bool = true) -> SheetMusicView {
-        // Create a proper zoom binding if we have a non-nil zoom level
-        let zoomBinding: Binding<Double>? = _zoomLevel.wrappedValue != nil ?
-            Binding<Double>(
-                get: { self._zoomLevel.wrappedValue ?? 1.0 },
-                set: { newValue in self._zoomLevel.wrappedValue = newValue }
-            ) : nil
-
         return SheetMusicView(
             xml: _xml,
             transposeSteps: _transposeSteps,
             isLoading: _isLoading,
-            zoomLevel: zoomBinding,
             fileName: fileName,
             bundle: bundle,
             fileURL: fileURL,
@@ -484,7 +414,8 @@ public struct SheetMusicView: View {
             showComposer: showComposer,
             showDebugPanel: show,
             pageLeftMargin: pageLeftMargin,
-            pageRightMargin: pageRightMargin
+            pageRightMargin: pageRightMargin,
+            zoomLevelBinding: zoomLevelBinding
         )
     }
 
@@ -494,18 +425,10 @@ public struct SheetMusicView: View {
     ///   - right: Right page margin in units (default: 10.0)
     /// - Returns: A modified SheetMusicView instance
     public func pageMargins(left: Double = 10.0, right: Double = 10.0) -> SheetMusicView {
-        // Create a proper zoom binding if we have a non-nil zoom level
-        let zoomBinding: Binding<Double>? = _zoomLevel.wrappedValue != nil ?
-            Binding<Double>(
-                get: { self._zoomLevel.wrappedValue ?? 1.0 },
-                set: { newValue in self._zoomLevel.wrappedValue = newValue }
-            ) : nil
-
         return SheetMusicView(
             xml: _xml,
             transposeSteps: _transposeSteps,
             isLoading: _isLoading,
-            zoomLevel: zoomBinding,
             fileName: fileName,
             bundle: bundle,
             fileURL: fileURL,
@@ -516,7 +439,8 @@ public struct SheetMusicView: View {
             showComposer: showComposer,
             showDebugPanel: showDebugPanel,
             pageLeftMargin: left,
-            pageRightMargin: right
+            pageRightMargin: right,
+            zoomLevelBinding: zoomLevelBinding
         )
     }
 

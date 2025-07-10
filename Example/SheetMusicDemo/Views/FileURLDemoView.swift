@@ -36,7 +36,6 @@ struct FileURLDemoView: View {
                         fileURL: fileURL,
                         transposeSteps: $transposeSteps,
                         isLoading: $isLoading,
-                        zoomLevel: $zoomLevel,
                         onError: { error in
                             lastError = error
                             showingError = true
@@ -45,6 +44,7 @@ struct FileURLDemoView: View {
                             print("Sheet music loaded from URL: \(fileURL.path)")
                         }
                     )
+                    .zoomLevel($zoomLevel)
                     .background(Color.white)
                     .cornerRadius(8)
                     .shadow(radius: 2)

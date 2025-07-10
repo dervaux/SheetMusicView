@@ -81,7 +81,6 @@ struct FilenameAPIDemo: View {
                             fileName: selectedFileName, // Just the filename, no extension needed!
                             transposeSteps: $transposeSteps,
                             isLoading: $isLoading,
-                            zoomLevel: $zoomLevel,
                             onError: { error in
                                 lastError = error
                                 showingError = true
@@ -91,6 +90,7 @@ struct FilenameAPIDemo: View {
                                 print("Successfully loaded '\(selectedFileName).musicxml'!")
                             }
                         )
+                        .zoomLevel($zoomLevel)
                         .showTitle()
                         .showComposer()
                         .showInstrumentName()

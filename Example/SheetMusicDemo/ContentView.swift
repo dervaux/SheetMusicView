@@ -146,7 +146,6 @@ struct BundleFileDemoView: View {
                         fileName: currentFileName, // Using the new fileName parameter!
                         transposeSteps: $transposeSteps,
                         isLoading: $isLoading,
-                        zoomLevel: $zoomLevel,
                         onError: { error in
                             lastError = error
                             showingError = true
@@ -155,6 +154,7 @@ struct BundleFileDemoView: View {
                             print("Sheet music loaded from file: \(currentFileName).musicxml")
                         }
                     )
+                    .zoomLevel($zoomLevel)
                     .showTitle(showTitle)
                     .showInstrumentName(showInstrumentName)
                     .showComposer(showComposer)
