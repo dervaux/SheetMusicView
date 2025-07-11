@@ -19,7 +19,7 @@
             display: block; /* Change from flex to block for better scrolling */
             position: relative;
             box-sizing: border-box;
-            padding: 2px; /* Add some padding for better appearance */
+            padding: 0px; /* No padding for maximum content space */
         }
 
         #loadingMessage {
@@ -53,13 +53,13 @@
         /* Responsive container adjustments */
         @media (max-width: 768px) {
             #osmdContainer {
-                padding: 2px;
+                padding: 0px;
             }
         }
 
         @media (orientation: landscape) and (max-height: 500px) {
             #osmdContainer {
-                padding: 2px;
+                padding: 0px;
             }
         }
     </style>
