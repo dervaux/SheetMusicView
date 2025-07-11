@@ -44,6 +44,7 @@ struct BundleFileDemoView: View {
     @State private var leftMargin: Double = 1.0
     @State private var rightMargin: Double = 1.0
     @State private var systemSpacing: Double = 0.0
+    @State private var scrollingEnabled: Bool = false
 
     var body: some View {
         NavigationView {
@@ -162,6 +163,7 @@ struct BundleFileDemoView: View {
                     .showDebugPanel(showDebugPanel)
                     .pageMargins(left: leftMargin, right: rightMargin, top: 1.0, bottom: 1.0)
                     .systemSpacing(systemSpacing)
+                    .scrollingEnabled(scrollingEnabled)
                     .background(Color.white)
                     .cornerRadius(8)
                     .shadow(radius: 2)
@@ -410,6 +412,11 @@ struct BundleFileDemoView: View {
                             Toggle("Show Instrument Names", isOn: $showInstrumentName)
                             Toggle("Show Composer", isOn: $showComposer)
                             Toggle("Show Debug Panel", isOn: $showDebugPanel)
+
+                            Divider()
+
+                            Toggle("Enable Scrolling & Zoom", isOn: $scrollingEnabled)
+                                .help("When disabled (default), the view is completely fixed. When enabled, allows scrolling and pinch-to-zoom gestures.")
                         }
                     }
                     .disabled(isLoading)

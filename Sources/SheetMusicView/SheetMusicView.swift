@@ -72,6 +72,9 @@ public struct SheetMusicView: View {
     // MARK: - Zoom Level
     private let zoomLevelBinding: Binding<Double>?
 
+    // MARK: - Scrolling Control
+    private let scrollingEnabled: Bool
+
     // MARK: - Computed Properties
     private var zoomLevel: Double? {
         return zoomLevelBinding?.wrappedValue
@@ -92,6 +95,7 @@ public struct SheetMusicView: View {
     @State private var lastPageTopMargin: Double = 1.0
     @State private var lastPageBottomMargin: Double = 1.0
     @State private var lastSystemSpacing: Double = 0.0
+    @State private var lastScrollingEnabled: Bool = false
 
     // MARK: - Initialization
 
@@ -119,6 +123,7 @@ public struct SheetMusicView: View {
         self.pageBottomMargin = 1.0
         self.systemSpacing = 0.0
         self.zoomLevelBinding = nil
+        self.scrollingEnabled = false
     }
 
     /// Initialize SheetMusicView with a filename (without .musicxml extension)
@@ -146,6 +151,7 @@ public struct SheetMusicView: View {
         self.pageBottomMargin = 1.0
         self.systemSpacing = 3.0
         self.zoomLevelBinding = nil
+        self.scrollingEnabled = false
     }
 
     /// Initialize SheetMusicView with callbacks
@@ -174,6 +180,7 @@ public struct SheetMusicView: View {
         self.pageBottomMargin = 1.0
         self.systemSpacing = 0.0
         self.zoomLevelBinding = nil
+        self.scrollingEnabled = false
     }
 
     /// Initialize SheetMusicView with filename and callbacks
@@ -203,6 +210,7 @@ public struct SheetMusicView: View {
         self.pageBottomMargin = 1.0
         self.systemSpacing = 0.0
         self.zoomLevelBinding = nil
+        self.scrollingEnabled = false
     }
 
     /// Initialize SheetMusicView with a file URL
@@ -230,6 +238,7 @@ public struct SheetMusicView: View {
         self.pageBottomMargin = 1.0
         self.systemSpacing = 0.0
         self.zoomLevelBinding = nil
+        self.scrollingEnabled = false
 
         // Store the file URL for loading
         self.fileURL = fileURL
@@ -254,7 +263,8 @@ public struct SheetMusicView: View {
         pageTopMargin: Double,
         pageBottomMargin: Double,
         systemSpacing: Double,
-        zoomLevelBinding: Binding<Double>?
+        zoomLevelBinding: Binding<Double>?,
+        scrollingEnabled: Bool
     ) {
         self._xml = xml
         self._transposeSteps = transposeSteps
@@ -274,12 +284,13 @@ public struct SheetMusicView: View {
         self.pageBottomMargin = pageBottomMargin
         self.systemSpacing = systemSpacing
         self.zoomLevelBinding = zoomLevelBinding
+        self.scrollingEnabled = scrollingEnabled
     }
 
     // MARK: - Body
     public var body: some View {
         GeometryReader { geometry in
-            SheetMusicWebViewRepresentable(coordinator: coordinator)
+            SheetMusicWebViewRepresentable(coordinator: coordinator, scrollingEnabled: scrollingEnabled)
                 .onAppear {
                     setupCoordinator()
                     containerSize = geometry.size
@@ -319,6 +330,12 @@ public struct SheetMusicView: View {
                     // The small delay ensures the view has fully updated before calling the coordinator
                     try? await Task.sleep(nanoseconds: 1_000_000) // 1ms delay
                     handleSystemSpacingChange(spacing: systemSpacing)
+                }
+                .task(id: "\(scrollingEnabled)") {
+                    // This task will be cancelled and restarted whenever the scrolling enabled state changes
+                    // The small delay ensures the view has fully updated before calling the coordinator
+                    try? await Task.sleep(nanoseconds: 1_000_000) // 1ms delay
+                    handleScrollingEnabledChange(enabled: scrollingEnabled)
                 }
                 .task(id: fileName) {
                     // This task will be cancelled and restarted whenever the fileName changes
@@ -361,7 +378,8 @@ public struct SheetMusicView: View {
             pageTopMargin: pageTopMargin,
             pageBottomMargin: pageBottomMargin,
             systemSpacing: systemSpacing,
-            zoomLevelBinding: zoomLevel
+            zoomLevelBinding: zoomLevel,
+            scrollingEnabled: scrollingEnabled
         )
     }
 
@@ -387,7 +405,8 @@ public struct SheetMusicView: View {
             pageTopMargin: pageTopMargin,
             pageBottomMargin: pageBottomMargin,
             systemSpacing: systemSpacing,
-            zoomLevelBinding: zoomLevelBinding
+            zoomLevelBinding: zoomLevelBinding,
+            scrollingEnabled: scrollingEnabled
         )
     }
 
@@ -413,7 +432,8 @@ public struct SheetMusicView: View {
             pageTopMargin: pageTopMargin,
             pageBottomMargin: pageBottomMargin,
             systemSpacing: systemSpacing,
-            zoomLevelBinding: zoomLevelBinding
+            zoomLevelBinding: zoomLevelBinding,
+            scrollingEnabled: scrollingEnabled
         )
     }
 
@@ -439,7 +459,8 @@ public struct SheetMusicView: View {
             pageTopMargin: pageTopMargin,
             pageBottomMargin: pageBottomMargin,
             systemSpacing: systemSpacing,
-            zoomLevelBinding: zoomLevelBinding
+            zoomLevelBinding: zoomLevelBinding,
+            scrollingEnabled: scrollingEnabled
         )
     }
 
@@ -465,7 +486,8 @@ public struct SheetMusicView: View {
             pageTopMargin: pageTopMargin,
             pageBottomMargin: pageBottomMargin,
             systemSpacing: systemSpacing,
-            zoomLevelBinding: zoomLevelBinding
+            zoomLevelBinding: zoomLevelBinding,
+            scrollingEnabled: scrollingEnabled
         )
     }
 
@@ -495,7 +517,8 @@ public struct SheetMusicView: View {
             pageTopMargin: top,
             pageBottomMargin: bottom,
             systemSpacing: systemSpacing,
-            zoomLevelBinding: zoomLevelBinding
+            zoomLevelBinding: zoomLevelBinding,
+            scrollingEnabled: scrollingEnabled
         )
     }
 
@@ -521,7 +544,35 @@ public struct SheetMusicView: View {
             pageTopMargin: pageTopMargin,
             pageBottomMargin: pageBottomMargin,
             systemSpacing: spacing,
-            zoomLevelBinding: zoomLevelBinding
+            zoomLevelBinding: zoomLevelBinding,
+            scrollingEnabled: scrollingEnabled
+        )
+    }
+
+    /// Controls whether scrolling is enabled in the sheet music view
+    /// - Parameter enabled: Whether to enable scrolling (default: true when modifier is used)
+    /// - Returns: A modified SheetMusicView instance
+    public func scrollingEnabled(_ enabled: Bool = true) -> SheetMusicView {
+        return SheetMusicView(
+            xml: _xml,
+            transposeSteps: _transposeSteps,
+            isLoading: _isLoading,
+            fileName: fileName,
+            bundle: bundle,
+            fileURL: fileURL,
+            onError: onError,
+            onReady: onReady,
+            showTitle: showTitle,
+            showInstrumentName: showInstrumentName,
+            showComposer: showComposer,
+            showDebugPanel: showDebugPanel,
+            pageLeftMargin: pageLeftMargin,
+            pageRightMargin: pageRightMargin,
+            pageTopMargin: pageTopMargin,
+            pageBottomMargin: pageBottomMargin,
+            systemSpacing: systemSpacing,
+            zoomLevelBinding: zoomLevelBinding,
+            scrollingEnabled: enabled
         )
     }
 
@@ -541,6 +592,9 @@ public struct SheetMusicView: View {
             // Force apply system spacing when ready (reset lastSystemSpacing to ensure it gets applied)
             lastSystemSpacing = -1.0  // Force update by using impossible value
             handleSystemSpacingChange(spacing: systemSpacing)
+            // Force apply scrolling enabled state when ready (reset lastScrollingEnabled to ensure it gets applied)
+            lastScrollingEnabled = !scrollingEnabled  // Force update by using opposite value
+            handleScrollingEnabledChange(enabled: scrollingEnabled)
             // Load initial XML if available (for xml-based API)
             if !xml.isEmpty && xml != lastXML {
                 handleXMLChange(xml)
@@ -847,6 +901,19 @@ public struct SheetMusicView: View {
         }
     }
 
+    private func handleScrollingEnabledChange(enabled: Bool) {
+        // Only update if scrolling enabled state actually changed
+        if enabled != lastScrollingEnabled {
+            lastScrollingEnabled = enabled
+
+            // Note: Scrolling control is handled at the web view level in the representable
+            // This handler is here for consistency and future extensibility
+            #if DEBUG
+            print("SheetMusicView: Scrolling enabled changed to: \(enabled)")
+            #endif
+        }
+    }
+
     private func determineOptimalPageFormat(for size: CGSize) -> String {
         let aspectRatio = size.width / size.height
 
@@ -870,6 +937,7 @@ public struct SheetMusicView: View {
 #if os(iOS)
 private struct SheetMusicWebViewRepresentable: UIViewRepresentable {
     let coordinator: SheetMusicCoordinator
+    let scrollingEnabled: Bool
 
     func makeUIView(context: Context) -> WKWebView {
         let configuration = WKWebViewConfiguration()
@@ -883,6 +951,43 @@ private struct SheetMusicWebViewRepresentable: UIViewRepresentable {
         }
         #endif
 
+        // Configure scrolling and zoom behavior
+        webView.scrollView.isScrollEnabled = scrollingEnabled
+        webView.scrollView.bounces = scrollingEnabled
+        webView.scrollView.bouncesZoom = scrollingEnabled
+
+        // Completely disable zoom when scrolling is disabled
+        if scrollingEnabled {
+            webView.scrollView.minimumZoomScale = 0.5
+            webView.scrollView.maximumZoomScale = 3.0
+            webView.scrollView.zoomScale = 1.0
+            // Enable zoom gestures
+            webView.scrollView.pinchGestureRecognizer?.isEnabled = true
+        } else {
+            // Set both min and max to 1.0 to completely disable zoom
+            webView.scrollView.minimumZoomScale = 1.0
+            webView.scrollView.maximumZoomScale = 1.0
+            webView.scrollView.zoomScale = 1.0
+            // Disable zoom gestures completely
+            webView.scrollView.pinchGestureRecognizer?.isEnabled = false
+        }
+
+        // Additional zoom prevention measures
+        if !scrollingEnabled {
+            // Disable user interaction with the scroll view to prevent all zoom gestures
+            webView.scrollView.isUserInteractionEnabled = false
+            // But keep the webview itself interactive for content interaction
+            webView.isUserInteractionEnabled = true
+        } else {
+            // Re-enable user interaction when scrolling is enabled
+            webView.scrollView.isUserInteractionEnabled = true
+            webView.isUserInteractionEnabled = true
+        }
+
+        // Hide scroll bars when scrolling is disabled
+        webView.scrollView.showsVerticalScrollIndicator = scrollingEnabled
+        webView.scrollView.showsHorizontalScrollIndicator = scrollingEnabled
+
         coordinator.setupWebView(webView)
 
         loadHTML(in: webView)
@@ -891,7 +996,42 @@ private struct SheetMusicWebViewRepresentable: UIViewRepresentable {
     }
 
     func updateUIView(_ webView: WKWebView, context: Context) {
-        // Updates are handled through the coordinator
+        // Update scrolling and zoom behavior when scrollingEnabled changes
+        webView.scrollView.isScrollEnabled = scrollingEnabled
+        webView.scrollView.bounces = scrollingEnabled
+        webView.scrollView.bouncesZoom = scrollingEnabled
+
+        // Update zoom settings
+        if scrollingEnabled {
+            webView.scrollView.minimumZoomScale = 0.5
+            webView.scrollView.maximumZoomScale = 3.0
+            webView.scrollView.zoomScale = 1.0
+            // Enable zoom gestures
+            webView.scrollView.pinchGestureRecognizer?.isEnabled = true
+        } else {
+            // Set both min and max to 1.0 to completely disable zoom
+            webView.scrollView.minimumZoomScale = 1.0
+            webView.scrollView.maximumZoomScale = 1.0
+            webView.scrollView.zoomScale = 1.0
+            // Disable zoom gestures completely
+            webView.scrollView.pinchGestureRecognizer?.isEnabled = false
+        }
+
+        // Additional zoom prevention measures
+        if !scrollingEnabled {
+            // Disable user interaction with the scroll view to prevent all zoom gestures
+            webView.scrollView.isUserInteractionEnabled = false
+            // But keep the webview itself interactive for content interaction
+            webView.isUserInteractionEnabled = true
+        } else {
+            // Re-enable user interaction when scrolling is enabled
+            webView.scrollView.isUserInteractionEnabled = true
+            webView.isUserInteractionEnabled = true
+        }
+
+        // Update scroll bar visibility
+        webView.scrollView.showsVerticalScrollIndicator = scrollingEnabled
+        webView.scrollView.showsHorizontalScrollIndicator = scrollingEnabled
     }
 
     private func loadHTML(in webView: WKWebView) {
@@ -926,6 +1066,7 @@ private struct SheetMusicWebViewRepresentable: UIViewRepresentable {
 #elseif os(macOS)
 private struct SheetMusicWebViewRepresentable: NSViewRepresentable {
     let coordinator: SheetMusicCoordinator
+    let scrollingEnabled: Bool
 
     func makeNSView(context: Context) -> WKWebView {
         let configuration = WKWebViewConfiguration()
@@ -941,6 +1082,31 @@ private struct SheetMusicWebViewRepresentable: NSViewRepresentable {
         }
         #endif
 
+        // Configure scrolling behavior for macOS
+        if let scrollView = webView.enclosingScrollView {
+            scrollView.hasVerticalScroller = scrollingEnabled
+            scrollView.hasHorizontalScroller = scrollingEnabled
+            scrollView.allowsMagnification = scrollingEnabled
+            if scrollingEnabled {
+                scrollView.minMagnification = 0.5
+                scrollView.maxMagnification = 3.0
+            } else {
+                scrollView.minMagnification = 1.0
+                scrollView.maxMagnification = 1.0
+            }
+            scrollView.magnification = 1.0
+
+            // Hide scroll bars when scrolling is disabled
+            scrollView.autohidesScrollers = !scrollingEnabled
+            if !scrollingEnabled {
+                scrollView.verticalScroller?.isHidden = true
+                scrollView.horizontalScroller?.isHidden = true
+            } else {
+                scrollView.verticalScroller?.isHidden = false
+                scrollView.horizontalScroller?.isHidden = false
+            }
+        }
+
         coordinator.setupWebView(webView)
 
         loadHTML(in: webView)
@@ -949,7 +1115,31 @@ private struct SheetMusicWebViewRepresentable: NSViewRepresentable {
     }
 
     func updateNSView(_ webView: WKWebView, context: Context) {
-        // Updates are handled through the coordinator
+        // Update scrolling behavior for macOS when scrollingEnabled changes
+        if let scrollView = webView.enclosingScrollView {
+            scrollView.hasVerticalScroller = scrollingEnabled
+            scrollView.hasHorizontalScroller = scrollingEnabled
+            scrollView.allowsMagnification = scrollingEnabled
+
+            if scrollingEnabled {
+                scrollView.minMagnification = 0.5
+                scrollView.maxMagnification = 3.0
+            } else {
+                scrollView.minMagnification = 1.0
+                scrollView.maxMagnification = 1.0
+            }
+            scrollView.magnification = 1.0
+
+            // Update scroll bar visibility
+            scrollView.autohidesScrollers = !scrollingEnabled
+            if !scrollingEnabled {
+                scrollView.verticalScroller?.isHidden = true
+                scrollView.horizontalScroller?.isHidden = true
+            } else {
+                scrollView.verticalScroller?.isHidden = false
+                scrollView.horizontalScroller?.isHidden = false
+            }
+        }
     }
 
     private func loadHTML(in webView: WKWebView) {
