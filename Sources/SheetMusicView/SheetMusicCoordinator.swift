@@ -252,6 +252,23 @@ public class SheetMusicCoordinator: NSObject, ObservableObject {
             throw sheetMusicError
         }
     }
+
+    /// Set system spacing using OSMD's EngravingRules
+    public func setSystemSpacing(_ spacing: Double) async throws {
+        guard isReady else {
+            throw SheetMusicError.notReady
+        }
+
+        do {
+            let script = "osmdSetSystemSpacing(\(spacing))"
+            _ = try await evaluateJavaScript(script)
+        } catch {
+            let sheetMusicError = error as? SheetMusicError ?? SheetMusicError.operationFailed(error.localizedDescription)
+            lastError = sheetMusicError
+            onError?(sheetMusicError)
+            throw sheetMusicError
+        }
+    }
     
     // MARK: - Private Methods
     

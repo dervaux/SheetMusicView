@@ -555,6 +555,36 @@
                 throw error;
             }
         }
+
+        // Set system spacing using OSMD's EngravingRules
+        function osmdSetSystemSpacing(spacing) {
+            if (!isInitialized || !osmd) {
+                throw new Error('OSMD is not initialized');
+            }
+
+            try {
+                console.log(`Setting system spacing: ${spacing}`);
+
+                // Set the system spacing using EngravingRules
+                if (osmd.EngravingRules) {
+                    osmd.EngravingRules.MinSkyBottomDistBetweenSystems = spacing;
+                } else {
+                    console.warn('EngravingRules not available');
+                    return false;
+                }
+
+                // Re-render to apply the changes
+                if (osmd.sheet) {
+                    osmd.render();
+                }
+
+                console.log('System spacing set successfully');
+                return true;
+            } catch (error) {
+                console.error('Failed to set system spacing:', error);
+                throw error;
+            }
+        }
         
         // Enhanced window resize handling with debouncing
         let resizeTimeout;

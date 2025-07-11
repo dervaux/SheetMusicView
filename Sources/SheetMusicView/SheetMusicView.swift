@@ -66,6 +66,9 @@ public struct SheetMusicView: View {
     private let pageTopMargin: Double
     private let pageBottomMargin: Double
 
+    // MARK: - System Spacing
+    private let systemSpacing: Double
+
     // MARK: - Zoom Level
     private let zoomLevelBinding: Binding<Double>?
 
@@ -88,6 +91,7 @@ public struct SheetMusicView: View {
     @State private var lastPageRightMargin: Double = 1.0
     @State private var lastPageTopMargin: Double = 1.0
     @State private var lastPageBottomMargin: Double = 1.0
+    @State private var lastSystemSpacing: Double = 0.0
 
     // MARK: - Initialization
 
@@ -113,6 +117,7 @@ public struct SheetMusicView: View {
         self.pageRightMargin = 1.0
         self.pageTopMargin = 1.0
         self.pageBottomMargin = 1.0
+        self.systemSpacing = 0.0
         self.zoomLevelBinding = nil
     }
 
@@ -139,6 +144,7 @@ public struct SheetMusicView: View {
         self.pageRightMargin = 1.0
         self.pageTopMargin = 1.0
         self.pageBottomMargin = 1.0
+        self.systemSpacing = 3.0
         self.zoomLevelBinding = nil
     }
 
@@ -166,6 +172,7 @@ public struct SheetMusicView: View {
         self.pageRightMargin = 1.0
         self.pageTopMargin = 1.0
         self.pageBottomMargin = 1.0
+        self.systemSpacing = 0.0
         self.zoomLevelBinding = nil
     }
 
@@ -194,6 +201,7 @@ public struct SheetMusicView: View {
         self.pageRightMargin = 1.0
         self.pageTopMargin = 1.0
         self.pageBottomMargin = 1.0
+        self.systemSpacing = 0.0
         self.zoomLevelBinding = nil
     }
 
@@ -220,6 +228,7 @@ public struct SheetMusicView: View {
         self.pageRightMargin = 1.0
         self.pageTopMargin = 1.0
         self.pageBottomMargin = 1.0
+        self.systemSpacing = 0.0
         self.zoomLevelBinding = nil
 
         // Store the file URL for loading
@@ -244,6 +253,7 @@ public struct SheetMusicView: View {
         pageRightMargin: Double,
         pageTopMargin: Double,
         pageBottomMargin: Double,
+        systemSpacing: Double,
         zoomLevelBinding: Binding<Double>?
     ) {
         self._xml = xml
@@ -262,6 +272,7 @@ public struct SheetMusicView: View {
         self.pageRightMargin = pageRightMargin
         self.pageTopMargin = pageTopMargin
         self.pageBottomMargin = pageBottomMargin
+        self.systemSpacing = systemSpacing
         self.zoomLevelBinding = zoomLevelBinding
     }
 
@@ -303,6 +314,12 @@ public struct SheetMusicView: View {
                     try? await Task.sleep(nanoseconds: 1_000_000) // 1ms delay
                     handlePageMarginsChange(left: pageLeftMargin, right: pageRightMargin, top: pageTopMargin, bottom: pageBottomMargin)
                 }
+                .task(id: "\(systemSpacing)") {
+                    // This task will be cancelled and restarted whenever the system spacing changes
+                    // The small delay ensures the view has fully updated before calling the coordinator
+                    try? await Task.sleep(nanoseconds: 1_000_000) // 1ms delay
+                    handleSystemSpacingChange(spacing: systemSpacing)
+                }
                 .task(id: fileName) {
                     // This task will be cancelled and restarted whenever the fileName changes
                     // This handles the case where the view is recreated with a new fileName
@@ -343,6 +360,7 @@ public struct SheetMusicView: View {
             pageRightMargin: pageRightMargin,
             pageTopMargin: pageTopMargin,
             pageBottomMargin: pageBottomMargin,
+            systemSpacing: systemSpacing,
             zoomLevelBinding: zoomLevel
         )
     }
@@ -368,6 +386,7 @@ public struct SheetMusicView: View {
             pageRightMargin: pageRightMargin,
             pageTopMargin: pageTopMargin,
             pageBottomMargin: pageBottomMargin,
+            systemSpacing: systemSpacing,
             zoomLevelBinding: zoomLevelBinding
         )
     }
@@ -393,6 +412,7 @@ public struct SheetMusicView: View {
             pageRightMargin: pageRightMargin,
             pageTopMargin: pageTopMargin,
             pageBottomMargin: pageBottomMargin,
+            systemSpacing: systemSpacing,
             zoomLevelBinding: zoomLevelBinding
         )
     }
@@ -418,6 +438,7 @@ public struct SheetMusicView: View {
             pageRightMargin: pageRightMargin,
             pageTopMargin: pageTopMargin,
             pageBottomMargin: pageBottomMargin,
+            systemSpacing: systemSpacing,
             zoomLevelBinding: zoomLevelBinding
         )
     }
@@ -443,6 +464,7 @@ public struct SheetMusicView: View {
             pageRightMargin: pageRightMargin,
             pageTopMargin: pageTopMargin,
             pageBottomMargin: pageBottomMargin,
+            systemSpacing: systemSpacing,
             zoomLevelBinding: zoomLevelBinding
         )
     }
@@ -472,6 +494,33 @@ public struct SheetMusicView: View {
             pageRightMargin: right,
             pageTopMargin: top,
             pageBottomMargin: bottom,
+            systemSpacing: systemSpacing,
+            zoomLevelBinding: zoomLevelBinding
+        )
+    }
+
+    /// Controls the spacing between systems in the sheet music display
+    /// - Parameter spacing: The minimum distance between the bottom of one system and top of the next (default: 0.0)
+    /// - Returns: A modified SheetMusicView instance
+    public func systemSpacing(_ spacing: Double = 0.0) -> SheetMusicView {
+        return SheetMusicView(
+            xml: _xml,
+            transposeSteps: _transposeSteps,
+            isLoading: _isLoading,
+            fileName: fileName,
+            bundle: bundle,
+            fileURL: fileURL,
+            onError: onError,
+            onReady: onReady,
+            showTitle: showTitle,
+            showInstrumentName: showInstrumentName,
+            showComposer: showComposer,
+            showDebugPanel: showDebugPanel,
+            pageLeftMargin: pageLeftMargin,
+            pageRightMargin: pageRightMargin,
+            pageTopMargin: pageTopMargin,
+            pageBottomMargin: pageBottomMargin,
+            systemSpacing: spacing,
             zoomLevelBinding: zoomLevelBinding
         )
     }
@@ -489,6 +538,9 @@ public struct SheetMusicView: View {
             lastPageTopMargin = -1.0  // Force update by using impossible values
             lastPageBottomMargin = -1.0  // Force update by using impossible values
             handlePageMarginsChange(left: pageLeftMargin, right: pageRightMargin, top: pageTopMargin, bottom: pageBottomMargin)
+            // Force apply system spacing when ready (reset lastSystemSpacing to ensure it gets applied)
+            lastSystemSpacing = -1.0  // Force update by using impossible value
+            handleSystemSpacingChange(spacing: systemSpacing)
             // Load initial XML if available (for xml-based API)
             if !xml.isEmpty && xml != lastXML {
                 handleXMLChange(xml)
@@ -770,6 +822,25 @@ public struct SheetMusicView: View {
                 } catch {
                     #if DEBUG
                     print("SheetMusicView: Failed to update page margins: \(error)")
+                    #endif
+                }
+            }
+        }
+    }
+
+    private func handleSystemSpacingChange(spacing: Double) {
+        guard coordinator.isReady else { return }
+
+        // Only update if system spacing actually changed
+        if spacing != lastSystemSpacing {
+            lastSystemSpacing = spacing
+
+            Task {
+                do {
+                    try await coordinator.setSystemSpacing(spacing)
+                } catch {
+                    #if DEBUG
+                    print("SheetMusicView: Failed to update system spacing: \(error)")
                     #endif
                 }
             }

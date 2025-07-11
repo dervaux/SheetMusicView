@@ -901,6 +901,22 @@ SheetMusicView(xml: $musicXML)
     .pageMargins()
 ```
 
+### System Spacing
+
+Control the spacing between systems (lines of music) using the `systemSpacing` modifier:
+
+```swift
+// Set custom system spacing (default is 0.0)
+SheetMusicView(xml: $musicXML)
+    .systemSpacing(5.0)
+
+// Use default system spacing
+SheetMusicView(xml: $musicXML)
+    .systemSpacing()
+```
+
+The `systemSpacing` modifier controls the minimum distance between the bottom of one system and the top of the next system. Higher values create more space between systems, while lower values create tighter spacing.
+
 ### Advanced Usage with Error Handling
 
 ```swift

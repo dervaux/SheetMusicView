@@ -43,6 +43,7 @@ struct BundleFileDemoView: View {
     @State private var isControlPanelExpanded: Bool = false
     @State private var leftMargin: Double = 1.0
     @State private var rightMargin: Double = 1.0
+    @State private var systemSpacing: Double = 0.0
 
     var body: some View {
         NavigationView {
@@ -159,7 +160,8 @@ struct BundleFileDemoView: View {
                     .showInstrumentName(showInstrumentName)
                     .showComposer(showComposer)
                     .showDebugPanel(showDebugPanel)
-                    .pageMargins(top: leftMargin, bottom: rightMargin)
+                    .pageMargins(left: leftMargin, right: rightMargin, top: 1.0, bottom: 1.0)
+                    .systemSpacing(systemSpacing)
                     .background(Color.white)
                     .cornerRadius(8)
                     .shadow(radius: 2)
@@ -367,6 +369,31 @@ struct BundleFileDemoView: View {
                                 .disabled(isLoading || abs(rightMargin - 1.0) < 0.1)
                             }
                         }
+                    }
+                    .disabled(isLoading)
+
+                    Divider()
+
+                    // System Spacing
+                    VStack(spacing: 12) {
+                        Text("System Spacing")
+                            .font(.headline)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+
+                        VStack(spacing: 8) {
+                            HStack {
+                                Text("Spacing: \(systemSpacing, specifier: "%.1f")")
+                                    .frame(width: 100, alignment: .leading)
+                                Slider(value: $systemSpacing, in: 0...20)
+                                Button("Reset") {
+                                    systemSpacing = 0.0
+                                }
+                                .buttonStyle(.bordered)
+                                .controlSize(.mini)
+                                .disabled(isLoading || abs(systemSpacing - 0.0) < 0.1)
+                            }
+                        }
+                        .help("Controls the spacing between systems (lines of music)")
                     }
                     .disabled(isLoading)
 

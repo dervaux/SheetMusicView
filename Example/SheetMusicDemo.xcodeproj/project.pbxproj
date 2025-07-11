@@ -17,6 +17,8 @@
 		1A00000F294A0000000000001 /* MusicPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A000010294A0000000000001 /* MusicPickerView.swift */; };
 		1A000011294A0000000000001 /* SheetMusicView in Frameworks */ = {isa = PBXBuildFile; productRef = 1A000012294A0000000000001 /* SheetMusicView */; };
 		1A000015294A0000000000002 /* FileURLDemoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A000016294A0000000000002 /* FileURLDemoView.swift */; };
+		9D5642F32E20984400CD7FA8 /* Cazalet-01.musicxml in Resources */ = {isa = PBXBuildFile; fileRef = 9D5642F12E20984400CD7FA8 /* Cazalet-01.musicxml */; };
+		9D5642F42E20984400CD7FA8 /* Cazalet-02.musicxml in Resources */ = {isa = PBXBuildFile; fileRef = 9D5642F22E20984400CD7FA8 /* Cazalet-02.musicxml */; };
 		9DF9EFB92E19FDB4001B4C26 /* chord_progression.musicxml in Resources */ = {isa = PBXBuildFile; fileRef = 9DF9EFB42E19FDB4001B4C26 /* chord_progression.musicxml */; };
 		9DF9EFBA2E19FDB4001B4C26 /* Horn.musicxml in Resources */ = {isa = PBXBuildFile; fileRef = 9DF9EFB52E19FDB4001B4C26 /* Horn.musicxml */; };
 		9DF9EFBB2E19FDB4001B4C26 /* bach_minuet.musicxml in Resources */ = {isa = PBXBuildFile; fileRef = 9DF9EFB32E19FDB4001B4C26 /* bach_minuet.musicxml */; };
@@ -35,8 +37,10 @@
 		1A00000E294A0000000000001 /* ZoomControlsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZoomControlsView.swift; sourceTree = "<group>"; };
 		1A000010294A0000000000001 /* MusicPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicPickerView.swift; sourceTree = "<group>"; };
 		1A000013294A0000000000001 /* SheetMusicDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SheetMusicDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		1A000016294A0000000000002 /* FileURLDemoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileURLDemoView.swift; sourceTree = "<group>"; };
 		1A000014294A0000000000001 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		1A000016294A0000000000002 /* FileURLDemoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileURLDemoView.swift; sourceTree = "<group>"; };
+		9D5642F12E20984400CD7FA8 /* Cazalet-01.musicxml */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = "Cazalet-01.musicxml"; sourceTree = "<group>"; };
+		9D5642F22E20984400CD7FA8 /* Cazalet-02.musicxml */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = "Cazalet-02.musicxml"; sourceTree = "<group>"; };
 		9DF9EFB32E19FDB4001B4C26 /* bach_minuet.musicxml */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = bach_minuet.musicxml; sourceTree = "<group>"; };
 		9DF9EFB42E19FDB4001B4C26 /* chord_progression.musicxml */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = chord_progression.musicxml; sourceTree = "<group>"; };
 		9DF9EFB52E19FDB4001B4C26 /* Horn.musicxml */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = Horn.musicxml; sourceTree = "<group>"; };
@@ -112,6 +116,8 @@
 				9DF9EFB32E19FDB4001B4C26 /* bach_minuet.musicxml */,
 				9DF9EFB42E19FDB4001B4C26 /* chord_progression.musicxml */,
 				9DF9EFB52E19FDB4001B4C26 /* Horn.musicxml */,
+				9D5642F12E20984400CD7FA8 /* Cazalet-01.musicxml */,
+				9D5642F22E20984400CD7FA8 /* Cazalet-02.musicxml */,
 				9DF9EFB62E19FDB4001B4C26 /* sample.musicxml */,
 				9DF9EFB72E19FDB4001B4C26 /* simple_scale.musicxml */,
 				9DF9EFB82E19FDB4001B4C26 /* twinkle.musicxml */,
@@ -187,6 +193,8 @@
 				9DF9EFB92E19FDB4001B4C26 /* chord_progression.musicxml in Resources */,
 				9DF9EFBA2E19FDB4001B4C26 /* Horn.musicxml in Resources */,
 				9DF9EFBB2E19FDB4001B4C26 /* bach_minuet.musicxml in Resources */,
+				9D5642F32E20984400CD7FA8 /* Cazalet-01.musicxml in Resources */,
+				9D5642F42E20984400CD7FA8 /* Cazalet-02.musicxml in Resources */,
 				9DF9EFBC2E19FDB4001B4C26 /* sample.musicxml in Resources */,
 				9DF9EFBD2E19FDB4001B4C26 /* twinkle.musicxml in Resources */,
 				9DF9EFBE2E19FDB4001B4C26 /* simple_scale.musicxml in Resources */,
