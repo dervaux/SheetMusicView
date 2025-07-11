@@ -366,7 +366,7 @@ By default, all display elements are **hidden** unless you use their correspondi
 - `.showInstrumentName()` or `.showInstrumentName(Bool)` - Controls whether instrument names are shown
 - `.showComposer()` or `.showComposer(Bool)` - Controls whether the composer name is displayed
 - `.showDebugPanel()` or `.showDebugPanel(Bool)` - Controls whether the debug status panel is displayed
-- `.pageMargins(left: Double, right: Double)` - Controls the page margins for the sheet music display
+- `.pageMargins(left: Double, right: Double, top: Double, bottom: Double)` - Controls the page margins for the sheet music display (all parameters have default value of 1.0)
 
 #### Debug Panel
 
@@ -400,7 +400,7 @@ SheetMusicView(xml: $musicXML)
     .showTitle()                         // Show title (no parameter = true)
     .showInstrumentName(false)           // Explicitly hide instruments
     .showComposer()                      // Show composer (no parameter = true)
-    .pageMargins(left: 15.0, right: 15.0) // Set custom page margins
+    .pageMargins(left: 15.0, right: 15.0) // Set custom left/right margins (top/bottom use default 1.0)
 ```
 
 #### SheetMusicCoordinator (JavaScript Bridge)
@@ -448,7 +448,7 @@ func resetZoom() async throws                     // Reset to 1.0 (100%)
 var zoomLevel: Double { get }                     // Get current zoom level
 
 // Page margin functionality
-func setPageMargins(left: Double, right: Double) async throws  // Set page margins using OSMD's EngravingRules
+func setPageMargins(left: Double, right: Double, top: Double, bottom: Double) async throws  // Set page margins using OSMD's EngravingRules
 ```
 
 #### SheetMusicError (Error Handling)
@@ -834,6 +834,8 @@ struct PageMarginsSheetMusicView: View {
     @State private var musicXML: String = ""
     @State private var leftMargin: Double = 1.0
     @State private var rightMargin: Double = 1.0
+    @State private var topMargin: Double = 1.0
+    @State private var bottomMargin: Double = 1.0
 
     var body: some View {
         VStack {
@@ -842,7 +844,7 @@ struct PageMarginsSheetMusicView: View {
                 transposeSteps: .constant(0),
                 isLoading: .constant(false)
             )
-            .pageMargins(left: leftMargin, right: rightMargin)
+            .pageMargins(left: leftMargin, right: rightMargin, top: topMargin, bottom: bottomMargin)
             .frame(height: 400)
 
             VStack(spacing: 10) {
@@ -858,15 +860,45 @@ struct PageMarginsSheetMusicView: View {
                     Text("\(rightMargin, specifier: "%.1f")")
                 }
 
+                HStack {
+                    Text("Top Margin:")
+                    Slider(value: $topMargin, in: 0...50)
+                    Text("\(topMargin, specifier: "%.1f")")
+                }
+
+                HStack {
+                    Text("Bottom Margin:")
+                    Slider(value: $bottomMargin, in: 0...50)
+                    Text("\(bottomMargin, specifier: "%.1f")")
+                }
+
                 Button("Reset to Default") {
                     leftMargin = 1.0
                     rightMargin = 1.0
+                    topMargin = 1.0
+                    bottomMargin = 1.0
                 }
             }
             .padding()
         }
     }
 }
+```
+
+The `pageMargins` modifier supports flexible parameter specification. You can set only the margins you need:
+
+```swift
+// Set only specific margins (others use default value of 1.0)
+SheetMusicView(xml: $musicXML)
+    .pageMargins(right: 5.0, bottom: 3.0)
+
+// Set all margins explicitly
+SheetMusicView(xml: $musicXML)
+    .pageMargins(left: 2.0, right: 2.0, top: 1.5, bottom: 1.5)
+
+// Use defaults for all margins
+SheetMusicView(xml: $musicXML)
+    .pageMargins()
 ```
 
 ### Advanced Usage with Error Handling

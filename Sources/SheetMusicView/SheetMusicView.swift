@@ -63,6 +63,8 @@ public struct SheetMusicView: View {
     // MARK: - Page Margins
     private let pageLeftMargin: Double
     private let pageRightMargin: Double
+    private let pageTopMargin: Double
+    private let pageBottomMargin: Double
 
     // MARK: - Zoom Level
     private let zoomLevelBinding: Binding<Double>?
@@ -84,6 +86,8 @@ public struct SheetMusicView: View {
     @State private var lastShowDebugPanel: Bool = false
     @State private var lastPageLeftMargin: Double = 1.0
     @State private var lastPageRightMargin: Double = 1.0
+    @State private var lastPageTopMargin: Double = 1.0
+    @State private var lastPageBottomMargin: Double = 1.0
 
     // MARK: - Initialization
 
@@ -107,6 +111,8 @@ public struct SheetMusicView: View {
         self.showDebugPanel = false
         self.pageLeftMargin = 1.0
         self.pageRightMargin = 1.0
+        self.pageTopMargin = 1.0
+        self.pageBottomMargin = 1.0
         self.zoomLevelBinding = nil
     }
 
@@ -131,6 +137,8 @@ public struct SheetMusicView: View {
         self.showDebugPanel = false
         self.pageLeftMargin = 1.0
         self.pageRightMargin = 1.0
+        self.pageTopMargin = 1.0
+        self.pageBottomMargin = 1.0
         self.zoomLevelBinding = nil
     }
 
@@ -156,6 +164,8 @@ public struct SheetMusicView: View {
         self.showDebugPanel = false
         self.pageLeftMargin = 1.0
         self.pageRightMargin = 1.0
+        self.pageTopMargin = 1.0
+        self.pageBottomMargin = 1.0
         self.zoomLevelBinding = nil
     }
 
@@ -182,6 +192,8 @@ public struct SheetMusicView: View {
         self.showDebugPanel = false
         self.pageLeftMargin = 1.0
         self.pageRightMargin = 1.0
+        self.pageTopMargin = 1.0
+        self.pageBottomMargin = 1.0
         self.zoomLevelBinding = nil
     }
 
@@ -206,6 +218,8 @@ public struct SheetMusicView: View {
         self.showDebugPanel = false
         self.pageLeftMargin = 1.0
         self.pageRightMargin = 1.0
+        self.pageTopMargin = 1.0
+        self.pageBottomMargin = 1.0
         self.zoomLevelBinding = nil
 
         // Store the file URL for loading
@@ -228,6 +242,8 @@ public struct SheetMusicView: View {
         showDebugPanel: Bool,
         pageLeftMargin: Double,
         pageRightMargin: Double,
+        pageTopMargin: Double,
+        pageBottomMargin: Double,
         zoomLevelBinding: Binding<Double>?
     ) {
         self._xml = xml
@@ -244,6 +260,8 @@ public struct SheetMusicView: View {
         self.showDebugPanel = showDebugPanel
         self.pageLeftMargin = pageLeftMargin
         self.pageRightMargin = pageRightMargin
+        self.pageTopMargin = pageTopMargin
+        self.pageBottomMargin = pageBottomMargin
         self.zoomLevelBinding = zoomLevelBinding
     }
 
@@ -279,11 +297,11 @@ public struct SheetMusicView: View {
                     try? await Task.sleep(nanoseconds: 1_000_000) // 1ms delay
                     handleDisplayOptionsChange(showTitle: showTitle, showInstrumentName: showInstrumentName, showComposer: showComposer, showDebugPanel: showDebugPanel)
                 }
-                .task(id: "\(pageLeftMargin)-\(pageRightMargin)") {
+                .task(id: "\(pageLeftMargin)-\(pageRightMargin)-\(pageTopMargin)-\(pageBottomMargin)") {
                     // This task will be cancelled and restarted whenever the page margins change
                     // The small delay ensures the view has fully updated before calling the coordinator
                     try? await Task.sleep(nanoseconds: 1_000_000) // 1ms delay
-                    handlePageMarginsChange(left: pageLeftMargin, right: pageRightMargin)
+                    handlePageMarginsChange(left: pageLeftMargin, right: pageRightMargin, top: pageTopMargin, bottom: pageBottomMargin)
                 }
                 .task(id: fileName) {
                     // This task will be cancelled and restarted whenever the fileName changes
@@ -323,6 +341,8 @@ public struct SheetMusicView: View {
             showDebugPanel: showDebugPanel,
             pageLeftMargin: pageLeftMargin,
             pageRightMargin: pageRightMargin,
+            pageTopMargin: pageTopMargin,
+            pageBottomMargin: pageBottomMargin,
             zoomLevelBinding: zoomLevel
         )
     }
@@ -346,6 +366,8 @@ public struct SheetMusicView: View {
             showDebugPanel: showDebugPanel,
             pageLeftMargin: pageLeftMargin,
             pageRightMargin: pageRightMargin,
+            pageTopMargin: pageTopMargin,
+            pageBottomMargin: pageBottomMargin,
             zoomLevelBinding: zoomLevelBinding
         )
     }
@@ -369,6 +391,8 @@ public struct SheetMusicView: View {
             showDebugPanel: showDebugPanel,
             pageLeftMargin: pageLeftMargin,
             pageRightMargin: pageRightMargin,
+            pageTopMargin: pageTopMargin,
+            pageBottomMargin: pageBottomMargin,
             zoomLevelBinding: zoomLevelBinding
         )
     }
@@ -392,6 +416,8 @@ public struct SheetMusicView: View {
             showDebugPanel: showDebugPanel,
             pageLeftMargin: pageLeftMargin,
             pageRightMargin: pageRightMargin,
+            pageTopMargin: pageTopMargin,
+            pageBottomMargin: pageBottomMargin,
             zoomLevelBinding: zoomLevelBinding
         )
     }
@@ -415,6 +441,8 @@ public struct SheetMusicView: View {
             showDebugPanel: show,
             pageLeftMargin: pageLeftMargin,
             pageRightMargin: pageRightMargin,
+            pageTopMargin: pageTopMargin,
+            pageBottomMargin: pageBottomMargin,
             zoomLevelBinding: zoomLevelBinding
         )
     }
@@ -423,8 +451,10 @@ public struct SheetMusicView: View {
     /// - Parameters:
     ///   - left: Left page margin in units (default: 1.0)
     ///   - right: Right page margin in units (default: 1.0)
+    ///   - top: Top page margin in units (default: 1.0)
+    ///   - bottom: Bottom page margin in units (default: 1.0)
     /// - Returns: A modified SheetMusicView instance
-    public func pageMargins(left: Double = 1.0, right: Double = 1.0) -> SheetMusicView {
+    public func pageMargins(left: Double = 1.0, right: Double = 1.0, top: Double = 1.0, bottom: Double = 1.0) -> SheetMusicView {
         return SheetMusicView(
             xml: _xml,
             transposeSteps: _transposeSteps,
@@ -440,6 +470,8 @@ public struct SheetMusicView: View {
             showDebugPanel: showDebugPanel,
             pageLeftMargin: left,
             pageRightMargin: right,
+            pageTopMargin: top,
+            pageBottomMargin: bottom,
             zoomLevelBinding: zoomLevelBinding
         )
     }
@@ -454,7 +486,9 @@ public struct SheetMusicView: View {
             // Force apply page margins when ready (reset lastPageMargins to ensure they get applied)
             lastPageLeftMargin = -1.0  // Force update by using impossible values
             lastPageRightMargin = -1.0  // Force update by using impossible values
-            handlePageMarginsChange(left: pageLeftMargin, right: pageRightMargin)
+            lastPageTopMargin = -1.0  // Force update by using impossible values
+            lastPageBottomMargin = -1.0  // Force update by using impossible values
+            handlePageMarginsChange(left: pageLeftMargin, right: pageRightMargin, top: pageTopMargin, bottom: pageBottomMargin)
             // Load initial XML if available (for xml-based API)
             if !xml.isEmpty && xml != lastXML {
                 handleXMLChange(xml)
@@ -720,17 +754,19 @@ public struct SheetMusicView: View {
         }
     }
 
-    private func handlePageMarginsChange(left: Double, right: Double) {
+    private func handlePageMarginsChange(left: Double, right: Double, top: Double, bottom: Double) {
         guard coordinator.isReady else { return }
 
         // Only update if page margins actually changed
-        if left != lastPageLeftMargin || right != lastPageRightMargin {
+        if left != lastPageLeftMargin || right != lastPageRightMargin || top != lastPageTopMargin || bottom != lastPageBottomMargin {
             lastPageLeftMargin = left
             lastPageRightMargin = right
+            lastPageTopMargin = top
+            lastPageBottomMargin = bottom
 
             Task {
                 do {
-                    try await coordinator.setPageMargins(left: left, right: right)
+                    try await coordinator.setPageMargins(left: left, right: right, top: top, bottom: bottom)
                 } catch {
                     #if DEBUG
                     print("SheetMusicView: Failed to update page margins: \(error)")

@@ -524,18 +524,20 @@
         }
 
         // Set page margins using OSMD's EngravingRules
-        function osmdSetPageMargins(leftMargin, rightMargin) {
+        function osmdSetPageMargins(leftMargin, rightMargin, topMargin, bottomMargin) {
             if (!isInitialized || !osmd) {
                 throw new Error('OSMD is not initialized');
             }
 
             try {
-                console.log(`Setting page margins - Left: ${leftMargin}, Right: ${rightMargin}`);
+                console.log(`Setting page margins - Left: ${leftMargin}, Right: ${rightMargin}, Top: ${topMargin}, Bottom: ${bottomMargin}`);
 
                 // Set the page margins using EngravingRules
                 if (osmd.EngravingRules) {
                     osmd.EngravingRules.PageLeftMargin = leftMargin;
                     osmd.EngravingRules.PageRightMargin = rightMargin;
+                    osmd.EngravingRules.PageTopMargin = topMargin;
+                    osmd.EngravingRules.PageBottomMargin = bottomMargin;
                 } else {
                     console.warn('EngravingRules not available');
                     return false;

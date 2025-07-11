@@ -51,20 +51,24 @@ final class SheetMusicViewTests: XCTestCase {
 
     @MainActor
     func testDefaultPageMargins() {
-        // Test that default page margins are 1.0 for both left and right
+        // Test that default page margins are 1.0 for all sides
         let sheetMusicView = SheetMusicView(xml: .constant(""))
 
         // Since the properties are private, we test the behavior by checking
         // that a view created without pageMargins modifier uses the expected defaults
-        // This is verified by the fact that the initializers set pageLeftMargin and pageRightMargin to 1.0
+        // This is verified by the fact that the initializers set all page margins to 1.0
 
         // We can also test that the pageMargins modifier has the correct default parameters
         let viewWithDefaults = sheetMusicView.pageMargins()
         XCTAssertNotNil(viewWithDefaults)
 
-        // Test that explicit values work
-        let viewWithCustomMargins = sheetMusicView.pageMargins(left: 5.0, right: 10.0)
+        // Test that explicit values work for all margins
+        let viewWithCustomMargins = sheetMusicView.pageMargins(left: 5.0, right: 10.0, top: 2.0, bottom: 3.0)
         XCTAssertNotNil(viewWithCustomMargins)
+
+        // Test that partial values work (using defaults for unspecified margins)
+        let viewWithPartialMargins = sheetMusicView.pageMargins(right: 15.0, bottom: 8.0)
+        XCTAssertNotNil(viewWithPartialMargins)
     }
 
     func testFileLoadingUtility() {
@@ -217,7 +221,7 @@ final class SheetMusicViewTests: XCTestCase {
             isLoading: .constant(false)
         )
 
-        let modifiedView = originalView.pageMargins(left: 20.0, right: 25.0)
+        let modifiedView = originalView.pageMargins(left: 20.0, right: 25.0, top: 15.0, bottom: 10.0)
 
         // Since the properties are private, we can't directly test them,
         // but we can verify the modifier returns a SheetMusicView instance
@@ -226,6 +230,10 @@ final class SheetMusicViewTests: XCTestCase {
         // Test with default values
         let defaultView = originalView.pageMargins()
         XCTAssertNotNil(defaultView)
+
+        // Test with partial values
+        let partialView = originalView.pageMargins(left: 5.0, top: 8.0)
+        XCTAssertNotNil(partialView)
     }
 
     @MainActor
@@ -234,7 +242,7 @@ final class SheetMusicViewTests: XCTestCase {
 
         // Test that setPageMargins throws notReady error when coordinator is not ready
         do {
-            try await coordinator.setPageMargins(left: 15.0, right: 15.0)
+            try await coordinator.setPageMargins(left: 15.0, right: 15.0, top: 10.0, bottom: 12.0)
             XCTFail("Should throw notReady error")
         } catch SheetMusicError.notReady {
             // Expected
@@ -252,7 +260,7 @@ final class SheetMusicViewTests: XCTestCase {
             isLoading: .constant(false)
         )
         .showTitle()
-        .pageMargins(left: 12.0, right: 18.0)
+        .pageMargins(left: 12.0, right: 18.0, top: 6.0, bottom: 9.0)
         .showComposer()
 
         XCTAssertNotNil(view)
@@ -266,7 +274,7 @@ final class SheetMusicViewTests: XCTestCase {
             transposeSteps: .constant(0),
             isLoading: .constant(false)
         )
-        .pageMargins(left: 5.0, right: 30.0)
+        .pageMargins(left: 5.0, right: 30.0, top: 4.0, bottom: 7.0)
 
         XCTAssertNotNil(view)
     }
@@ -280,8 +288,30 @@ final class SheetMusicViewTests: XCTestCase {
             transposeSteps: .constant(0),
             isLoading: .constant(false)
         )
-        .pageMargins(left: 8.0, right: 12.0)
+        .pageMargins(left: 8.0, right: 12.0, top: 3.0, bottom: 5.0)
 
         XCTAssertNotNil(view)
+    }
+
+    @MainActor
+    func testPageMarginsFlexibleParameters() {
+        // Test the flexible parameter specification feature
+        let baseView = SheetMusicView(xml: .constant(""))
+
+        // Test setting only right and bottom margins
+        let partialView1 = baseView.pageMargins(right: 5.0, bottom: 3.0)
+        XCTAssertNotNil(partialView1)
+
+        // Test setting only left and top margins
+        let partialView2 = baseView.pageMargins(left: 2.5, top: 4.0)
+        XCTAssertNotNil(partialView2)
+
+        // Test setting only one margin
+        let singleMarginView = baseView.pageMargins(top: 10.0)
+        XCTAssertNotNil(singleMarginView)
+
+        // Test all margins with different values
+        let allMarginsView = baseView.pageMargins(left: 1.5, right: 2.5, top: 3.5, bottom: 4.5)
+        XCTAssertNotNil(allMarginsView)
     }
 }

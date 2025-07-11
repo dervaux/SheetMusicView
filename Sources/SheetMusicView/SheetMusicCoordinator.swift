@@ -237,13 +237,13 @@ public class SheetMusicCoordinator: NSObject, ObservableObject {
     }
 
     /// Set page margins using OSMD's EngravingRules
-    public func setPageMargins(left: Double, right: Double) async throws {
+    public func setPageMargins(left: Double, right: Double, top: Double, bottom: Double) async throws {
         guard isReady else {
             throw SheetMusicError.notReady
         }
 
         do {
-            let script = "osmdSetPageMargins(\(left), \(right))"
+            let script = "osmdSetPageMargins(\(left), \(right), \(top), \(bottom))"
             _ = try await evaluateJavaScript(script)
         } catch {
             let sheetMusicError = error as? SheetMusicError ?? SheetMusicError.operationFailed(error.localizedDescription)

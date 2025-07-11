@@ -159,7 +159,7 @@ struct BundleFileDemoView: View {
                     .showInstrumentName(showInstrumentName)
                     .showComposer(showComposer)
                     .showDebugPanel(showDebugPanel)
-                    // .pageMargins(left: leftMargin, right: rightMargin)
+                    .pageMargins(top: leftMargin, bottom: rightMargin)
                     .background(Color.white)
                     .cornerRadius(8)
                     .shadow(radius: 2)
