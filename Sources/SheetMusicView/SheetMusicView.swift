@@ -75,6 +75,9 @@ public struct SheetMusicView: View {
     // MARK: - Scrolling Control
     private let scrollingEnabled: Bool
 
+    // MARK: - Console Messages Control
+    private let showConsoleMessages: Bool
+
     // MARK: - Computed Properties
     private var zoomLevel: Double? {
         return zoomLevelBinding?.wrappedValue
@@ -96,6 +99,7 @@ public struct SheetMusicView: View {
     @State private var lastPageBottomMargin: Double = 1.0
     @State private var lastSystemSpacing: Double = 0.0
     @State private var lastScrollingEnabled: Bool = false
+    @State private var lastShowConsoleMessages: Bool = false
 
     // MARK: - Initialization
 
@@ -124,6 +128,7 @@ public struct SheetMusicView: View {
         self.systemSpacing = 0.0
         self.zoomLevelBinding = nil
         self.scrollingEnabled = false
+        self.showConsoleMessages = false
     }
 
     /// Initialize SheetMusicView with a filename (without .musicxml extension)
@@ -152,6 +157,7 @@ public struct SheetMusicView: View {
         self.systemSpacing = 3.0
         self.zoomLevelBinding = nil
         self.scrollingEnabled = false
+        self.showConsoleMessages = false
     }
 
     /// Initialize SheetMusicView with callbacks
@@ -181,6 +187,7 @@ public struct SheetMusicView: View {
         self.systemSpacing = 0.0
         self.zoomLevelBinding = nil
         self.scrollingEnabled = false
+        self.showConsoleMessages = false
     }
 
     /// Initialize SheetMusicView with filename and callbacks
@@ -211,6 +218,7 @@ public struct SheetMusicView: View {
         self.systemSpacing = 0.0
         self.zoomLevelBinding = nil
         self.scrollingEnabled = false
+        self.showConsoleMessages = false
     }
 
     /// Initialize SheetMusicView with a file URL
@@ -239,6 +247,7 @@ public struct SheetMusicView: View {
         self.systemSpacing = 0.0
         self.zoomLevelBinding = nil
         self.scrollingEnabled = false
+        self.showConsoleMessages = false
 
         // Store the file URL for loading
         self.fileURL = fileURL
@@ -264,7 +273,8 @@ public struct SheetMusicView: View {
         pageBottomMargin: Double,
         systemSpacing: Double,
         zoomLevelBinding: Binding<Double>?,
-        scrollingEnabled: Bool
+        scrollingEnabled: Bool,
+        showConsoleMessages: Bool
     ) {
         self._xml = xml
         self._transposeSteps = transposeSteps
@@ -285,12 +295,13 @@ public struct SheetMusicView: View {
         self.systemSpacing = systemSpacing
         self.zoomLevelBinding = zoomLevelBinding
         self.scrollingEnabled = scrollingEnabled
+        self.showConsoleMessages = showConsoleMessages
     }
 
     // MARK: - Body
     public var body: some View {
         GeometryReader { geometry in
-            SheetMusicWebViewRepresentable(coordinator: coordinator, scrollingEnabled: scrollingEnabled)
+            SheetMusicWebViewRepresentable(coordinator: coordinator, scrollingEnabled: scrollingEnabled, showConsoleMessages: showConsoleMessages)
                 .onAppear {
                     setupCoordinator()
                     containerSize = geometry.size
@@ -337,6 +348,10 @@ public struct SheetMusicView: View {
                     try? await Task.sleep(nanoseconds: 1_000_000) // 1ms delay
                     handleScrollingEnabledChange(enabled: scrollingEnabled)
                 }
+                .task(id: "\(showConsoleMessages)") {
+                    // This task will be cancelled and restarted whenever the console messages state changes
+                    handleConsoleMessagesChange(show: showConsoleMessages)
+                }
                 .task(id: fileName) {
                     // This task will be cancelled and restarted whenever the fileName changes
                     // This handles the case where the view is recreated with a new fileName
@@ -379,7 +394,8 @@ public struct SheetMusicView: View {
             pageBottomMargin: pageBottomMargin,
             systemSpacing: systemSpacing,
             zoomLevelBinding: zoomLevel,
-            scrollingEnabled: scrollingEnabled
+            scrollingEnabled: scrollingEnabled,
+            showConsoleMessages: showConsoleMessages
         )
     }
 
@@ -406,7 +422,8 @@ public struct SheetMusicView: View {
             pageBottomMargin: pageBottomMargin,
             systemSpacing: systemSpacing,
             zoomLevelBinding: zoomLevelBinding,
-            scrollingEnabled: scrollingEnabled
+            scrollingEnabled: scrollingEnabled,
+            showConsoleMessages: showConsoleMessages
         )
     }
 
@@ -433,7 +450,8 @@ public struct SheetMusicView: View {
             pageBottomMargin: pageBottomMargin,
             systemSpacing: systemSpacing,
             zoomLevelBinding: zoomLevelBinding,
-            scrollingEnabled: scrollingEnabled
+            scrollingEnabled: scrollingEnabled,
+            showConsoleMessages: showConsoleMessages
         )
     }
 
@@ -460,7 +478,8 @@ public struct SheetMusicView: View {
             pageBottomMargin: pageBottomMargin,
             systemSpacing: systemSpacing,
             zoomLevelBinding: zoomLevelBinding,
-            scrollingEnabled: scrollingEnabled
+            scrollingEnabled: scrollingEnabled,
+            showConsoleMessages: showConsoleMessages
         )
     }
 
@@ -487,7 +506,8 @@ public struct SheetMusicView: View {
             pageBottomMargin: pageBottomMargin,
             systemSpacing: systemSpacing,
             zoomLevelBinding: zoomLevelBinding,
-            scrollingEnabled: scrollingEnabled
+            scrollingEnabled: scrollingEnabled,
+            showConsoleMessages: showConsoleMessages
         )
     }
 
@@ -518,7 +538,8 @@ public struct SheetMusicView: View {
             pageBottomMargin: bottom,
             systemSpacing: systemSpacing,
             zoomLevelBinding: zoomLevelBinding,
-            scrollingEnabled: scrollingEnabled
+            scrollingEnabled: scrollingEnabled,
+            showConsoleMessages: showConsoleMessages
         )
     }
 
@@ -545,7 +566,8 @@ public struct SheetMusicView: View {
             pageBottomMargin: pageBottomMargin,
             systemSpacing: spacing,
             zoomLevelBinding: zoomLevelBinding,
-            scrollingEnabled: scrollingEnabled
+            scrollingEnabled: scrollingEnabled,
+            showConsoleMessages: showConsoleMessages
         )
     }
 
@@ -572,13 +594,43 @@ public struct SheetMusicView: View {
             pageBottomMargin: pageBottomMargin,
             systemSpacing: systemSpacing,
             zoomLevelBinding: zoomLevelBinding,
-            scrollingEnabled: enabled
+            scrollingEnabled: enabled,
+            showConsoleMessages: showConsoleMessages
+        )
+    }
+
+    /// Controls whether console messages are displayed in the debug console
+    /// - Parameter show: Whether to show console messages (default: false)
+    /// - Returns: A modified SheetMusicView instance
+    public func showConsoleMessages(_ show: Bool = true) -> SheetMusicView {
+        return SheetMusicView(
+            xml: _xml,
+            transposeSteps: _transposeSteps,
+            isLoading: _isLoading,
+            fileName: fileName,
+            bundle: bundle,
+            fileURL: fileURL,
+            onError: onError,
+            onReady: onReady,
+            showTitle: showTitle,
+            showInstrumentName: showInstrumentName,
+            showComposer: showComposer,
+            showDebugPanel: showDebugPanel,
+            pageLeftMargin: pageLeftMargin,
+            pageRightMargin: pageRightMargin,
+            pageTopMargin: pageTopMargin,
+            pageBottomMargin: pageBottomMargin,
+            systemSpacing: systemSpacing,
+            zoomLevelBinding: zoomLevelBinding,
+            scrollingEnabled: scrollingEnabled,
+            showConsoleMessages: show
         )
     }
 
     // MARK: - Private Methods
 
     private func setupCoordinator() {
+        coordinator.showConsoleMessages = showConsoleMessages
         coordinator.onReady = {
             onReady?()
             // Apply display options when ready
@@ -595,6 +647,9 @@ public struct SheetMusicView: View {
             // Force apply scrolling enabled state when ready (reset lastScrollingEnabled to ensure it gets applied)
             lastScrollingEnabled = !scrollingEnabled  // Force update by using opposite value
             handleScrollingEnabledChange(enabled: scrollingEnabled)
+            // Force apply console messages state when ready (reset lastShowConsoleMessages to ensure it gets applied)
+            lastShowConsoleMessages = !showConsoleMessages  // Force update by using opposite value
+            handleConsoleMessagesChange(show: showConsoleMessages)
             // Load initial XML if available (for xml-based API)
             if !xml.isEmpty && xml != lastXML {
                 handleXMLChange(xml)
@@ -602,20 +657,28 @@ public struct SheetMusicView: View {
             // For fileName-based API, check if we have loaded content or need to load
             else if let fileName = fileName, !fileName.isEmpty {
                 if !loadedXML.isEmpty {
-                    print("SheetMusicView: Coordinator ready, loading previously loaded XML for '\(fileName)'")
+                    if showConsoleMessages {
+                        print("SheetMusicView: Coordinator ready, loading previously loaded XML for '\(fileName)'")
+                    }
                     handleXMLChange(loadedXML)
                 } else {
-                    print("SheetMusicView: Coordinator ready, loading file '\(fileName)'")
+                    if showConsoleMessages {
+                        print("SheetMusicView: Coordinator ready, loading file '\(fileName)'")
+                    }
                     loadFileIfNeeded()
                 }
             }
             // For fileURL-based API, check if we have loaded content or need to load
             else if let fileURL = fileURL {
                 if !loadedXML.isEmpty {
-                    print("SheetMusicView: Coordinator ready, loading previously loaded XML for '\(fileURL.lastPathComponent)'")
+                    if showConsoleMessages {
+                        print("SheetMusicView: Coordinator ready, loading previously loaded XML for '\(fileURL.lastPathComponent)'")
+                    }
                     handleXMLChange(loadedXML)
                 } else {
-                    print("SheetMusicView: Coordinator ready, loading file '\(fileURL.lastPathComponent)'")
+                    if showConsoleMessages {
+                        print("SheetMusicView: Coordinator ready, loading file '\(fileURL.lastPathComponent)'")
+                    }
                     loadFileIfNeeded()
                 }
             }
@@ -627,17 +690,23 @@ public struct SheetMusicView: View {
     }
 
     private func loadFileIfNeeded() {
-        print("SheetMusicView: loadFileIfNeeded called - fileName: \(fileName ?? "nil"), fileURL: \(fileURL?.lastPathComponent ?? "nil"), loadedFileName: \(loadedFileName)")
+        if showConsoleMessages {
+            print("SheetMusicView: loadFileIfNeeded called - fileName: \(fileName ?? "nil"), fileURL: \(fileURL?.lastPathComponent ?? "nil"), loadedFileName: \(loadedFileName)")
+        }
 
         // Handle fileName-based loading
         if let fileName = fileName, !fileName.isEmpty {
             // Check if we need to load a different file
             guard fileName != loadedFileName else {
-                print("SheetMusicView: File '\(fileName)' already loaded, skipping")
+                if showConsoleMessages {
+                    print("SheetMusicView: File '\(fileName)' already loaded, skipping")
+                }
                 return
             }
 
-            print("SheetMusicView: Starting to load file '\(fileName).musicxml'")
+            if showConsoleMessages {
+                print("SheetMusicView: Starting to load file '\(fileName).musicxml'")
+            }
 
             Task {
                 do {
@@ -645,13 +714,17 @@ public struct SheetMusicView: View {
                     loadedXML = xmlContent
                     loadedFileName = fileName
 
-                    print("SheetMusicView: Successfully loaded file '\(fileName).musicxml', content length: \(xmlContent.count)")
+                    if showConsoleMessages {
+                        print("SheetMusicView: Successfully loaded file '\(fileName).musicxml', content length: \(xmlContent.count)")
+                    }
 
                     // Load the XML content regardless of coordinator state
                     // handleXMLChange will check if coordinator is ready
                     handleXMLChange(xmlContent)
                 } catch {
-                    print("SheetMusicView: Failed to load file '\(fileName).musicxml': \(error.localizedDescription)")
+                    if showConsoleMessages {
+                        print("SheetMusicView: Failed to load file '\(fileName).musicxml': \(error.localizedDescription)")
+                    }
                     let sheetMusicError = SheetMusicError.loadingFailed("Failed to load file '\(fileName).musicxml': \(error.localizedDescription)")
                     onError?(sheetMusicError)
                 }
@@ -663,11 +736,15 @@ public struct SheetMusicView: View {
 
             // Check if we need to load a different file
             guard urlString != loadedFileName else {
-                print("SheetMusicView: File '\(fileURL.lastPathComponent)' already loaded, skipping")
+                if showConsoleMessages {
+                    print("SheetMusicView: File '\(fileURL.lastPathComponent)' already loaded, skipping")
+                }
                 return
             }
 
-            print("SheetMusicView: Starting to load file from URL: \(fileURL.lastPathComponent)")
+            if showConsoleMessages {
+                print("SheetMusicView: Starting to load file from URL: \(fileURL.lastPathComponent)")
+            }
 
             Task {
                 do {
@@ -675,20 +752,26 @@ public struct SheetMusicView: View {
                     loadedXML = xmlContent
                     loadedFileName = urlString
 
-                    print("SheetMusicView: Successfully loaded file '\(fileURL.lastPathComponent)', content length: \(xmlContent.count)")
+                    if showConsoleMessages {
+                        print("SheetMusicView: Successfully loaded file '\(fileURL.lastPathComponent)', content length: \(xmlContent.count)")
+                    }
 
                     // Load the XML content regardless of coordinator state
                     // handleXMLChange will check if coordinator is ready
                     handleXMLChange(xmlContent)
                 } catch {
-                    print("SheetMusicView: Failed to load file '\(fileURL.lastPathComponent)': \(error.localizedDescription)")
+                    if showConsoleMessages {
+                        print("SheetMusicView: Failed to load file '\(fileURL.lastPathComponent)': \(error.localizedDescription)")
+                    }
                     let sheetMusicError = SheetMusicError.loadingFailed("Failed to load file '\(fileURL.lastPathComponent)': \(error.localizedDescription)")
                     onError?(sheetMusicError)
                 }
             }
         }
         else {
-            print("SheetMusicView: No fileName or fileURL provided, clearing loadedFileName")
+            if showConsoleMessages {
+                print("SheetMusicView: No fileName or fileURL provided, clearing loadedFileName")
+            }
             loadedFileName = ""
         }
     }
@@ -739,12 +822,16 @@ public struct SheetMusicView: View {
 
     private func handleXMLChange(_ newXML: String) {
         guard coordinator.isReady, !newXML.isEmpty, newXML != lastXML else {
-            print("SheetMusicView: handleXMLChange early return - coordinator.isReady: \(coordinator.isReady), newXML.isEmpty: \(newXML.isEmpty), newXML == lastXML: \(newXML == lastXML)")
+            if showConsoleMessages {
+                print("SheetMusicView: handleXMLChange early return - coordinator.isReady: \(coordinator.isReady), newXML.isEmpty: \(newXML.isEmpty), newXML == lastXML: \(newXML == lastXML)")
+            }
             return
         }
 
         lastXML = newXML
-        print("SheetMusicView: handleXMLChange proceeding to load XML")
+        if showConsoleMessages {
+            print("SheetMusicView: handleXMLChange proceeding to load XML")
+        }
 
         Task {
             do {
@@ -852,9 +939,9 @@ public struct SheetMusicView: View {
                     try await coordinator.updateDisplayOptions(showTitle: showTitle, showInstrumentName: showInstrumentName, showComposer: showComposer)
                     try await coordinator.setDebugPanelVisible(showDebugPanel)
                 } catch {
-                    #if DEBUG
-                    print("SheetMusicView: Failed to update display options: \(error)")
-                    #endif
+                    if showConsoleMessages {
+                        print("SheetMusicView: Failed to update display options: \(error)")
+                    }
                 }
             }
         }
@@ -874,9 +961,9 @@ public struct SheetMusicView: View {
                 do {
                     try await coordinator.setPageMargins(left: left, right: right, top: top, bottom: bottom)
                 } catch {
-                    #if DEBUG
-                    print("SheetMusicView: Failed to update page margins: \(error)")
-                    #endif
+                    if showConsoleMessages {
+                        print("SheetMusicView: Failed to update page margins: \(error)")
+                    }
                 }
             }
         }
@@ -893,9 +980,9 @@ public struct SheetMusicView: View {
                 do {
                     try await coordinator.setSystemSpacing(spacing)
                 } catch {
-                    #if DEBUG
-                    print("SheetMusicView: Failed to update system spacing: \(error)")
-                    #endif
+                    if showConsoleMessages {
+                        print("SheetMusicView: Failed to update system spacing: \(error)")
+                    }
                 }
             }
         }
@@ -908,9 +995,34 @@ public struct SheetMusicView: View {
 
             // Note: Scrolling control is handled at the web view level in the representable
             // This handler is here for consistency and future extensibility
-            #if DEBUG
-            print("SheetMusicView: Scrolling enabled changed to: \(enabled)")
-            #endif
+            if showConsoleMessages {
+                print("SheetMusicView: Scrolling enabled changed to: \(enabled)")
+            }
+        }
+    }
+
+    private func handleConsoleMessagesChange(show: Bool) {
+        // Only update if console messages state actually changed
+        if show != lastShowConsoleMessages {
+            lastShowConsoleMessages = show
+            coordinator.showConsoleMessages = show
+
+            if show {
+                print("SheetMusicView: Console messages enabled")
+            }
+
+            // Update JavaScript console messages visibility if coordinator is ready
+            if coordinator.isReady {
+                Task {
+                    do {
+                        try await coordinator.setConsoleMessagesVisible(show)
+                    } catch {
+                        if show {
+                            print("SheetMusicView: Failed to update JavaScript console messages visibility: \(error)")
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -938,6 +1050,7 @@ public struct SheetMusicView: View {
 private struct SheetMusicWebViewRepresentable: UIViewRepresentable {
     let coordinator: SheetMusicCoordinator
     let scrollingEnabled: Bool
+    let showConsoleMessages: Bool
 
     func makeUIView(context: Context) -> WKWebView {
         let configuration = WKWebViewConfiguration()
@@ -1052,13 +1165,17 @@ private struct SheetMusicWebViewRepresentable: UIViewRepresentable {
         }
 
         guard let finalURL = htmlURL else {
-            print("Error: Could not find osmd.html in bundle")
-            print("Bundle path: \(Bundle.module.bundlePath)")
-            print("Bundle resources: \(Bundle.module.paths(forResourcesOfType: "html", inDirectory: nil))")
+            if showConsoleMessages {
+                print("Error: Could not find osmd.html in bundle")
+                print("Bundle path: \(Bundle.module.bundlePath)")
+                print("Bundle resources: \(Bundle.module.paths(forResourcesOfType: "html", inDirectory: nil))")
+            }
             return
         }
 
-        print("Loading HTML from: \(finalURL.path)")
+        if showConsoleMessages {
+            print("Loading HTML from: \(finalURL.path)")
+        }
         webView.loadFileURL(finalURL, allowingReadAccessTo: finalURL.deletingLastPathComponent())
     }
 }
@@ -1067,6 +1184,7 @@ private struct SheetMusicWebViewRepresentable: UIViewRepresentable {
 private struct SheetMusicWebViewRepresentable: NSViewRepresentable {
     let coordinator: SheetMusicCoordinator
     let scrollingEnabled: Bool
+    let showConsoleMessages: Bool
 
     func makeNSView(context: Context) -> WKWebView {
         let configuration = WKWebViewConfiguration()
@@ -1160,13 +1278,17 @@ private struct SheetMusicWebViewRepresentable: NSViewRepresentable {
         }
 
         guard let finalURL = htmlURL else {
-            print("Error: Could not find osmd.html in bundle")
-            print("Bundle path: \(Bundle.module.bundlePath)")
-            print("Bundle resources: \(Bundle.module.paths(forResourcesOfType: "html", inDirectory: nil))")
+            if showConsoleMessages {
+                print("Error: Could not find osmd.html in bundle")
+                print("Bundle path: \(Bundle.module.bundlePath)")
+                print("Bundle resources: \(Bundle.module.paths(forResourcesOfType: "html", inDirectory: nil))")
+            }
             return
         }
 
-        print("Loading HTML from: \(finalURL.path)")
+        if showConsoleMessages {
+            print("Loading HTML from: \(finalURL.path)")
+        }
         webView.loadFileURL(finalURL, allowingReadAccessTo: finalURL.deletingLastPathComponent())
     }
 }

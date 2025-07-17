@@ -45,6 +45,7 @@ struct BundleFileDemoView: View {
     @State private var rightMargin: Double = 1.0
     @State private var systemSpacing: Double = 0.0
     @State private var scrollingEnabled: Bool = false
+    @State private var showConsoleMessages: Bool = false
 
     var body: some View {
         NavigationView {
@@ -153,7 +154,9 @@ struct BundleFileDemoView: View {
                             showingError = true
                         },
                         onReady: {
-                            print("Sheet music loaded from file: \(currentFileName).musicxml")
+                            if showConsoleMessages {
+                                print("Sheet music loaded from file: \(currentFileName).musicxml")
+                            }
                         }
                     )
                     .zoomLevel($zoomLevel)
@@ -164,6 +167,7 @@ struct BundleFileDemoView: View {
                     .pageMargins(left: leftMargin, right: rightMargin, top: 1.0, bottom: 1.0)
                     .systemSpacing(systemSpacing)
                     .scrollingEnabled(scrollingEnabled)
+                    .showConsoleMessages(showConsoleMessages)
                     .background(Color.white)
                     .cornerRadius(8)
                     .shadow(radius: 2)
@@ -412,6 +416,8 @@ struct BundleFileDemoView: View {
                             Toggle("Show Instrument Names", isOn: $showInstrumentName)
                             Toggle("Show Composer", isOn: $showComposer)
                             Toggle("Show Debug Panel", isOn: $showDebugPanel)
+                            Toggle("Show Console Messages", isOn: $showConsoleMessages)
+                                .help("When enabled, debug messages will be printed to the console. Useful for troubleshooting.")
 
                             Divider()
 

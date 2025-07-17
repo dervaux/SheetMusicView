@@ -87,7 +87,7 @@
 
         // OSMD is loaded directly from local file, so we can proceed immediately
         function initOSMDWhenReady() {
-            console.log('OSMD loaded from local bundle');
+            logMessage('OSMD loaded from local bundle');
             updateDebug('OSMD loaded from bundle', 'Local bundle');
             waitForOSMD();
         }
@@ -104,14 +104,30 @@
         // Global OSMD instance
         let osmd = null;
         let isInitialized = false;
+
+        // Console messages control
+        let showConsoleMessages = false;
+
+        // Custom console logging function
+        function logMessage(message) {
+            if (showConsoleMessages) {
+                console.log(message);
+            }
+        }
+
+        // Function to control console message visibility
+        function osmdSetConsoleMessagesVisible(visible) {
+            showConsoleMessages = visible;
+            logMessage(`Console messages ${visible ? 'enabled' : 'disabled'}`);
+        }
         
         // Initialize OSMD when the page loads and script is available
         function waitForOSMD() {
-            console.log('Waiting for OSMD...', typeof opensheetmusicdisplay);
+            logMessage('Waiting for OSMD... ' + typeof opensheetmusicdisplay);
             updateDebug('Waiting for OSMD...', typeof opensheetmusicdisplay);
 
             if (typeof opensheetmusicdisplay !== 'undefined') {
-                console.log('OSMD is available, initializing...');
+                logMessage('OSMD is available, initializing...');
                 updateDebug('OSMD available, initializing...', 'Available');
                 initializeOSMD();
             } else {
@@ -122,12 +138,12 @@
 
         // Test Swift bridge immediately
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('DOM loaded, testing Swift bridge...');
+            logMessage('DOM loaded, testing Swift bridge...');
             updateDebug('DOM loaded', 'Testing bridge...');
 
             // Test if Swift bridge is available
             if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.osmdBridge) {
-                console.log('Swift bridge is available');
+                logMessage('Swift bridge is available');
                 updateDebug('Swift bridge available', 'Bridge OK');
 
                 // Send test message
@@ -146,13 +162,13 @@
         
         function initializeOSMD() {
             try {
-                console.log('Starting OSMD initialization...');
+                logMessage('Starting OSMD initialization...');
 
                 // Clear loading message
                 const container = document.getElementById('osmdContainer');
                 container.innerHTML = '';
 
-                console.log('Creating OSMD instance...');
+                logMessage('Creating OSMD instance...');
 
                 // Create OSMD instance with enhanced scrollable settings
                 osmd = new opensheetmusicdisplay.OpenSheetMusicDisplay(container, {
@@ -197,7 +213,7 @@
                     });
                 }
                 
-                console.log('OSMD initialized successfully');
+                logMessage('OSMD initialized successfully');
                 
             } catch (error) {
                 console.error('Failed to initialize OSMD:', error);
@@ -224,7 +240,7 @@
             
             try {
                 osmd.load(xmlString);
-                console.log('MusicXML loaded successfully');
+                logMessage('MusicXML loaded successfully');
                 return true;
             } catch (error) {
                 console.error('Failed to load MusicXML:', error);
@@ -240,7 +256,7 @@
 
             try {
                 osmd.render();
-                console.log('Music rendered successfully');
+                logMessage('Music rendered successfully');
 
                 // Check scrollability after rendering
                 setTimeout(() => {
@@ -273,9 +289,9 @@
                 }
 
                 // Set the transpose value on the sheet
-                console.log(`Setting transpose to ${steps}, current value: ${osmd.Sheet.Transpose}`);
+                logMessage(`Setting transpose to ${steps}, current value: ${osmd.Sheet.Transpose}`);
                 osmd.Sheet.Transpose = steps;
-                console.log(`Transpose set to: ${osmd.Sheet.Transpose}`);
+                logMessage(`Transpose set to: ${osmd.Sheet.Transpose}`);
 
                 // Update the graphic representation
                 osmd.updateGraphic();
@@ -283,7 +299,7 @@
                 // Re-render after transposition
                 osmd.render();
 
-                console.log(`Music transposed to ${steps} semitones`);
+                logMessage(`Music transposed to ${steps} semitones`);
                 updateDebug(`Transposed to ${steps}`, `${steps} semitones`);
                 return true;
             } catch (error) {
@@ -304,7 +320,7 @@
             }
 
             try {
-                console.log(`Setting zoom level to: ${zoomLevel}`);
+                logMessage(`Setting zoom level to: ${zoomLevel}`);
 
                 // Set the zoom level on OSMD
                 osmd.Zoom = zoomLevel;
@@ -312,7 +328,7 @@
                 // Re-render to apply the zoom
                 osmd.render();
 
-                console.log(`Zoom level set to: ${zoomLevel}`);
+                logMessage(`Zoom level set to: ${zoomLevel}`);
                 updateDebug(`Zoom: ${zoomLevel}`, `${Math.round(zoomLevel * 100)}%`);
                 return true;
             } catch (error) {
@@ -356,7 +372,7 @@
 
             try {
                 osmd.clear();
-                console.log('Display cleared');
+                logMessage('Display cleared');
                 return true;
             } catch (error) {
                 console.error('Failed to clear display:', error);
@@ -371,7 +387,7 @@
             }
 
             try {
-                console.log(`Updating container size to ${width}x${height}`);
+                logMessage(`Updating container size to ${width}x${height}`);
 
                 // Update container dimensions - use width but allow height to grow
                 const container = document.getElementById('osmdContainer');
@@ -396,7 +412,7 @@
                     }, 50); // Small delay to ensure container size is updated
                 }
 
-                console.log('Container size updated successfully');
+                logMessage('Container size updated successfully');
                 return true;
             } catch (error) {
                 console.error('Failed to update container size:', error);
@@ -462,12 +478,12 @@
             }
 
             try {
-                console.log(`Setting page format to: ${format}`);
+                logMessage(`Setting page format to: ${format}`);
 
                 // Set the page format
                 osmd.setPageFormat(format);
 
-                console.log('Page format set successfully');
+                logMessage('Page format set successfully');
                 return true;
             } catch (error) {
                 console.error('Failed to set page format:', error);
@@ -482,7 +498,7 @@
             }
 
             try {
-                console.log(`Updating display options - Title: ${showTitle}, Instrument Names: ${showInstrumentName}, Composer: ${showComposer}`);
+                logMessage(`Updating display options - Title: ${showTitle}, Instrument Names: ${showInstrumentName}, Composer: ${showComposer}`);
 
                 // Update OSMD rules for display options
                 if (osmd.rules) {
@@ -497,7 +513,7 @@
                     osmd.render();
                 }
 
-                console.log('Display options updated successfully');
+                logMessage('Display options updated successfully');
                 return true;
             } catch (error) {
                 console.error('Failed to update display options:', error);
@@ -511,7 +527,7 @@
                 const debugPanel = document.getElementById('debugInfo');
                 if (debugPanel) {
                     debugPanel.style.display = visible ? 'block' : 'none';
-                    console.log(`Debug panel ${visible ? 'shown' : 'hidden'}`);
+                    logMessage(`Debug panel ${visible ? 'shown' : 'hidden'}`);
                     return true;
                 } else {
                     console.warn('Debug panel not found');
@@ -530,7 +546,7 @@
             }
 
             try {
-                console.log(`Setting page margins - Left: ${leftMargin}, Right: ${rightMargin}, Top: ${topMargin}, Bottom: ${bottomMargin}`);
+                logMessage(`Setting page margins - Left: ${leftMargin}, Right: ${rightMargin}, Top: ${topMargin}, Bottom: ${bottomMargin}`);
 
                 // Set the page margins using EngravingRules
                 if (osmd.EngravingRules) {
@@ -548,7 +564,7 @@
                     osmd.render();
                 }
 
-                console.log('Page margins set successfully');
+                logMessage('Page margins set successfully');
                 return true;
             } catch (error) {
                 console.error('Failed to set page margins:', error);
@@ -563,7 +579,7 @@
             }
 
             try {
-                console.log(`Setting system spacing: ${spacing}`);
+                logMessage(`Setting system spacing: ${spacing}`);
 
                 // Set the system spacing using EngravingRules
                 if (osmd.EngravingRules) {
@@ -578,7 +594,7 @@
                     osmd.render();
                 }
 
-                console.log('System spacing set successfully');
+                logMessage('System spacing set successfully');
                 return true;
             } catch (error) {
                 console.error('Failed to set system spacing:', error);
@@ -596,13 +612,13 @@
                 // Debounce resize events for better performance
                 resizeTimeout = setTimeout(() => {
                     try {
-                        console.log('Window resized, re-rendering OSMD');
+                        logMessage('Window resized, re-rendering OSMD');
 
                         // Get current container size
                         const container = document.getElementById('osmdContainer');
                         if (container && osmd.sheet) {
                             const rect = container.getBoundingClientRect();
-                            console.log(`Container size: ${rect.width}x${rect.height}`);
+                            logMessage(`Container size: ${rect.width}x${rect.height}`);
 
                             // Re-render with current content
                             osmd.render();

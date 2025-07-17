@@ -20,6 +20,9 @@ public class SheetMusicCoordinator: NSObject, ObservableObject {
     // MARK: - Callbacks
     public var onReady: (() -> Void)?
     public var onError: ((SheetMusicError) -> Void)?
+
+    // MARK: - Console Messages Control
+    public var showConsoleMessages: Bool = false
     
     // MARK: - Initialization
     public override init() {
@@ -32,9 +35,9 @@ public class SheetMusicCoordinator: NSObject, ObservableObject {
         webView.configuration.userContentController.add(self, name: "osmdBridge")
         webView.navigationDelegate = self
 
-        #if DEBUG
-        print("SheetMusicCoordinator: WebView setup complete")
-        #endif
+        if showConsoleMessages {
+            print("SheetMusicCoordinator: WebView setup complete")
+        }
     }
     
     // MARK: - OSMD Operations
@@ -269,6 +272,23 @@ public class SheetMusicCoordinator: NSObject, ObservableObject {
             throw sheetMusicError
         }
     }
+
+    /// Set console messages visibility in JavaScript
+    public func setConsoleMessagesVisible(_ visible: Bool) async throws {
+        guard isReady else {
+            throw SheetMusicError.notReady
+        }
+
+        do {
+            let script = "osmdSetConsoleMessagesVisible(\(visible ? "true" : "false"))"
+            _ = try await evaluateJavaScript(script)
+        } catch {
+            let sheetMusicError = error as? SheetMusicError ?? SheetMusicError.operationFailed(error.localizedDescription)
+            lastError = sheetMusicError
+            onError?(sheetMusicError)
+            throw sheetMusicError
+        }
+    }
     
     // MARK: - Private Methods
     
@@ -326,29 +346,29 @@ public class SheetMusicCoordinator: NSObject, ObservableObject {
 extension SheetMusicCoordinator: WKScriptMessageHandler {
     public func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
         guard let body = message.body as? [String: Any] else {
-            #if DEBUG
-            print("SheetMusicCoordinator: Received invalid message body")
-            #endif
+            if showConsoleMessages {
+                print("SheetMusicCoordinator: Received invalid message body")
+            }
             return
         }
 
-        #if DEBUG
-        print("SheetMusicCoordinator: Received message: \(body)")
-        #endif
+        if showConsoleMessages {
+            print("SheetMusicCoordinator: Received message: \(body)")
+        }
 
         if let type = body["type"] as? String {
             switch type {
             case "test":
-                #if DEBUG
-                if let message = body["message"] as? String {
-                    print("SheetMusicCoordinator: Test message received: \(message)")
+                if showConsoleMessages {
+                    if let message = body["message"] as? String {
+                        print("SheetMusicCoordinator: Test message received: \(message)")
+                    }
                 }
-                #endif
 
             case "ready":
-                #if DEBUG
-                print("SheetMusicCoordinator: OSMD is ready!")
-                #endif
+                if showConsoleMessages {
+                    print("SheetMusicCoordinator: OSMD is ready!")
+                }
                 isReady = true
                 onReady?()
 
@@ -379,16 +399,16 @@ extension SheetMusicCoordinator: WKScriptMessageHandler {
 // MARK: - WKNavigationDelegate
 extension SheetMusicCoordinator: WKNavigationDelegate {
     public func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
-        #if DEBUG
-        print("SheetMusicCoordinator: WebView finished loading")
-        #endif
+        if showConsoleMessages {
+            print("SheetMusicCoordinator: WebView finished loading")
+        }
         // Web view finished loading, OSMD initialization will be handled by JavaScript
     }
 
     public func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
-        #if DEBUG
-        print("SheetMusicCoordinator: WebView failed to load: \(error.localizedDescription)")
-        #endif
+        if showConsoleMessages {
+            print("SheetMusicCoordinator: WebView failed to load: \(error.localizedDescription)")
+        }
         let sheetMusicError = SheetMusicError.webViewLoadingFailed(error.localizedDescription)
         lastError = sheetMusicError
         onError?(sheetMusicError)

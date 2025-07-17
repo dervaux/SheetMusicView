@@ -19,6 +19,7 @@
 		1A000015294A0000000000002 /* FileURLDemoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A000016294A0000000000002 /* FileURLDemoView.swift */; };
 		9D5642F32E20984400CD7FA8 /* Cazalet-01.musicxml in Resources */ = {isa = PBXBuildFile; fileRef = 9D5642F12E20984400CD7FA8 /* Cazalet-01.musicxml */; };
 		9D5642F42E20984400CD7FA8 /* Cazalet-02.musicxml in Resources */ = {isa = PBXBuildFile; fileRef = 9D5642F22E20984400CD7FA8 /* Cazalet-02.musicxml */; };
+		9DCE648B2E246FF50094E3A8 /* Express_09.musicxml in Resources */ = {isa = PBXBuildFile; fileRef = 9DCE648A2E246FF50094E3A8 /* Express_09.musicxml */; };
 		9DF9EFB92E19FDB4001B4C26 /* chord_progression.musicxml in Resources */ = {isa = PBXBuildFile; fileRef = 9DF9EFB42E19FDB4001B4C26 /* chord_progression.musicxml */; };
 		9DF9EFBA2E19FDB4001B4C26 /* Horn.musicxml in Resources */ = {isa = PBXBuildFile; fileRef = 9DF9EFB52E19FDB4001B4C26 /* Horn.musicxml */; };
 		9DF9EFBB2E19FDB4001B4C26 /* bach_minuet.musicxml in Resources */ = {isa = PBXBuildFile; fileRef = 9DF9EFB32E19FDB4001B4C26 /* bach_minuet.musicxml */; };
@@ -41,6 +42,7 @@
 		1A000016294A0000000000002 /* FileURLDemoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileURLDemoView.swift; sourceTree = "<group>"; };
 		9D5642F12E20984400CD7FA8 /* Cazalet-01.musicxml */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = "Cazalet-01.musicxml"; sourceTree = "<group>"; };
 		9D5642F22E20984400CD7FA8 /* Cazalet-02.musicxml */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = "Cazalet-02.musicxml"; sourceTree = "<group>"; };
+		9DCE648A2E246FF50094E3A8 /* Express_09.musicxml */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = Express_09.musicxml; sourceTree = "<group>"; };
 		9DF9EFB32E19FDB4001B4C26 /* bach_minuet.musicxml */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = bach_minuet.musicxml; sourceTree = "<group>"; };
 		9DF9EFB42E19FDB4001B4C26 /* chord_progression.musicxml */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = chord_progression.musicxml; sourceTree = "<group>"; };
 		9DF9EFB52E19FDB4001B4C26 /* Horn.musicxml */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = Horn.musicxml; sourceTree = "<group>"; };
@@ -113,6 +115,7 @@
 		1A00001B294A0000000000001 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				9DCE648A2E246FF50094E3A8 /* Express_09.musicxml */,
 				9DF9EFB32E19FDB4001B4C26 /* bach_minuet.musicxml */,
 				9DF9EFB42E19FDB4001B4C26 /* chord_progression.musicxml */,
 				9DF9EFB52E19FDB4001B4C26 /* Horn.musicxml */,
@@ -199,6 +202,7 @@
 				9DF9EFBD2E19FDB4001B4C26 /* twinkle.musicxml in Resources */,
 				9DF9EFBE2E19FDB4001B4C26 /* simple_scale.musicxml in Resources */,
 				1A000005294A0000000000001 /* Assets.xcassets in Resources */,
+				9DCE648B2E246FF50094E3A8 /* Express_09.musicxml in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

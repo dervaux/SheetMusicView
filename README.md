@@ -366,6 +366,7 @@ By default, all display elements are **hidden** unless you use their correspondi
 - `.showInstrumentName()` or `.showInstrumentName(Bool)` - Controls whether instrument names are shown
 - `.showComposer()` or `.showComposer(Bool)` - Controls whether the composer name is displayed
 - `.showDebugPanel()` or `.showDebugPanel(Bool)` - Controls whether the debug status panel is displayed
+- `.showConsoleMessages()` or `.showConsoleMessages(Bool)` - Controls whether debug messages are printed to the console (default: false)
 - `.pageMargins(left: Double, right: Double, top: Double, bottom: Double)` - Controls the page margins for the sheet music display (all parameters have default value of 1.0)
 
 #### Debug Panel
@@ -378,12 +379,28 @@ The debug panel provides real-time information about the OSMD engine status and 
 
 The debug panel appears as a semi-transparent overlay in the top-right corner of the view when enabled. It's hidden by default to keep the production interface clean.
 
-**Available Modifiers:**
-- `.showTitle()` or `.showTitle(_ show: Bool)` - Controls whether the piece title is displayed
-- `.showInstrumentName()` or `.showInstrumentName(_ show: Bool)` - Controls whether instrument names are shown
-- `.showComposer()` or `.showComposer(_ show: Bool)` - Controls whether the composer name is displayed
-- `.showDebugPanel()` or `.showDebugPanel(_ show: Bool)` - Controls whether the debug status panel is displayed
-- `.pageMargins(left: Double, right: Double)` - Controls the page margins for the sheet music display
+#### Console Messages
+
+The console messages feature allows you to control whether debug information is printed to the console. This is useful for development and troubleshooting:
+
+```swift
+// Enable console messages for debugging
+SheetMusicView(fileName: "example")
+    .showConsoleMessages(true)
+
+// Or use the shorthand (equivalent to true)
+SheetMusicView(fileName: "example")
+    .showConsoleMessages()
+```
+
+When enabled, you'll see detailed information in the console about:
+- File loading progress and results
+- MusicXML parsing status
+- Rendering operations
+- Error details and troubleshooting information
+- JavaScript bridge communication
+
+**Default Behavior**: Console messages are **disabled by default** to keep the console clean in production. Enable them only when you need to debug issues or understand what's happening internally.
 
 **Modifier Chaining:**
 Modifiers can be chained together and applied in any order:
@@ -394,12 +411,14 @@ SheetMusicView(xml: $musicXML, transposeSteps: $transpose)
     .showTitle(showTitleToggle)
     .showInstrumentName(showInstrumentsToggle)
     .showComposer(showComposerToggle)
+    .showConsoleMessages(debugMode)      // Enable console messages when debugging
 
 // Mixed usage - some with parameters, some without
 SheetMusicView(xml: $musicXML)
     .showTitle()                         // Show title (no parameter = true)
     .showInstrumentName(false)           // Explicitly hide instruments
     .showComposer()                      // Show composer (no parameter = true)
+    .showConsoleMessages()               // Enable console messages for debugging
     .pageMargins(left: 15.0, right: 15.0) // Set custom left/right margins (top/bottom use default 1.0)
 ```
 

@@ -41,9 +41,11 @@ struct FileURLDemoView: View {
                             showingError = true
                         },
                         onReady: {
-                            print("Sheet music loaded from URL: \(fileURL.path)")
+                            // Console messages are controlled by the .showConsoleMessages() modifier
+                            // This print statement is removed to respect the console messages setting
                         }
                     )
+                    .showConsoleMessages(false)
                     .zoomLevel($zoomLevel)
 //                    .pageMargins(left: -3, right: 4)
                     .background(Color.white)
@@ -131,7 +133,7 @@ struct FileURLDemoView: View {
         case .success(let urls):
             if let url = urls.first {
                 selectedFileURL = url
-                print("Selected file: \(url.path)")
+                // File selection is handled silently - console messages are controlled by SheetMusicView modifier
             }
         case .failure(let error):
             lastError = SheetMusicError.loadingFailed("Failed to select file: \(error.localizedDescription)")
